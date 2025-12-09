@@ -14,6 +14,7 @@ const DashboardPage = lazy(() => import("./pages/dashboard"));
 const FormPage = lazy(() => import("./pages/valuationform"));
 const EditValuationPage = lazy(() => import("./pages/ubiShop.jsx"));
 const BofMaharastraEditForm = lazy(() => import("./pages/bomflat.jsx"));
+const UbiApfEditForm = lazy(() => import("./pages/ubiApf.jsx"));
 
 const BillsPage = lazy(() => import("./pages/billspage"));
 const BillForm = lazy(() => import("./components/BillForm"));
@@ -238,6 +239,18 @@ function AppContent() {
                         <ProtectedRoute>
                             <Suspense fallback={<PageLoader />}>
                                 <BofMaharastraEditForm user={user} onLogin={handleLogin} />
+                            </Suspense>
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* Edit Form - UBI APF - Protected Route with Lazy Loading */}
+                <Route
+                    path="/valuationeditformubiapf/:id"
+                    element={
+                        <ProtectedRoute>
+                            <Suspense fallback={<PageLoader />}>
+                                <UbiApfEditForm user={user} onLogin={handleLogin} />
                             </Suspense>
                         </ProtectedRoute>
                     }

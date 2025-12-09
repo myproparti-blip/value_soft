@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "../components/ui";
 import { getAllValuations, requestRework } from "../services/ubiShopService";
 import { getAllBofMaharashtra, requestReworkBofMaharashtra } from "../services/bomFlatService";
+import { getAllUbiApfForms, requestReworkUbiApfForm } from "../services/ubiApfService";
 import { logoutUser } from "../services/auth";
 import { showLoader, hideLoader } from "../redux/slices/loaderSlice";
 import { setCurrentPage, setTotalItems } from "../redux/slices/paginationSlice";
@@ -77,8 +78,8 @@ const DashboardPage = ({ user, onLogout, onLogin }) => {
             formRoute = "/valuationeditform";
             console.log("✅ Routing based on selectedForm='ubiShop'");
         } else if (record?.selectedForm === 'ubiApf') {
-            // UBI APF defaults to standard ubiShop form
-            formRoute = "/valuationeditform";
+            // UBI APF form route
+            formRoute = "/valuationeditformubiapf";
             console.log("✅ Routing based on selectedForm='ubiApf'");
         } else {
             // If no selectedForm, use bank-based routing
@@ -248,11 +249,13 @@ const DashboardPage = ({ user, onLogout, onLogin }) => {
             // Invalidate cache before fetching to ensure fresh data
             invalidateCache("/valuations");
             invalidateCache("/bof-maharashtra");
+            invalidateCache("/ubi-apf");
             
-            // Fetch from both endpoints in parallel
-            const [valuationsResponse, bofResponse] = await Promise.all([
+            // Fetch from all three endpoints in parallel
+            const [valuationsResponse, bofResponse, ubiApfResponse] = await Promise.all([
                 getAllValuations({ username, userRole: role, clientId }).catch(() => ({ data: [] })),
-                getAllBofMaharashtra({ username, userRole: role, clientId }).catch(() => ({ data: [] }))
+                getAllBofMaharashtra({ username, userRole: role, clientId }).catch(() => ({ data: [] })),
+                getAllUbiApfForms({ username, userRole: role, clientId }).catch(() => ({ data: [] }))
             ]);
             
             // Combine responses with formType markers
@@ -260,10 +263,12 @@ const DashboardPage = ({ user, onLogout, onLogin }) => {
                 .map(item => ({ ...item, formType: 'ubiShop' }));
             const bofData = (Array.isArray(bofResponse?.data) ? bofResponse.data : [])
                 .map(item => ({ ...item, formType: 'bomFlat' }));
+            const ubiApfData = (Array.isArray(ubiApfResponse?.data) ? ubiApfResponse.data : [])
+                .map(item => ({ ...item, formType: 'ubiApf' }));
             
             const response = {
                 ...valuationsResponse,
-                data: [...valuationsData, ...bofData]
+                data: [...valuationsData, ...bofData, ...ubiApfData]
             };
             // Handle response format: API returns { success, data: [...], pagination: {...} }
             let filesList = [];
@@ -457,6 +462,10 @@ const DashboardPage = ({ user, onLogout, onLogin }) => {
                 console.log("[handleReworkSubmit] Calling requestReworkBofMaharashtra");
                 await requestReworkBofMaharashtra(reworkingRecordId, reworkComments, username, role);
                 invalidateCache("bof-maharashtra");
+            } else if (reworkingRecord?.formType === 'ubiApf') {
+                console.log("[handleReworkSubmit] Calling requestReworkUbiApfForm");
+                await requestReworkUbiApfForm(reworkingRecordId, reworkComments, username, role);
+                invalidateCache("ubi-apf");
             } else {
                 console.log("[handleReworkSubmit] Calling requestRework (UbiShop)");
                 await requestRework(reworkingRecordId, reworkComments, username, role);

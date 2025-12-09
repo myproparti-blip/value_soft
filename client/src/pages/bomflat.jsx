@@ -535,9 +535,16 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                         } else if (img.fileName) {
                             previewUrl = `/api/uploads/${img.fileName}`;
                         }
-                        return { url: previewUrl, name: img.name || `Property Image ${idx + 1}`, path: img.path || img.fileName || '' };
-                    });
-                setImagePreviews(propertyPreviews);
+                        return {
+                            preview: previewUrl,
+                            file: null,
+                            inputNumber: img.inputNumber || 1
+                        };
+                    })
+                    .filter(preview => preview.preview);
+                if (propertyPreviews.length > 0) {
+                    setImagePreviews(propertyPreviews);
+                }
             }
 
             // Restore location image previews from database
@@ -554,9 +561,15 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                         } else if (img.fileName) {
                             previewUrl = `/api/uploads/${img.fileName}`;
                         }
-                        return { url: previewUrl, name: img.name || `Location Image ${idx + 1}`, path: img.path || img.fileName || '' };
-                    });
-                setLocationImagePreviews(locationPreviews);
+                        return {
+                            preview: previewUrl,
+                            file: null
+                        };
+                    })
+                    .filter(preview => preview.preview);
+                if (locationPreviews.length > 0) {
+                    setLocationImagePreviews(locationPreviews);
+                }
             }
 
             setBankName(dbData.bankName || "");

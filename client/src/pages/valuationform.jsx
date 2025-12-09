@@ -6,6 +6,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Input, Textarea, Labe
 import { v4 as uuidv4 } from "uuid";
 import { createValuation } from "../services/ubiShopService";
 import { createBofMaharashtra } from "../services/bomFlatService";
+import { createUbiApfForm } from "../services/ubiApfService";
 import { isBofMaharashtraBank } from "../config/bankFormMapping";
 import { addCustomOption, getCustomOptions, deleteCustomOption } from "../services/customOptionsService";
 import api, { invalidateCache } from "../services/axios";
@@ -375,14 +376,17 @@ const FormPage = ({ user, onLogin }) => {
             localStorage.removeItem(`valuation_draft_${username}`);
 
             // Route forms based on selectedForm or bank name
-            if (selectedForm === 'bomFlat' || isBofMaharashtraBank(finalBankName)) {
-                console.log("[onFinish] Creating BOF Maharashtra form:", { finalBankName, selectedForm });
-                await createBofMaharashtra(payload);
-            } else {
-                console.log("[onFinish] Creating standard valuation form:", { finalBankName, selectedForm });
-                // Create valuation in database for other banks
-                await createValuation(payload);
-            }
+             if (selectedForm === 'bomFlat' || isBofMaharashtraBank(finalBankName)) {
+                 console.log("[onFinish] Creating BOF Maharashtra form:", { finalBankName, selectedForm });
+                 await createBofMaharashtra(payload);
+             } else if (selectedForm === 'ubiApf') {
+                 console.log("[onFinish] Creating UBI APF form:", { finalBankName, selectedForm });
+                 await createUbiApfForm(payload);
+             } else {
+                 console.log("[onFinish] Creating standard UBI Shop form:", { finalBankName, selectedForm });
+                 // Create valuation in database for other banks
+                 await createValuation(payload);
+             }
 
              // Success - form values remain visible during success notification
              showSuccess("Form submitted successfully!");

@@ -116,8 +116,9 @@ import authRoutes from "./routes/authRoutes.js";
 import imageRoutes from "./routes/imageRoutes.js";
 import customOptionsRoutes from "./routes/customOptionsRoutes.js";
 import billRoutes from "./routes/billRoutes.js";
-import bofMaharastraRoutes from "./routes/bomFlatRoutes.js";
+import ubiApfRoutes from "./routes/ubiApfRoutes.js";
 import valuationRoutes from "./routes/ubiShopRoutes.js";
+import bofMaharastraRoutes from "./routes/bomFlatRoutes.js";
 
 
 app.use("/api/auth", authRoutes);
@@ -125,7 +126,9 @@ app.use("/api/valuations", valuationRoutes);
 app.use("/api/images", imageRoutes);
 app.use("/api/options", customOptionsRoutes);
 app.use("/api/bills", billRoutes);
+app.use("/api/ubi-apf", ubiApfRoutes);
 app.use("/api/bof-maharashtra", bofMaharastraRoutes);
+
 
 app.get("/", (req, res) => {
   res.send("🚀 MERN Backend Running – Production Optimized");
