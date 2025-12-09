@@ -48,7 +48,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
     const [modalAction, setModalAction] = useState(null);
     const [modalFeedback, setModalFeedback] = useState("");
     const [activeTab, setActiveTab] = useState("client");
-    const [activeValuationSubTab, setActiveValuationSubTab] = useState("documents");
+    const [activeValuationSubTab, setActiveValuationSubTab] = useState("general");
     const { showSuccess, showError } = useNotification();
     const [formData, setFormData] = useState({
         // BASIC INFO
@@ -660,7 +660,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                     const value = parseFloat(newPdfDetails[item.valueField]) || 0;
                     return sum + value;
                 }, 0);
-                
+
                 // Round to nearest 1000
                 const roundFigureTotal = Math.round(totalValuation / 1000) * 1000;
 
@@ -1012,46 +1012,46 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
         <div className="space-y-6">
             <div className="mb-6 p-6 bg-blue-50 rounded-2xl border border-blue-100">
                 <h4 className="font-bold text-gray-900 mb-4">Purpose of Valuation</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Purpose of Valuation</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Purpose of Valuation</Label>
                         <Input
                             placeholder="e.g., Mortgage/Loan Purpose"
                             value={formData.pdfDetails?.purposeOfValuation || ""}
                             onChange={(e) => handleValuationChange('purposeOfValuation', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Date of Inspection</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Date of Inspection</Label>
                         <Input
                             type="date"
                             value={formData.pdfDetails?.dateOfInspection || ""}
                             onChange={(e) => handleValuationChange('dateOfInspection', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Date of Valuation Made</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Date of Valuation Made</Label>
                         <Input
                             type="date"
                             value={formData.pdfDetails?.dateOfValuationMade || ""}
                             onChange={(e) => handleValuationChange('dateOfValuationMade', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Place</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Place</Label>
                         <Input
                             type="text"
                             placeholder="e.g., City/Location"
                             value={formData.pdfDetails?.place || ""}
                             onChange={(e) => handleValuationChange('place', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                 </div>
@@ -1071,9 +1071,9 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* OWNER & BRIEF DESCRIPTION */}
             <div className="mb-6 p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
                 <h4 className="font-bold text-gray-900 mb-4">Owner Information</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Owner Name(s) and their Address</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Owner Name(s) and their Address</Label>
                         <Textarea
                             placeholder="Enter owner name and address"
                             value={formData.pdfDetails?.ownerNameAddress || ""}
@@ -1083,8 +1083,8 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             rows="2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Brief Description of the Property</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Brief Description of the Property</Label>
                         <Textarea
                             placeholder="Enter brief description"
                             value={formData.pdfDetails?.briefDescriptionProperty || ""}
@@ -1100,92 +1100,92 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* PROPERTY LOCATION & DESCRIPTION */}
             <div className="mb-6 p-6 bg-cyan-50 rounded-2xl border border-cyan-100">
                 <h4 className="font-bold text-gray-900 mb-4">Location of the property</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">a) Plot No./ Survey No.</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">a) Plot No./ Survey No.</Label>
                         <Input
                             placeholder="e.g., S. No. 26"
                             value={formData.pdfDetails?.plotSurveyNo || ""}
                             onChange={(e) => handleValuationChange('plotSurveyNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">b) Door No.</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">b) Door No.</Label>
                         <Input
                             placeholder="e.g., Hali No. B-4502"
                             value={formData.pdfDetails?.doorNo || ""}
                             onChange={(e) => handleValuationChange('doorNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">c) T.S. No./Village</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">c) T.S. No./Village</Label>
                         <Input
                             placeholder="e.g., Yasai"
                             value={formData.pdfDetails?.tpVillage || ""}
                             onChange={(e) => handleValuationChange('tpVillage', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">d) Ward/Taluka</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">d) Ward/Taluka</Label>
                         <Input
                             placeholder="e.g., Taluka"
                             value={formData.pdfDetails?.wardTaluka || ""}
                             onChange={(e) => handleValuationChange('wardTaluka', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">e) District</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">e) District</Label>
                         <Input
                             placeholder="e.g., District"
                             value={formData.pdfDetails?.mandalDistrict || ""}
                             onChange={(e) => handleValuationChange('mandalDistrict', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">f) Date of issue and validity of layout plan</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">f) Date of issue and validity of layout plan</Label>
                         <Input
                             type="date"
                             value={formData.pdfDetails?.layoutPlanIssueDate || ""}
                             onChange={(e) => handleValuationChange('layoutPlanIssueDate', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">g) Approved map/plan issuing authority </Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">g) Approved map/plan issuing authority </Label>
                         <Input
                             placeholder="e.g., CIDCO"
                             value={formData.pdfDetails?.approvedMapAuthority || ""}
                             onChange={(e) => handleValuationChange('approvedMapAuthority', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">h) Whether authenticity of approved map/plan is verified</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">h) Whether authenticity of approved map/plan is verified</Label>
                         <select
                             value={formData.pdfDetails?.authenticityVerified || ""}
                             onChange={(e) => handleValuationChange('authenticityVerified', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Status</option>
                             <option value="Verified">Yes</option>
                             <option value="Not Verified">Not</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">i) Any other conveniences provided by our approved plan</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">i) Any other conveniences provided by our approved plan</Label>
                         <Textarea
                             placeholder="e.g., Parking, Amenities, etc."
                             value={formData.pdfDetails?.otherApprovedPlanDetails || ""}
@@ -1195,17 +1195,17 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             rows="2"
                         />
                     </div>
-            
-                    
+
+
                 </div>
             </div>
 
             {/* POSTAL ADDRESS & CLASSIFICATION */}
             <div className="mb-6 p-6 bg-violet-50 rounded-2xl border border-violet-100">
                 <h4 className="font-bold text-gray-900 mb-4">Property Classification & Address</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Postal Address of the property</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Postal Address of the property</Label>
                         <Textarea
                             placeholder="Enter full address"
                             value={formData.pdfDetails?.postalAddress || ""}
@@ -1215,14 +1215,14 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             rows="3"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">City/Town</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">City/Town</Label>
                         <Input
                             placeholder="e.g., Mumbai"
                             value={formData.pdfDetails?.cityTown || ""}
                             onChange={(e) => handleValuationChange('cityTown', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
@@ -1480,25 +1480,25 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* DIMENSIONS OF THE PROPERTY */}
             <div className="mb-6 p-6 bg-blue-50 rounded-2xl border border-blue-100">
                 <h4 className="font-bold text-gray-900 mb-4">Dimensions of the Unit</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Dimensions (as per Document)</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Dimensions (as per Document)</Label>
                         <Input
                             placeholder="e.g., 28.88 Sq. ft. / 2.88 Sq. ft."
                             value={formData.pdfDetails?.dimensionsDeed || ""}
                             onChange={(e) => handleValuationChange('dimensionsDeed', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Dimensions (as per Actuals)</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Dimensions (as per Actuals)</Label>
                         <Input
                             placeholder="e.g., 28.88 Sq. ft. / 2.88 Sq. ft."
                             value={formData.pdfDetails?.dimensionsActual || ""}
                             onChange={(e) => handleValuationChange('dimensionsActual', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
@@ -1507,54 +1507,54 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* EXTENT OF THE UNIT */}
             <div className="mb-6 p-6 bg-green-50 rounded-2xl border border-green-100">
                 <h4 className="font-bold text-gray-900 mb-4">Extent of the site</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Extent of Site</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Extent of Site</Label>
                         <Input
                             placeholder="e.g., ₹ 40,34,950 per Sq. ft."
                             value={formData.pdfDetails?.extentOfUnit || ""}
                             onChange={(e) => handleValuationChange('extentOfUnit', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Latitude/Longitude</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Latitude/Longitude</Label>
                         <Input
                             placeholder="e.g., 19°07'53.2 N & 73°00"
                             value={formData.pdfDetails?.latitudeLongitude || ""}
                             onChange={(e) => handleValuationChange('latitudeLongitude', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    
+
                 </div>
             </div>
 
             {/* EXTENT OF SITE & RENT */}
             <div className="mb-6 p-6 bg-yellow-50 rounded-2xl border border-yellow-100">
                 <h4 className="font-bold text-gray-900 mb-4">Extent & Occupancy Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Extent of Site Considered for Valuation</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Extent of Site Considered for Valuation</Label>
                         <Input
                             placeholder="e.g., Area in Sq. ft."
                             value={formData.pdfDetails?.extentOfSiteValuation || ""}
                             onChange={(e) => handleValuationChange('extentOfSiteValuation', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Whether occupied by the owner/tenant? If occupied by tenant, since how long? Rent 
-    received per month </Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Whether occupied by the owner/tenant? If occupied by tenant, since how long? Rent
+                            received per month </Label>
                         <Input
                             placeholder="Owner/ Tenant & Rent Amount"
                             value={formData.pdfDetails?.rentReceivedPerMonth || ""}
                             onChange={(e) => handleValuationChange('rentReceivedPerMonth', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
@@ -1563,14 +1563,14 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* AREA CLASSIFICATION */}
             <div className="mb-6 p-6 bg-teal-50 rounded-2xl border border-teal-100">
                 <h4 className="font-bold text-gray-900 mb-4">Area Classification</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">High/Middle/Poor</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">High/Middle/Poor</Label>
                         <select
                             value={formData.pdfDetails?.areaClassification || ""}
                             onChange={(e) => handleValuationChange('areaClassification', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select</option>
                             <option value="High">High</option>
@@ -1578,13 +1578,13 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             <option value="Poor">Poor</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Metro / Urban / Semi-Urban / Rural</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Metro / Urban / Semi-Urban / Rural</Label>
                         <select
                             value={formData.pdfDetails?.urbanClassification || ""}
                             onChange={(e) => handleValuationChange('urbanClassification', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select</option>
                             <option value="Metro">Metro</option>
@@ -1593,13 +1593,13 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             <option value="Rural">Rural</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Government Type / Comming Under</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Government Type / Comming Under</Label>
                         <select
                             value={formData.pdfDetails?.governmentType || ""}
                             onChange={(e) => handleValuationChange('governmentType', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Type</option>
                             <option value="Municipal">Municipality</option>
@@ -1608,13 +1608,13 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             <option value="Village Panchayat">Village Panchayat</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Whether covered under any Govt. Enactments</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Whether covered under any Govt. Enactments</Label>
                         <select
                             value={formData.pdfDetails?.govtEnactmentsCovered || ""}
                             onChange={(e) => handleValuationChange('govtEnactmentsCovered', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
@@ -1666,109 +1666,109 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
         return (
             <div className="space-y-6">
                 {/* VALUATION ITEMS TABLE */}
-                <div className="mb-6 p-4 bg-rose-50 rounded-2xl border border-rose-100">
-                    <h4 className="font-bold text-gray-900 mb-3">Valuation Details Table</h4>
+                <div className="mb-6 p-6 bg-rose-50 rounded-2xl border border-rose-100">
+                    <h4 className="font-bold text-gray-900 mb-4 text-base">Valuation Details Table</h4>
                     <div className="w-full overflow-x-auto">
-                        <table className="min-w-full text-sm border-collapse">
+                        <table className="min-w-full border-collapse text-xs">
                             <thead>
                                 <tr className="bg-rose-100 border border-rose-200">
-                                    <th className="px-2 py-2 text-left font-bold text-gray-900 border border-rose-200 min-w-[50px]">Sr. No.</th>
-                                    <th className="px-2 py-2 text-left font-bold text-gray-900 border border-rose-200 min-w-[200px]">Description</th>
-                                    <th className="px-2 py-2 text-left font-bold text-gray-900 border border-rose-200 min-w-[120px]">Qty/Sq. ft.</th>
-                                    <th className="px-2 py-2 text-left font-bold text-gray-900 border border-rose-200 min-w-[140px]">Rate</th>
-                                    <th className="px-2 py-2 text-left font-bold text-gray-900 border border-rose-200 min-w-[150px]">Estimated Value</th>
+                                    <th className="px-2 py-3 text-left font-bold text-gray-900 border border-rose-200 min-w-[50px]">Sr. No.</th>
+                                    <th className="px-2 py-3 text-left font-bold text-gray-900 border border-rose-200 min-w-[200px]">Description</th>
+                                    <th className="px-2 py-3 text-left font-bold text-gray-900 border border-rose-200 min-w-[120px]">Qty/Sq. ft.</th>
+                                    <th className="px-2 py-3 text-left font-bold text-gray-900 border border-rose-200 min-w-[140px]">Rate</th>
+                                    <th className="px-2 py-3 text-left font-bold text-gray-900 border border-rose-200 min-w-[150px]">Estimated Value</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {/* Present Value of Flat */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">1</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Present Value of Hard Built up area</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.presentValueQty || ""} onChange={(e) => handleValuationChange('presentValueQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.presentValueRate || ""} onChange={(e) => handleValuationChange('presentValueRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.presentValue || ""} onChange={(e) => handleValuationChange('presentValue', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">1</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Present Value of Hard Built up area</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.presentValueQty || ""} onChange={(e) => handleValuationChange('presentValueQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.presentValueRate || ""} onChange={(e) => handleValuationChange('presentValueRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.presentValue || ""} onChange={(e) => handleValuationChange('presentValue', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Wardrobes */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">2</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Wardrobes</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.wardrobesQty || ""} onChange={(e) => handleValuationChange('wardrobesQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.wardrobesRate || ""} onChange={(e) => handleValuationChange('wardrobesRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.wardrobes || ""} onChange={(e) => handleValuationChange('wardrobes', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">2</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Wardrobes</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.wardrobesQty || ""} onChange={(e) => handleValuationChange('wardrobesQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.wardrobesRate || ""} onChange={(e) => handleValuationChange('wardrobesRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.wardrobes || ""} onChange={(e) => handleValuationChange('wardrobes', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Showcases */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">3</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Show cases, Almirah</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.showcasesQty || ""} onChange={(e) => handleValuationChange('showcasesQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.showcasesRate || ""} onChange={(e) => handleValuationChange('showcasesRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.showcases || ""} onChange={(e) => handleValuationChange('showcases', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">3</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Show cases, Almirah</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.showcasesQty || ""} onChange={(e) => handleValuationChange('showcasesQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.showcasesRate || ""} onChange={(e) => handleValuationChange('showcasesRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.showcases || ""} onChange={(e) => handleValuationChange('showcases', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Kitchen Arrangements */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">4</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Kitchen arrangements</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.kitchenArrangementsQty || ""} onChange={(e) => handleValuationChange('kitchenArrangementsQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.kitchenArrangementsRate || ""} onChange={(e) => handleValuationChange('kitchenArrangementsRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.kitchenArrangements || ""} onChange={(e) => handleValuationChange('kitchenArrangements', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">4</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Kitchen arrangements</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.kitchenArrangementsQty || ""} onChange={(e) => handleValuationChange('kitchenArrangementsQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.kitchenArrangementsRate || ""} onChange={(e) => handleValuationChange('kitchenArrangementsRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.kitchenArrangements || ""} onChange={(e) => handleValuationChange('kitchenArrangements', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Superficial Finish */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">5</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Superfine Finish</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.superfineFinishQty || ""} onChange={(e) => handleValuationChange('superfineFinishQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.superfineFinishRate || ""} onChange={(e) => handleValuationChange('superfineFinishRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.superfineFinish || ""} onChange={(e) => handleValuationChange('superfineFinish', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">5</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Superfine Finish</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.superfineFinishQty || ""} onChange={(e) => handleValuationChange('superfineFinishQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.superfineFinishRate || ""} onChange={(e) => handleValuationChange('superfineFinishRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.superfineFinish || ""} onChange={(e) => handleValuationChange('superfineFinish', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Interiors, Decorations */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">6</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Interior Decorations</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.interiorDecorationsQty || ""} onChange={(e) => handleValuationChange('interiorDecorationsQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.interiorDecorationsRate || ""} onChange={(e) => handleValuationChange('interiorDecorationsRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.interiorDecorations || ""} onChange={(e) => handleValuationChange('interiorDecorations', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">6</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Interior Decorations</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.interiorDecorationsQty || ""} onChange={(e) => handleValuationChange('interiorDecorationsQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.interiorDecorationsRate || ""} onChange={(e) => handleValuationChange('interiorDecorationsRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.interiorDecorations || ""} onChange={(e) => handleValuationChange('interiorDecorations', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Electrical Deposits */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">7</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Electricity Deposits</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.electricityDepositsQty || ""} onChange={(e) => handleValuationChange('electricityDepositsQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.electricityDepositsRate || ""} onChange={(e) => handleValuationChange('electricityDepositsRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.electricityDeposits || ""} onChange={(e) => handleValuationChange('electricityDeposits', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">7</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Electricity Deposits</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.electricityDepositsQty || ""} onChange={(e) => handleValuationChange('electricityDepositsQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.electricityDepositsRate || ""} onChange={(e) => handleValuationChange('electricityDepositsRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.electricityDeposits || ""} onChange={(e) => handleValuationChange('electricityDeposits', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Collapsible Gates */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">8</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Collapsible Gates</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.collapsibleGatesQty || ""} onChange={(e) => handleValuationChange('collapsibleGatesQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.collapsibleGatesRate || ""} onChange={(e) => handleValuationChange('collapsibleGatesRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.collapsibleGates || ""} onChange={(e) => handleValuationChange('collapsibleGates', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">8</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Collapsible Gates</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.collapsibleGatesQty || ""} onChange={(e) => handleValuationChange('collapsibleGatesQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.collapsibleGatesRate || ""} onChange={(e) => handleValuationChange('collapsibleGatesRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.collapsibleGates || ""} onChange={(e) => handleValuationChange('collapsibleGates', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Potential Value */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">9</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Potential Value</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.potentialValueQty || ""} onChange={(e) => handleValuationChange('potentialValueQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.potentialValueRate || ""} onChange={(e) => handleValuationChange('potentialValueRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.potentialValue || ""} onChange={(e) => handleValuationChange('potentialValue', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">9</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Potential Value</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.potentialValueQty || ""} onChange={(e) => handleValuationChange('potentialValueQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.potentialValueRate || ""} onChange={(e) => handleValuationChange('potentialValueRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.potentialValue || ""} onChange={(e) => handleValuationChange('potentialValue', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Others */}
                                 <tr className="border border-rose-200">
-                                    <td className="px-2 py-2 border border-rose-200 text-sm font-bold text-center">10</td>
-                                    <td className="px-2 py-2 border border-rose-200 text-sm">Others</td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.otherItemsQty || ""} onChange={(e) => handleValuationChange('otherItemsQty', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.otherItemsRate || ""} onChange={(e) => handleValuationChange('otherItemsRate', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
-                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.otherItems || ""} onChange={(e) => handleValuationChange('otherItems', e.target.value)} disabled={!canEdit} className="h-7 text-xs border border-neutral-300 bg-white rounded" /></td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs font-bold text-center">10</td>
+                                    <td className="px-2 py-2 border border-rose-200 text-xs">Others</td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.otherItemsQty || ""} onChange={(e) => handleValuationChange('otherItemsQty', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.otherItemsRate || ""} onChange={(e) => handleValuationChange('otherItemsRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
+                                    <td className="px-2 py-2 border border-rose-200"><Input type="number" value={formData.pdfDetails?.otherItems || ""} onChange={(e) => handleValuationChange('otherItems', e.target.value)} disabled={!canEdit} className="h-8 text-xs border border-neutral-300 bg-white rounded px-2 w-full" /></td>
                                 </tr>
                                 {/* Total Row */}
                                 <tr className="bg-rose-200 border border-rose-300 font-bold">
-                                    <td colSpan="4" className="px-2 py-2 border border-rose-300 text-sm text-right">TOTAL</td>
-                                    <td className="px-2 py-2 border border-rose-300 text-sm text-gray-900">{formatIndianCurrency(totalValuation)}</td>
+                                    <td colSpan="4" className="px-2 py-3 border border-rose-300 text-xs text-right">TOTAL</td>
+                                    <td className="px-2 py-3 border border-rose-300 text-xs text-gray-900">{formatIndianCurrency(totalValuation)}</td>
                                 </tr>
                                 {/* Round Figure Row */}
                                 <tr className="bg-orange-200 border border-orange-300 font-bold">
-                                    <td colSpan="4" className="px-2 py-2 border border-orange-300 text-sm text-right">ROUND FIGURE</td>
-                                    <td className="px-2 py-2 border border-orange-300 text-sm text-gray-900">{formatIndianCurrency(roundFigureTotal)}</td>
+                                    <td colSpan="4" className="px-2 py-3 border border-orange-300 text-xs text-right">ROUND FIGURE</td>
+                                    <td className="px-2 py-3 border border-orange-300 text-xs text-gray-900">{formatIndianCurrency(roundFigureTotal)}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1777,72 +1777,72 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
 
                 {/* VALUE OF FLAT - AUTO-CALCULATED RESULTS SECTION */}
                 <div className="mb-6 p-6 bg-teal-50 rounded-2xl border border-teal-100">
-                    <h4 className="font-bold text-gray-900 mb-4">Value of Flat - Auto-Calculated Results</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label className="text-sm font-bold text-gray-900">Total Valuation (Market Value)</Label>
+                    <h4 className="font-bold text-gray-900 mb-4 text-base">Value of Flat - Auto-Calculated Results</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold text-gray-900">Total Valuation (Market Value)</Label>
                             <Input
                                 type="number"
                                 placeholder="Auto-calculated or enter value"
                                 value={formData.pdfDetails?.fairMarketValue || ""}
                                 onChange={(e) => handleValuationChange('fairMarketValue', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                                className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label className="text-sm font-bold text-gray-900">Realisable Value (90%)</Label>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold text-gray-900">Realisable Value (90%)</Label>
                             <Input
                                 type="number"
                                 placeholder="Auto-calculated or enter value"
                                 value={formData.pdfDetails?.realizableValue || ""}
                                 onChange={(e) => handleValuationChange('realizableValue', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                                className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label className="text-sm font-bold text-gray-900">Distress Value (80%)</Label>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold text-gray-900">Distress Value (80%)</Label>
                             <Input
                                 type="number"
                                 placeholder="Auto-calculated or enter value"
                                 value={formData.pdfDetails?.distressValue || ""}
                                 onChange={(e) => handleValuationChange('distressValue', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                                className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label className="text-sm font-bold text-gray-900">Insurable Value (35%)</Label>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold text-gray-900">Insurable Value (35%)</Label>
                             <Input
                                 type="number"
                                 placeholder="Auto-calculated or enter value"
                                 value={formData.pdfDetails?.insurableValue || ""}
                                 onChange={(e) => handleValuationChange('insurableValue', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                                className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label className="text-sm font-bold text-gray-900">Agreement Value</Label>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold text-gray-900">Agreement Value</Label>
                             <Input
                                 type="number"
                                 placeholder="Enter Agreement Value"
                                 value={formData.pdfDetails?.agreementValue || ""}
                                 onChange={(e) => handleValuationChange('agreementValue', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                                className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <Label className="text-sm font-bold text-gray-900">Value as per Circle Rate</Label>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold text-gray-900">Value as per Circle Rate</Label>
                             <Input
                                 type="number"
                                 placeholder="Enter Value as per Circle Rate"
                                 value={formData.pdfDetails?.valueCircleRate || ""}
                                 onChange={(e) => handleValuationChange('valueCircleRate', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200"
+                                className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
                             />
                         </div>
                     </div>
@@ -1851,14 +1851,14 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                 {/* APARTMENT NATURE & LOCATION */}
                 <div className="mb-6 p-6 bg-green-50 rounded-2xl border border-green-100">
                     <h4 className="font-bold text-gray-900 mb-4">Apartment Nature & Location</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         <div className="space-y-2">
                             <Label className="text-sm font-bold text-gray-900">Nature of the Apartment</Label>
                             <select
                                 value={formData.pdfDetails?.apartmentNature || ""}
                                 onChange={(e) => handleValuationChange('apartmentNature', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                             >
                                 <option value="">Select</option>
                                 <option value="Residential">Residential</option>
@@ -1873,7 +1873,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.apartmentLocation || ""}
                                 onChange={(e) => handleValuationChange('apartmentLocation', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                             />
                         </div>
                     </div>
@@ -1885,7 +1885,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.apartmentCTSNo || ""}
                                 onChange={(e) => handleValuationChange('apartmentCTSNo', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                             />
                         </div>
                         <div className="space-y-2">
@@ -1895,7 +1895,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.apartmentSectorNo || ""}
                                 onChange={(e) => handleValuationChange('apartmentSectorNo', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                             />
                         </div>
                     </div>
@@ -1907,7 +1907,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.apartmentBlockNo || ""}
                                 onChange={(e) => handleValuationChange('apartmentBlockNo', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                             />
                         </div>
                         <div className="space-y-2">
@@ -1917,7 +1917,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.apartmentWardNo || ""}
                                 onChange={(e) => handleValuationChange('apartmentWardNo', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                             />
                         </div>
                     </div>
@@ -1929,7 +1929,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.apartmentVillageMunicipalityCounty || ""}
                                 onChange={(e) => handleValuationChange('apartmentVillageMunicipalityCounty', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                             />
                         </div>
                         <div className="space-y-2">
@@ -1939,7 +1939,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.apartmentDoorNoStreetRoad || ""}
                                 onChange={(e) => handleValuationChange('apartmentDoorNoStreetRoad', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                             />
                         </div>
                     </div>
@@ -1951,7 +1951,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.apartmentPinCode || ""}
                                 onChange={(e) => handleValuationChange('apartmentPinCode', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                             />
                         </div>
                     </div>
@@ -1960,14 +1960,14 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                 {/* BUILDING & CONSTRUCTION DETAILS */}
                 <div className="mb-6 p-6 bg-amber-50 rounded-2xl border border-amber-100">
                     <h4 className="font-bold text-gray-900 mb-4">Building & Construction Details</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         <div className="space-y-2">
                             <Label className="text-sm font-bold text-gray-900">Description of the locality (Residential / Commercial / Mixed)</Label>
                             <select
                                 value={formData.pdfDetails?.descriptionOfLocalityResidentialCommercialMixed || ""}
                                 onChange={(e) => handleValuationChange('descriptionOfLocalityResidentialCommercialMixed', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                             >
                                 <option value="">Select Type</option>
                                 <option value="Residential">Residential</option>
@@ -1982,7 +1982,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.yearOfConstruction || ""}
                                 onChange={(e) => handleValuationChange('yearOfConstruction', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                             />
                         </div>
                         <div className="space-y-2">
@@ -1992,7 +1992,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.numberOfFloors || ""}
                                 onChange={(e) => handleValuationChange('numberOfFloors', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                             />
                         </div>
                         <div className="space-y-2">
@@ -2001,7 +2001,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.typeOfStructure || ""}
                                 onChange={(e) => handleValuationChange('typeOfStructure', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                             >
                                 <option value="">Select Structure</option>
                                 <option value="RCC Frame with Masonry">RCC Frame with Masonry</option>
@@ -2016,7 +2016,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.numberOfDwellingUnitsInBuilding || ""}
                                 onChange={(e) => handleValuationChange('numberOfDwellingUnitsInBuilding', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                             />
                         </div>
                         <div className="space-y-2">
@@ -2025,7 +2025,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.qualityOfConstruction || ""}
                                 onChange={(e) => handleValuationChange('qualityOfConstruction', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                             >
                                 <option value="">Select Quality</option>
                                 <option value="Good">Good</option>
@@ -2039,7 +2039,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.appearanceOfBuilding || ""}
                                 onChange={(e) => handleValuationChange('appearanceOfBuilding', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                             >
                                 <option value="">Select Appearance</option>
                                 <option value="Good">Good</option>
@@ -2053,7 +2053,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                                 value={formData.pdfDetails?.maintenanceOfBuilding || ""}
                                 onChange={(e) => handleValuationChange('maintenanceOfBuilding', e.target.value)}
                                 disabled={!canEdit}
-                                className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                                className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                             >
                                 <option value="">Select Maintenance</option>
                                 <option value="Good">Good</option>
@@ -2070,7 +2070,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div className="space-y-2">
                             <Label className="text-sm font-bold text-gray-900">Lift</Label>
-                            <select value={formData.pdfDetails?.liftAvailable || ""} onChange={(e) => handleValuationChange('liftAvailable', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                            <select value={formData.pdfDetails?.liftAvailable || ""} onChange={(e) => handleValuationChange('liftAvailable', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                                 <option value="">Select</option>
                                 <option value="Available">Available</option>
                                 <option value="Not Available">Not Available</option>
@@ -2078,7 +2078,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                         </div>
                         <div className="space-y-2">
                             <Label className="text-sm font-bold text-gray-900">Protected water supply</Label>
-                            <select value={formData.pdfDetails?.protectedWaterSupply || ""} onChange={(e) => handleValuationChange('protectedWaterSupply', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                            <select value={formData.pdfDetails?.protectedWaterSupply || ""} onChange={(e) => handleValuationChange('protectedWaterSupply', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                                 <option value="">Select</option>
                                 <option value="Available">Available</option>
                                 <option value="Not Available">Not Available</option>
@@ -2086,7 +2086,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                         </div>
                         <div className="space-y-2">
                             <Label className="text-sm font-bold text-gray-900">Underground Sewerage</Label>
-                            <select value={formData.pdfDetails?.undergroundSewerage || ""} onChange={(e) => handleValuationChange('undergroundSewerage', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                            <select value={formData.pdfDetails?.undergroundSewerage || ""} onChange={(e) => handleValuationChange('undergroundSewerage', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                                 <option value="">Select</option>
                                 <option value="Available">Available</option>
                                 <option value="Not Available">Not Available</option>
@@ -2094,7 +2094,7 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                         </div>
                         <div className="space-y-2">
                             <Label className="text-sm font-bold text-gray-900">Car parking (Open/Covered)</Label>
-                            <select value={formData.pdfDetails?.carParkingOpenCovered || ""} onChange={(e) => handleValuationChange('carParkingOpenCovered', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                            <select value={formData.pdfDetails?.carParkingOpenCovered || ""} onChange={(e) => handleValuationChange('carParkingOpenCovered', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                                 <option value="">Select</option>
                                 <option value="Open">Open</option>
                                 <option value="Covered">Covered</option>
@@ -2103,28 +2103,28 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                         </div>
                         <div className="space-y-2">
                             <Label className="text-sm font-bold text-gray-900">Compound Wall</Label>
-                            <select value={formData.pdfDetails?.isCompoundWallExisting || ""} onChange={(e) => handleValuationChange('isCompoundWallExisting', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                            <select value={formData.pdfDetails?.isCompoundWallExisting || ""} onChange={(e) => handleValuationChange('isCompoundWallExisting', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                                 <option value="">Select</option>
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select>
                         </div>
                         <div className="space-y-2">
-                             <Label className="text-sm font-bold text-gray-900">Pavement around the building</Label>
-                             <select value={formData.pdfDetails?.isPavementLaidAroundBuilding || ""} onChange={(e) => handleValuationChange('isPavementLaidAroundBuilding', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
-                                 <option value="">Select</option>
-                                 <option value="Yes">Yes</option>
-                                 <option value="No">No</option>
-                             </select>
-                         </div>
-                         <div className="space-y-2">
-                             <Label className="text-sm font-bold text-gray-900">Any others facility</Label>
-                             <select value={formData.pdfDetails?.othersFacility || ""} onChange={(e) => handleValuationChange('othersFacility', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
-                                 <option value="">Select</option>
-                                 <option value="Yes">Yes</option>
-                                 <option value="No">No</option>
-                             </select>
-                         </div>
+                            <Label className="text-sm font-bold text-gray-900">Pavement around the building</Label>
+                            <select value={formData.pdfDetails?.isPavementLaidAroundBuilding || ""} onChange={(e) => handleValuationChange('isPavementLaidAroundBuilding', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-sm font-bold text-gray-900">Any others facility</Label>
+                            <select value={formData.pdfDetails?.othersFacility || ""} onChange={(e) => handleValuationChange('othersFacility', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
+                                <option value="">Select</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2135,39 +2135,39 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
         <div className="space-y-6">
             {/* IV MARKETABILITY SECTION */}
             <div className="mb-6 p-6 bg-cyan-50 rounded-2xl border border-cyan-100">
-                <h4 className="font-bold text-gray-900 mb-4"> Marketability</h4>
-                <div className="space-y-4">
-                    <div>
-                        <Label className="text-sm font-bold text-gray-900 mb-2 block">1. How is the marketability?</Label>
+                <h4 className="font-bold text-gray-900 mb-4 text-base">Marketability</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-gray-900 block">Marketability</Label>
                         <Textarea
-                            placeholder="The Marketability of the property is good based on following factors..."
+                            placeholder="e.g., Property is good..."
                             value={formData.pdfDetails?.marketability || ""}
                             onChange={(e) => handleValuationChange('marketability', e.target.value)}
                             disabled={!canEdit}
-                            className="text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                            rows="3"
+                            className="text-xs rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none"
+                            rows="2"
                         />
                     </div>
-                    <div>
-                        <Label className="text-sm font-bold text-gray-900 mb-2 block">2. What are the factors favoring for an extra potential value?</Label>
+                    <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-gray-900 block">Favoring Factors</Label>
                         <Textarea
-                            placeholder="All civic amenities are nearby & within easy to reach. The location is well connected by roads & railways to destination..."
+                            placeholder="e.g., Amenities nearby..."
                             value={formData.pdfDetails?.favoringFactors || ""}
                             onChange={(e) => handleValuationChange('favoringFactors', e.target.value)}
                             disabled={!canEdit}
-                            className="text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                            rows="3"
+                            className="text-xs rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none"
+                            rows="2"
                         />
                     </div>
-                    <div>
-                        <Label className="text-sm font-bold text-gray-900 mb-2 block">3. Any negative factors observed which affect</Label>
+                    <div className="md:col-span-2 space-y-1.5">
+                        <Label className="text-xs font-bold text-gray-900 block">Negative Factors</Label>
                         <Textarea
-                            placeholder="No such negative factors observed"
+                            placeholder="e.g., No negative factors"
                             value={formData.pdfDetails?.negativeFactors || ""}
                             onChange={(e) => handleValuationChange('negativeFactors', e.target.value)}
                             disabled={!canEdit}
-                            className="text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                            rows="3"
+                            className="text-xs rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none"
+                            rows="2"
                         />
                     </div>
                 </div>
@@ -2175,39 +2175,39 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
 
             {/* RATE SECTION */}
             <div className="mb-6 p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
-                <h4 className="font-bold text-gray-900 mb-4">Rate</h4>
-                <div className="space-y-4">
-                    <div>
-                        <Label className="text-sm font-bold text-gray-900 mb-2 block">After analyzing the comparative rates what is the applicable rate for a similar property?</Label>
+                <h4 className="font-bold text-gray-900 mb-4 text-base">Rate Analysis</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-gray-900 block">Applicable Rate</Label>
                         <Textarea
-                            placeholder="After analyzing the comparative rates in a specific rate of similar property..."
+                            placeholder="e.g., Rate per sq.ft..."
                             value={formData.pdfDetails?.marketabilityDescription || ""}
                             onChange={(e) => handleValuationChange('marketabilityDescription', e.target.value)}
                             disabled={!canEdit}
-                            className="text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                            rows="3"
+                            className="text-xs rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none"
+                            rows="2"
                         />
                     </div>
-                    <div>
-                        <Label className="text-sm font-bold text-gray-900 mb-2 block">Assuming is a new construction Wh is the applicable rate for the square of land?</Label>
+                    <div className="space-y-1.5">
+                        <Label className="text-xs font-bold text-gray-900 block">Land Rate (New Const.)</Label>
                         <Textarea
-                            placeholder="Assuming a new construction wh is..."
+                            placeholder="e.g., Land rate..."
                             value={formData.pdfDetails?.smallFlatDescription || ""}
                             onChange={(e) => handleValuationChange('smallFlatDescription', e.target.value)}
                             disabled={!canEdit}
-                            className="text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                            rows="3"
+                            className="text-xs rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none"
+                            rows="2"
                         />
                     </div>
-                    <div>
-                        <Label className="text-sm font-bold text-gray-900 mb-2 block">Considering the above Rate</Label>
+                    <div className="md:col-span-2 space-y-1.5">
+                        <Label className="text-xs font-bold text-gray-900 block">Rate Adjustments</Label>
                         <Textarea
-                            placeholder="Considering the above rate..."
+                            placeholder="e.g., Adjustments..."
                             value={formData.pdfDetails?.rateAdjustments || ""}
                             onChange={(e) => handleValuationChange('rateAdjustments', e.target.value)}
                             disabled={!canEdit}
-                            className="text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                            rows="3"
+                            className="text-xs rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none"
+                            rows="2"
                         />
                     </div>
                 </div>
@@ -2216,25 +2216,25 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* BREAK-UP FOR THE RATE */}
             <div className="mb-6 p-6 bg-purple-50 rounded-2xl border border-purple-100">
                 <h4 className="font-bold text-gray-900 mb-4"> Break-up for the above Rate</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Building + Services </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Building + Services </Label>
                         <Input
                             placeholder="e.g., ₹ 3,000/- per Sq. ft."
                             value={formData.pdfDetails?.buildingServicesRate || ""}
                             onChange={(e) => handleValuationChange('buildingServicesRate', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Land + Other </Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Land + Other </Label>
                         <Input
                             placeholder="e.g., ₹ 15,000/- per Sq. ft."
                             value={formData.pdfDetails?.landOthersRate || ""}
                             onChange={(e) => handleValuationChange('landOthersRate', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                 </div>
@@ -2243,65 +2243,65 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* COMPOSITE RATE AFTER DEPRECIATION */}
             <div className="mb-6 p-6 bg-orange-50 rounded-2xl border border-orange-100">
                 <h4 className="font-bold text-gray-900 mb-4">Composite Rate after depreciation</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Depreciation Building Date</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Depreciation Building Date</Label>
                         <Input
                             type="date"
                             value={formData.pdfDetails?.depreciationBuildingDate || ""}
                             onChange={(e) => handleValuationChange('depreciationBuildingDate', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Replacement Cost Services</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Replacement Cost Services</Label>
                         <Input
                             placeholder="e.g., ₹ Value"
                             value={formData.pdfDetails?.replacementCostServices || ""}
                             onChange={(e) => handleValuationChange('replacementCostServices', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Age of the Building/Assumed</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Age of the Building/Assumed</Label>
                         <Input
                             placeholder="e.g., 42 years"
                             value={formData.pdfDetails?.buildingAge || ""}
                             onChange={(e) => handleValuationChange('buildingAge', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Future Life of Building estimated</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Future Life of Building estimated</Label>
                         <Input
                             placeholder="e.g., 18 years"
                             value={formData.pdfDetails?.buildingLife || ""}
                             onChange={(e) => handleValuationChange('buildingLife', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Depreciation percentage</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Depreciation percentage</Label>
                         <Input
                             placeholder="e.g., 58 %"
                             value={formData.pdfDetails?.depreciationPercentage || ""}
                             onChange={(e) => handleValuationChange('depreciationPercentage', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Depreciation Rate of the building </Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Depreciation Rate of the building </Label>
                         <Input
                             placeholder="e.g., Value"
                             value={formData.pdfDetails?.depreciationStorage || ""}
                             onChange={(e) => handleValuationChange('depreciationStorage', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                 </div>
@@ -2310,35 +2310,35 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* TOTAL COMPOSITE RATE */}
             <div className="mb-6 p-6 bg-green-50 rounded-2xl border border-green-100">
                 <h4 className="font-bold text-gray-900 mb-4">Total Composite Rate</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Total Composite Rate</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Total Composite Rate</Label>
                         <Input
                             placeholder="e.g., ₹ Value"
                             value={formData.pdfDetails?.totalCompositeRate || ""}
                             onChange={(e) => handleValuationChange('totalCompositeRate', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Depreciated Building Rate</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Depreciated Building Rate</Label>
                         <Input
                             placeholder="e.g., ₹ Value per Sq. ft."
                             value={formData.pdfDetails?.depreciatedBuildingRate || ""}
                             onChange={(e) => handleValuationChange('depreciatedBuildingRate', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Rate for Land & Other</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Rate for Land & Other</Label>
                         <Input
                             placeholder="e.g., ₹ Value"
                             value={formData.pdfDetails?.rateForLandOther || ""}
                             onChange={(e) => handleValuationChange('rateForLandOther', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                 </div>
@@ -2347,14 +2347,14 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* FLAT/UNIT SPECIFICATIONS */}
             <div className="mb-6 p-6 bg-sky-50 rounded-2xl border border-sky-100">
                 <h4 className="font-bold text-gray-900 mb-4">Unit Specifications</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">The floor in which the Unit is situated</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">The floor in which the Unit is situated</Label>
                         <select
                             value={formData.pdfDetails?.unitFloor || ""}
                             onChange={(e) => handleValuationChange('unitFloor', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Floor</option>
                             <option value="Ground">Ground</option>
@@ -2364,150 +2364,150 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             <option value="Higher">Higher</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Door Number of the Flat</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Door Number of the Flat</Label>
                         <Input
                             placeholder="e.g., Flat No. B-402"
                             value={formData.pdfDetails?.unitDoorNo || ""}
                             onChange={(e) => handleValuationChange('unitDoorNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Specifications - Roof</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Specifications - Roof</Label>
                         <Input
                             placeholder="e.g., RCC"
                             value={formData.pdfDetails?.unitRoof || ""}
                             onChange={(e) => handleValuationChange('unitRoof', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Specifications - Flooring</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Specifications - Flooring</Label>
                         <Input
                             placeholder="e.g., Marble/Tiles"
                             value={formData.pdfDetails?.unitFlooring || ""}
                             onChange={(e) => handleValuationChange('unitFlooring', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Specifications - Doors & Windows</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Specifications - Doors & Windows</Label>
                         <Input
                             placeholder="e.g., Details"
                             value={formData.pdfDetails?.unitDoors || ""}
                             onChange={(e) => handleValuationChange('unitDoors', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specifications - Bath & WC</Label>
-                         <Input
-                             placeholder="e.g., Details"
-                             value={formData.pdfDetails?.unitBathAndWC || ""}
-                             onChange={(e) => handleValuationChange('unitBathAndWC', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specifications - Electrical Wiring</Label>
-                         <Input
-                             placeholder="e.g., Details"
-                             value={formData.pdfDetails?.unitElectricalWiring || ""}
-                             onChange={(e) => handleValuationChange('unitElectricalWiring', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specification of the Flat</Label>
-                         <Input
-                             placeholder="e.g., 1RK, 2BHK, 3BHK"
-                             value={formData.pdfDetails?.unitSpecification || ""}
-                             onChange={(e) => handleValuationChange('unitSpecification', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specifications - Fittings</Label>
-                         <Input
-                             placeholder="e.g., Details"
-                             value={formData.pdfDetails?.unitFittings || ""}
-                             onChange={(e) => handleValuationChange('unitFittings', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specifications - Finishing</Label>
-                         <Input
-                             placeholder="e.g., Details"
-                             value={formData.pdfDetails?.unitFinishing || ""}
-                             onChange={(e) => handleValuationChange('unitFinishing', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
+                        <Label className="text-sm font-bold text-gray-900">Specifications - Bath & WC</Label>
+                        <Input
+                            placeholder="e.g., Details"
+                            value={formData.pdfDetails?.unitBathAndWC || ""}
+                            onChange={(e) => handleValuationChange('unitBathAndWC', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">Specifications - Electrical Wiring</Label>
+                        <Input
+                            placeholder="e.g., Details"
+                            value={formData.pdfDetails?.unitElectricalWiring || ""}
+                            onChange={(e) => handleValuationChange('unitElectricalWiring', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">Specification of the Flat</Label>
+                        <Input
+                            placeholder="e.g., 1RK, 2BHK, 3BHK"
+                            value={formData.pdfDetails?.unitSpecification || ""}
+                            onChange={(e) => handleValuationChange('unitSpecification', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">Specifications - Fittings</Label>
+                        <Input
+                            placeholder="e.g., Details"
+                            value={formData.pdfDetails?.unitFittings || ""}
+                            onChange={(e) => handleValuationChange('unitFittings', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">Specifications - Finishing</Label>
+                        <Input
+                            placeholder="e.g., Details"
+                            value={formData.pdfDetails?.unitFinishing || ""}
+                            onChange={(e) => handleValuationChange('unitFinishing', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
                 </div>
             </div>
 
             {/* ELECTRICITY SERVICE */}
             <div className="mb-6 p-6 bg-yellow-50 rounded-2xl border border-yellow-100">
                 <h4 className="font-bold text-gray-900 mb-4">Electricity Service Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Electricity service connection number Meter 
-            card is in the name of </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Electricity service connection number Meter
+                            card is in the name of </Label>
                         <Input
                             placeholder="e.g., Service Number"
                             value={formData.pdfDetails?.electricityServiceNo || ""}
                             onChange={(e) => handleValuationChange('electricityServiceNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    
+
                 </div>
             </div>
 
             {/* UNIT TAX/ASSESSMENT */}
             <div className="mb-6 p-6 bg-lime-50 rounded-2xl border border-lime-100">
                 <h4 className="font-bold text-gray-900 mb-4">Unit Tax & Assessment</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Assessment No.</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Assessment No.</Label>
                         <Input
                             placeholder="e.g., Assessment No."
                             value={formData.pdfDetails?.assessmentNo || ""}
                             onChange={(e) => handleValuationChange('assessmentNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Tax Paid Name</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Tax Paid Name</Label>
                         <Input
                             placeholder="e.g., Name"
                             value={formData.pdfDetails?.taxPaidName || ""}
                             onChange={(e) => handleValuationChange('taxPaidName', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Tax Amount</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Tax Amount</Label>
                         <Input
                             placeholder="e.g., Amount"
                             value={formData.pdfDetails?.taxAmount || ""}
                             onChange={(e) => handleValuationChange('taxAmount', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                 </div>
@@ -2517,14 +2517,14 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             <div className="mb-6 p-6 bg-pink-50 rounded-2xl border border-pink-100">
                 <h4 className="font-bold text-gray-900 mb-4">Agreement for Sale</h4>
                 <div className="grid grid-cols-1 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Agreement for Sale executed Name</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Agreement for Sale executed Name</Label>
                         <Input
                             placeholder="e.g., Agreement Name/Details"
                             value={formData.pdfDetails?.agreementSaleExecutedName || ""}
                             onChange={(e) => handleValuationChange('agreementSaleExecutedName', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                 </div>
@@ -2533,62 +2533,62 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* UNIT AREA DETAILS */}
             <div className="mb-6 p-6 bg-orange-50 rounded-2xl border border-orange-100">
                 <h4 className="font-bold text-gray-900 mb-4">Area Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">What is the undivided area of the land as per 
-            sale deed ? </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">What is the undivided area of the land as per
+                            sale deed ? </Label>
                         <Input
                             placeholder="e.g., Area in Sq. ft."
                             value={formData.pdfDetails?.undividedAreaLand || ""}
                             onChange={(e) => handleValuationChange('undividedAreaLand', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Plinth Area of Flat </Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Plinth Area of Flat </Label>
                         <Input
                             placeholder="e.g., 278.57 Sq ft"
                             value={formData.pdfDetails?.plinthArea || ""}
                             onChange={(e) => handleValuationChange('plinthArea', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Carpet Area of Flat</Label>
-                         <Input
-                             placeholder="e.g., Area in Sq. ft."
-                             value={formData.pdfDetails?.carpetArea || ""}
-                             onChange={(e) => handleValuationChange('carpetArea', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">What is the floor space index?</Label>
-                         <Input
-                             placeholder="e.g., FSI value"
-                             value={formData.pdfDetails?.floorSpaceIndex || ""}
-                             onChange={(e) => handleValuationChange('floorSpaceIndex', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                         />
-                     </div>
+                        <Label className="text-sm font-bold text-gray-900">Carpet Area of Flat</Label>
+                        <Input
+                            placeholder="e.g., Area in Sq. ft."
+                            value={formData.pdfDetails?.carpetArea || ""}
+                            onChange={(e) => handleValuationChange('carpetArea', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        />
                     </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">What is the floor space index?</Label>
+                        <Input
+                            placeholder="e.g., FSI value"
+                            value={formData.pdfDetails?.floorSpaceIndex || ""}
+                            onChange={(e) => handleValuationChange('floorSpaceIndex', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        />
                     </div>
+                </div>
+            </div>
 
             {/* UNIT MAINTENANCE */}
             <div className="mb-6 p-6 bg-fuchsia-50 rounded-2xl border border-fuchsia-100">
                 <h4 className="font-bold text-gray-900 mb-4">Unit Maintenance</h4>
                 <div className="grid grid-cols-1 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">How is the maintenance of the Flat ?</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">How is the maintenance of the Flat ?</Label>
                         <select
                             value={formData.pdfDetails?.unitMaintenance || ""}
                             onChange={(e) => handleValuationChange('unitMaintenance', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 px-3"
                         >
                             <option value="">Select</option>
                             <option value="Good">Good</option>
@@ -2602,68 +2602,68 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* UNIT CLASSIFICATION */}
             <div className="mb-6 p-6 bg-purple-50 rounded-2xl border border-purple-100">
                 <h4 className="font-bold text-gray-900 mb-4">Unit Classification</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Classification - Posh</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Classification - Posh</Label>
                         <Input
                             placeholder="e.g., Details"
                             value={formData.pdfDetails?.classificationPosh || ""}
                             onChange={(e) => handleValuationChange('classificationPosh', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Classification - Usage</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Classification - Usage</Label>
                         <Input
                             placeholder="e.g., Residential/Commercial"
                             value={formData.pdfDetails?.classificationUsage || ""}
                             onChange={(e) => handleValuationChange('classificationUsage', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Is it owner occupied or tenanted?</Label>
-                         <select
-                             value={formData.pdfDetails?.ownerOccupancyStatus || ""}
-                             onChange={(e) => handleValuationChange('ownerOccupancyStatus', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 px-3"
-                         >
-                             <option value="">Select</option>
-                             <option value="Owner Occupied">Owner Occupied</option>
-                             <option value="Tenanted">Tenanted</option>
-                         </select>
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">If tenanted, what is the monthly rent?</Label>
-                         <Input
-                             placeholder="e.g., Amount"
-                             value={formData.pdfDetails?.monthlyRent || ""}
-                             onChange={(e) => handleValuationChange('monthlyRent', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                         />
-                     </div>
+                        <Label className="text-sm font-bold text-gray-900">Is it owner occupied or tenanted?</Label>
+                        <select
+                            value={formData.pdfDetails?.ownerOccupancyStatus || ""}
+                            onChange={(e) => handleValuationChange('ownerOccupancyStatus', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 px-3"
+                        >
+                            <option value="">Select</option>
+                            <option value="Owner Occupied">Owner Occupied</option>
+                            <option value="Tenanted">Tenanted</option>
+                        </select>
                     </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">If tenanted, what is the monthly rent?</Label>
+                        <Input
+                            placeholder="e.g., Amount"
+                            value={formData.pdfDetails?.monthlyRent || ""}
+                            onChange={(e) => handleValuationChange('monthlyRent', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        />
                     </div>
+                </div>
             </div>
-            );
+        </div>
+    );
 
     const renderBuildingTab = () => (
         <div className="space-y-6">
             {/* APARTMENT NATURE & LOCATION */}
             <div className="mb-6 p-6 bg-green-50 rounded-2xl border border-green-100">
                 <h4 className="font-bold text-gray-900 mb-4">Apartment Nature & Location</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Nature of the Apartment</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Nature of the Apartment</Label>
                         <select
                             value={formData.pdfDetails?.apartmentNature || ""}
                             onChange={(e) => handleValuationChange('apartmentNature', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select</option>
                             <option value="Residential">Residential</option>
@@ -2671,92 +2671,92 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             <option value="Mixed">Mixed</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Location</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Location</Label>
                         <Input
                             placeholder="e.g., CIDCO"
                             value={formData.pdfDetails?.apartmentLocation || ""}
                             onChange={(e) => handleValuationChange('apartmentLocation', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">C.T.S. No.</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">C.T.S. No.</Label>
                         <Input
                             placeholder="e.g., Plot number"
                             value={formData.pdfDetails?.apartmentCTSNo || ""}
                             onChange={(e) => handleValuationChange('apartmentCTSNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Sector No.</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Sector No.</Label>
                         <Input
                             placeholder="e.g., 26"
                             value={formData.pdfDetails?.apartmentSectorNo || ""}
                             onChange={(e) => handleValuationChange('apartmentSectorNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Block No.</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Block No.</Label>
                         <Input
                             placeholder="e.g., A"
                             value={formData.pdfDetails?.apartmentBlockNo || ""}
                             onChange={(e) => handleValuationChange('apartmentBlockNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Ward No.</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Ward No.</Label>
                         <Input
                             placeholder="e.g., --"
                             value={formData.pdfDetails?.apartmentWardNo || ""}
                             onChange={(e) => handleValuationChange('apartmentWardNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Village / Municipality / Corporation</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Village / Municipality / Corporation</Label>
                         <Input
                             placeholder="e.g., CIDCO"
                             value={formData.pdfDetails?.apartmentVillageMunicipalityCounty || ""}
                             onChange={(e) => handleValuationChange('apartmentVillageMunicipalityCounty', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Door No. / Street or Road</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Door No. / Street or Road</Label>
                         <Input
                             placeholder="e.g., Flat No. B-45/0:2"
                             value={formData.pdfDetails?.apartmentDoorNoStreetRoad || ""}
                             onChange={(e) => handleValuationChange('apartmentDoorNoStreetRoad', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Pin Code</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Pin Code</Label>
                         <Input
                             placeholder="e.g., 400703"
                             value={formData.pdfDetails?.apartmentPinCode || ""}
                             onChange={(e) => handleValuationChange('apartmentPinCode', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
@@ -2765,14 +2765,14 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* BUILDING & CONSTRUCTION DETAILS */}
             <div className="mb-6 p-6 bg-amber-50 rounded-2xl border border-amber-100">
                 <h4 className="font-bold text-gray-900 mb-4">Building & Construction Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Description of the locality (Residential / Commercial / Mixed)</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Description of the locality (Residential / Commercial / Mixed)</Label>
                         <select
                             value={formData.pdfDetails?.descriptionOfLocalityResidentialCommercialMixed || ""}
                             onChange={(e) => handleValuationChange('descriptionOfLocalityResidentialCommercialMixed', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Type</option>
                             <option value="Residential">Residential</option>
@@ -2780,33 +2780,33 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             <option value="Mixed">Mixed</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Year of Construction</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Year of Construction</Label>
                         <Input
                             placeholder="e.g., 1993"
                             value={formData.pdfDetails?.yearOfConstruction || ""}
                             onChange={(e) => handleValuationChange('yearOfConstruction', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Number of Floors</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Number of Floors</Label>
                         <Input
                             placeholder="e.g., 5"
                             value={formData.pdfDetails?.numberOfFloors || ""}
                             onChange={(e) => handleValuationChange('numberOfFloors', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Type of structure</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Type of structure</Label>
                         <select
                             value={formData.pdfDetails?.typeOfStructure || ""}
                             onChange={(e) => handleValuationChange('typeOfStructure', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Structure</option>
                             <option value="RCC Frame with Masonry">RCC Frame with Masonry</option>
@@ -2814,23 +2814,23 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             <option value="Steel Frame">Steel Frame</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Number of dwelling units in the building</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Number of dwelling units in the building</Label>
                         <Input
                             placeholder="e.g., 10"
                             value={formData.pdfDetails?.numberOfDwellingUnitsInBuilding || ""}
                             onChange={(e) => handleValuationChange('numberOfDwellingUnitsInBuilding', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Quality of Construction</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Quality of Construction</Label>
                         <select
                             value={formData.pdfDetails?.qualityOfConstruction || ""}
                             onChange={(e) => handleValuationChange('qualityOfConstruction', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Quality</option>
                             <option value="Good">Good</option>
@@ -2838,13 +2838,13 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             <option value="Poor">Poor</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Appearance of the Building</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Appearance of the Building</Label>
                         <select
                             value={formData.pdfDetails?.appearanceOfBuilding || ""}
                             onChange={(e) => handleValuationChange('appearanceOfBuilding', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Appearance</option>
                             <option value="Good">Good</option>
@@ -2852,13 +2852,13 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             <option value="Poor">Poor</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Maintenance of the Building</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Maintenance of the Building</Label>
                         <select
                             value={formData.pdfDetails?.maintenanceOfBuilding || ""}
                             onChange={(e) => handleValuationChange('maintenanceOfBuilding', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Maintenance</option>
                             <option value="Good">Good</option>
@@ -2873,65 +2873,65 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             <div className="mb-6 p-6 bg-neutral-50 rounded-xl border border-neutral-200">
                 <h4 className="font-bold text-gray-900 mb-4">Facilities Available</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Lift</Label>
-                        <select value={formData.pdfDetails?.liftAvailable || ""} onChange={(e) => handleValuationChange('liftAvailable', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Lift</Label>
+                        <select value={formData.pdfDetails?.liftAvailable || ""} onChange={(e) => handleValuationChange('liftAvailable', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                             <option value="">Select</option>
                             <option value="Available">Available</option>
                             <option value="Not Available">Not Available</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Protected water supply</Label>
-                        <select value={formData.pdfDetails?.protectedWaterSupply || ""} onChange={(e) => handleValuationChange('protectedWaterSupply', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Protected water supply</Label>
+                        <select value={formData.pdfDetails?.protectedWaterSupply || ""} onChange={(e) => handleValuationChange('protectedWaterSupply', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                             <option value="">Select</option>
                             <option value="Available">Available</option>
                             <option value="Not Available">Not Available</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Underground Sewerage</Label>
-                        <select value={formData.pdfDetails?.undergroundSewerage || ""} onChange={(e) => handleValuationChange('undergroundSewerage', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Underground Sewerage</Label>
+                        <select value={formData.pdfDetails?.undergroundSewerage || ""} onChange={(e) => handleValuationChange('undergroundSewerage', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                             <option value="">Select</option>
                             <option value="Available">Available</option>
                             <option value="Not Available">Not Available</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Car parking (Open/Covered)</Label>
-                        <select value={formData.pdfDetails?.carParkingOpenCovered || ""} onChange={(e) => handleValuationChange('carParkingOpenCovered', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Car parking (Open/Covered)</Label>
+                        <select value={formData.pdfDetails?.carParkingOpenCovered || ""} onChange={(e) => handleValuationChange('carParkingOpenCovered', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                             <option value="">Select</option>
                             <option value="Open">Open</option>
                             <option value="Covered">Covered</option>
                             <option value="Not Available">Not Available</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Compound Wall</Label>
-                        <select value={formData.pdfDetails?.isCompoundWallExisting || ""} onChange={(e) => handleValuationChange('isCompoundWallExisting', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Compound Wall</Label>
+                        <select value={formData.pdfDetails?.isCompoundWallExisting || ""} onChange={(e) => handleValuationChange('isCompoundWallExisting', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
                             <option value="No">No</option>
                         </select>
                     </div>
                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Pavement around the building</Label>
-                         <select value={formData.pdfDetails?.isPavementLaidAroundBuilding || ""} onChange={(e) => handleValuationChange('isPavementLaidAroundBuilding', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
-                             <option value="">Select</option>
-                             <option value="Yes">Yes</option>
-                             <option value="No">No</option>
-                         </select>
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Any others facility</Label>
-                         <select value={formData.pdfDetails?.othersFacility || ""} onChange={(e) => handleValuationChange('othersFacility', e.target.value)} disabled={!canEdit} className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3">
-                             <option value="">Select</option>
-                             <option value="Yes">Yes</option>
-                             <option value="No">No</option>
-                         </select>
-                     </div>
+                        <Label className="text-sm font-bold text-gray-900">Pavement around the building</Label>
+                        <select value={formData.pdfDetails?.isPavementLaidAroundBuilding || ""} onChange={(e) => handleValuationChange('isPavementLaidAroundBuilding', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
                     </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">Any others facility</Label>
+                        <select value={formData.pdfDetails?.othersFacility || ""} onChange={(e) => handleValuationChange('othersFacility', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
                     </div>
+                </div>
+            </div>
         </div>
     );
 
@@ -2940,92 +2940,92 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* PROPERTY LOCATION & DESCRIPTION */}
             <div className="mb-6 p-6 bg-cyan-50 rounded-2xl border border-cyan-100">
                 <h4 className="font-bold text-gray-900 mb-4">Location of the property</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">a) Plot No./ Survey No.</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">a) Plot No./ Survey No.</Label>
                         <Input
                             placeholder="e.g., S. No. 26"
                             value={formData.pdfDetails?.plotSurveyNo || ""}
                             onChange={(e) => handleValuationChange('plotSurveyNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">b) Door No.</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">b) Door No.</Label>
                         <Input
                             placeholder="e.g., Hali No. B-4502"
                             value={formData.pdfDetails?.doorNo || ""}
                             onChange={(e) => handleValuationChange('doorNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">c) T.S. No./Village</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">c) T.S. No./Village</Label>
                         <Input
                             placeholder="e.g., Yasai"
                             value={formData.pdfDetails?.tpVillage || ""}
                             onChange={(e) => handleValuationChange('tpVillage', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">d) Ward/Taluka</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">d) Ward/Taluka</Label>
                         <Input
                             placeholder="e.g., Taluka"
                             value={formData.pdfDetails?.wardTaluka || ""}
                             onChange={(e) => handleValuationChange('wardTaluka', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">e) District</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">e) District</Label>
                         <Input
                             placeholder="e.g., District"
                             value={formData.pdfDetails?.mandalDistrict || ""}
                             onChange={(e) => handleValuationChange('mandalDistrict', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">f) Date of issue and validity of layout plan</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">f) Date of issue and validity of layout plan</Label>
                         <Input
                             type="date"
                             value={formData.pdfDetails?.layoutPlanIssueDate || ""}
                             onChange={(e) => handleValuationChange('layoutPlanIssueDate', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">g) Approved map/plan issuing authority </Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">g) Approved map/plan issuing authority </Label>
                         <Input
                             placeholder="e.g., CIDCO"
                             value={formData.pdfDetails?.approvedMapAuthority || ""}
                             onChange={(e) => handleValuationChange('approvedMapAuthority', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">h) Whether authenticity of approved map/plan is verified</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">h) Whether authenticity of approved map/plan is verified</Label>
                         <select
                             value={formData.pdfDetails?.authenticityVerified || ""}
                             onChange={(e) => handleValuationChange('authenticityVerified', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Status</option>
                             <option value="Verified">Yes</option>
                             <option value="Not Verified">Not</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">i) Any other conveniences provided by our approved plan</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">i) Any other conveniences provided by our approved plan</Label>
                         <Textarea
                             placeholder="e.g., Parking, Amenities, etc."
                             value={formData.pdfDetails?.otherApprovedPlanDetails || ""}
@@ -3035,17 +3035,17 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             rows="2"
                         />
                     </div>
-            
-                    
+
+
                 </div>
             </div>
 
             {/* POSTAL ADDRESS & CLASSIFICATION */}
             <div className="mb-6 p-6 bg-violet-50 rounded-2xl border border-violet-100">
                 <h4 className="font-bold text-gray-900 mb-4">Property Classification & Address</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Postal Address of the property</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Postal Address of the property</Label>
                         <Textarea
                             placeholder="Enter full address"
                             value={formData.pdfDetails?.postalAddress || ""}
@@ -3055,14 +3055,14 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
                             rows="3"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">City/Town</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">City/Town</Label>
                         <Input
                             placeholder="e.g., Mumbai"
                             value={formData.pdfDetails?.cityTown || ""}
                             onChange={(e) => handleValuationChange('cityTown', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
@@ -3320,25 +3320,25 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* DIMENSIONS OF THE PROPERTY */}
             <div className="mb-6 p-6 bg-blue-50 rounded-2xl border border-blue-100">
                 <h4 className="font-bold text-gray-900 mb-4">Dimensions of the Unit</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Dimensions (as per Document)</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Dimensions (as per Document)</Label>
                         <Input
                             placeholder="e.g., 28.88 Sq. ft. / 2.88 Sq. ft."
                             value={formData.pdfDetails?.dimensionsDeed || ""}
                             onChange={(e) => handleValuationChange('dimensionsDeed', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Dimensions (as per Actuals)</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Dimensions (as per Actuals)</Label>
                         <Input
                             placeholder="e.g., 28.88 Sq. ft. / 2.88 Sq. ft."
                             value={formData.pdfDetails?.dimensionsActual || ""}
                             onChange={(e) => handleValuationChange('dimensionsActual', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
@@ -3347,54 +3347,54 @@ const BOfMaharastraEditForm = ({ user, onLogin }) => {
             {/* EXTENT OF THE UNIT */}
             <div className="mb-6 p-6 bg-green-50 rounded-2xl border border-green-100">
                 <h4 className="font-bold text-gray-900 mb-4">Extent of the site</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Extent of Site</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Extent of Site</Label>
                         <Input
                             placeholder="e.g., ₹ 40,34,950 per Sq. ft."
                             value={formData.pdfDetails?.extentOfUnit || ""}
                             onChange={(e) => handleValuationChange('extentOfUnit', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Latitude/Longitude</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Latitude/Longitude</Label>
                         <Input
                             placeholder="e.g., 19°07'53.2 N & 73°00"
                             value={formData.pdfDetails?.latitudeLongitude || ""}
                             onChange={(e) => handleValuationChange('latitudeLongitude', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    
+
                 </div>
             </div>
 
             {/* EXTENT OF SITE & RENT */}
             <div className="mb-6 p-6 bg-yellow-50 rounded-2xl border border-yellow-100">
                 <h4 className="font-bold text-gray-900 mb-4">Extent & Occupancy Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Extent of Site Considered for Valuation</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Extent of Site Considered for Valuation</Label>
                         <Input
                             placeholder="e.g., Area in Sq. ft."
                             value={formData.pdfDetails?.extentOfSiteValuation || ""}
                             onChange={(e) => handleValuationChange('extentOfSiteValuation', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Whether occupied by the owner/tenant? If occupied by tenant, since how long? Rent 
-received per month </Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Whether occupied by the owner/tenant? If occupied by tenant, since how long? Rent
+                            received per month </Label>
                         <Input
                             placeholder="Owner/ Tenant & Rent Amount"
                             value={formData.pdfDetails?.rentReceivedPerMonth || ""}
                             onChange={(e) => handleValuationChange('rentReceivedPerMonth', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                 </div>
@@ -3403,14 +3403,14 @@ received per month </Label>
             {/* AREA CLASSIFICATION */}
             <div className="mb-6 p-6 bg-teal-50 rounded-2xl border border-teal-100">
                 <h4 className="font-bold text-gray-900 mb-4">Area Classification</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">High/Middle/Poor</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">High/Middle/Poor</Label>
                         <select
                             value={formData.pdfDetails?.areaClassification || ""}
                             onChange={(e) => handleValuationChange('areaClassification', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select</option>
                             <option value="High">High</option>
@@ -3418,13 +3418,13 @@ received per month </Label>
                             <option value="Poor">Poor</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Metro / Urban / Semi-Urban / Rural</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Metro / Urban / Semi-Urban / Rural</Label>
                         <select
                             value={formData.pdfDetails?.urbanClassification || ""}
                             onChange={(e) => handleValuationChange('urbanClassification', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select</option>
                             <option value="Metro">Metro</option>
@@ -3433,13 +3433,13 @@ received per month </Label>
                             <option value="Rural">Rural</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Government Type / Comming Under</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Government Type / Comming Under</Label>
                         <select
                             value={formData.pdfDetails?.governmentType || ""}
                             onChange={(e) => handleValuationChange('governmentType', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Type</option>
                             <option value="Municipal">Municipality</option>
@@ -3448,13 +3448,13 @@ received per month </Label>
                             <option value="Village Panchayat">Village Panchayat</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Whether covered under any Govt. Enactments</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Whether covered under any Govt. Enactments</Label>
                         <select
                             value={formData.pdfDetails?.govtEnactmentsCovered || ""}
                             onChange={(e) => handleValuationChange('govtEnactmentsCovered', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select</option>
                             <option value="Yes">Yes</option>
@@ -3471,14 +3471,14 @@ received per month </Label>
             {/* FLAT/UNIT SPECIFICATIONS */}
             <div className="mb-6 p-6 bg-sky-50 rounded-2xl border border-sky-100">
                 <h4 className="font-bold text-gray-900 mb-4">Unit Specifications</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">The floor in which the Unit is situated</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">The floor in which the Unit is situated</Label>
                         <select
                             value={formData.pdfDetails?.unitFloor || ""}
                             onChange={(e) => handleValuationChange('unitFloor', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white px-3"
                         >
                             <option value="">Select Floor</option>
                             <option value="Ground">Ground</option>
@@ -3488,150 +3488,150 @@ received per month </Label>
                             <option value="Higher">Higher</option>
                         </select>
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Door Number of the Flat</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Door Number of the Flat</Label>
                         <Input
                             placeholder="e.g., Flat No. B-402"
                             value={formData.pdfDetails?.unitDoorNo || ""}
                             onChange={(e) => handleValuationChange('unitDoorNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Specifications - Roof</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Specifications - Roof</Label>
                         <Input
                             placeholder="e.g., RCC"
                             value={formData.pdfDetails?.unitRoof || ""}
                             onChange={(e) => handleValuationChange('unitRoof', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Specifications - Flooring</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Specifications - Flooring</Label>
                         <Input
                             placeholder="e.g., Marble/Tiles"
                             value={formData.pdfDetails?.unitFlooring || ""}
                             onChange={(e) => handleValuationChange('unitFlooring', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Specifications - Doors & Windows</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Specifications - Doors & Windows</Label>
                         <Input
                             placeholder="e.g., Details"
                             value={formData.pdfDetails?.unitDoors || ""}
                             onChange={(e) => handleValuationChange('unitDoors', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
                         />
                     </div>
                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specifications - Bath & WC</Label>
-                         <Input
-                             placeholder="e.g., Details"
-                             value={formData.pdfDetails?.unitBathAndWC || ""}
-                             onChange={(e) => handleValuationChange('unitBathAndWC', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specifications - Electrical Wiring</Label>
-                         <Input
-                             placeholder="e.g., Details"
-                             value={formData.pdfDetails?.unitElectricalWiring || ""}
-                             onChange={(e) => handleValuationChange('unitElectricalWiring', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specification of the Flat</Label>
-                         <Input
-                             placeholder="e.g., 1RK, 2BHK, 3BHK"
-                             value={formData.pdfDetails?.unitSpecification || ""}
-                             onChange={(e) => handleValuationChange('unitSpecification', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specifications - Fittings</Label>
-                         <Input
-                             placeholder="e.g., Details"
-                             value={formData.pdfDetails?.unitFittings || ""}
-                             onChange={(e) => handleValuationChange('unitFittings', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Specifications - Finishing</Label>
-                         <Input
-                             placeholder="e.g., Details"
-                             value={formData.pdfDetails?.unitFinishing || ""}
-                             onChange={(e) => handleValuationChange('unitFinishing', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300"
-                         />
-                     </div>
+                        <Label className="text-sm font-bold text-gray-900">Specifications - Bath & WC</Label>
+                        <Input
+                            placeholder="e.g., Details"
+                            value={formData.pdfDetails?.unitBathAndWC || ""}
+                            onChange={(e) => handleValuationChange('unitBathAndWC', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">Specifications - Electrical Wiring</Label>
+                        <Input
+                            placeholder="e.g., Details"
+                            value={formData.pdfDetails?.unitElectricalWiring || ""}
+                            onChange={(e) => handleValuationChange('unitElectricalWiring', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">Specification of the Flat</Label>
+                        <Input
+                            placeholder="e.g., 1RK, 2BHK, 3BHK"
+                            value={formData.pdfDetails?.unitSpecification || ""}
+                            onChange={(e) => handleValuationChange('unitSpecification', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">Specifications - Fittings</Label>
+                        <Input
+                            placeholder="e.g., Details"
+                            value={formData.pdfDetails?.unitFittings || ""}
+                            onChange={(e) => handleValuationChange('unitFittings', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">Specifications - Finishing</Label>
+                        <Input
+                            placeholder="e.g., Details"
+                            value={formData.pdfDetails?.unitFinishing || ""}
+                            onChange={(e) => handleValuationChange('unitFinishing', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2"
+                        />
+                    </div>
                 </div>
             </div>
 
             {/* ELECTRICITY SERVICE */}
             <div className="mb-6 p-6 bg-yellow-50 rounded-2xl border border-yellow-100">
                 <h4 className="font-bold text-gray-900 mb-4">Electricity Service Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Electricity service connection number Meter 
-card is in the name of </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Electricity service connection number Meter
+                            card is in the name of </Label>
                         <Input
                             placeholder="e.g., Service Number"
                             value={formData.pdfDetails?.electricityServiceNo || ""}
                             onChange={(e) => handleValuationChange('electricityServiceNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    
+
                 </div>
             </div>
 
             {/* UNIT TAX/ASSESSMENT */}
             <div className="mb-6 p-6 bg-lime-50 rounded-2xl border border-lime-100">
                 <h4 className="font-bold text-gray-900 mb-4">Unit Tax & Assessment</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Assessment No.</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Assessment No.</Label>
                         <Input
                             placeholder="e.g., Assessment No."
                             value={formData.pdfDetails?.assessmentNo || ""}
                             onChange={(e) => handleValuationChange('assessmentNo', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Tax Paid Name</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Tax Paid Name</Label>
                         <Input
                             placeholder="e.g., Name"
                             value={formData.pdfDetails?.taxPaidName || ""}
                             onChange={(e) => handleValuationChange('taxPaidName', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Tax Amount</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Tax Amount</Label>
                         <Input
                             placeholder="e.g., Amount"
                             value={formData.pdfDetails?.taxAmount || ""}
                             onChange={(e) => handleValuationChange('taxAmount', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                 </div>
@@ -3641,14 +3641,14 @@ card is in the name of </Label>
             <div className="mb-6 p-6 bg-pink-50 rounded-2xl border border-pink-100">
                 <h4 className="font-bold text-gray-900 mb-4">Agreement for Sale</h4>
                 <div className="grid grid-cols-1 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Agreement for Sale executed Name</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Agreement for Sale executed Name</Label>
                         <Input
                             placeholder="e.g., Agreement Name/Details"
                             value={formData.pdfDetails?.agreementSaleExecutedName || ""}
                             onChange={(e) => handleValuationChange('agreementSaleExecutedName', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                 </div>
@@ -3657,62 +3657,62 @@ card is in the name of </Label>
             {/* UNIT AREA DETAILS */}
             <div className="mb-6 p-6 bg-orange-50 rounded-2xl border border-orange-100">
                 <h4 className="font-bold text-gray-900 mb-4">Area Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">What is the undivided area of the land as per 
-sale deed ? </Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">What is the undivided area of the land as per
+                            sale deed ? </Label>
                         <Input
                             placeholder="e.g., Area in Sq. ft."
                             value={formData.pdfDetails?.undividedAreaLand || ""}
                             onChange={(e) => handleValuationChange('undividedAreaLand', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Plinth Area of Flat </Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Plinth Area of Flat </Label>
                         <Input
                             placeholder="e.g., 278.57 Sq ft"
                             value={formData.pdfDetails?.plinthArea || ""}
                             onChange={(e) => handleValuationChange('plinthArea', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Carpet Area of Flat</Label>
-                         <Input
-                             placeholder="e.g., Area in Sq. ft."
-                             value={formData.pdfDetails?.carpetArea || ""}
-                             onChange={(e) => handleValuationChange('carpetArea', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                         />
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">What is the floor space index?</Label>
-                         <Input
-                             placeholder="e.g., FSI value"
-                             value={formData.pdfDetails?.floorSpaceIndex || ""}
-                             onChange={(e) => handleValuationChange('floorSpaceIndex', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                         />
-                     </div>
+                        <Label className="text-sm font-bold text-gray-900">Carpet Area of Flat</Label>
+                        <Input
+                            placeholder="e.g., Area in Sq. ft."
+                            value={formData.pdfDetails?.carpetArea || ""}
+                            onChange={(e) => handleValuationChange('carpetArea', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        />
                     </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">What is the floor space index?</Label>
+                        <Input
+                            placeholder="e.g., FSI value"
+                            value={formData.pdfDetails?.floorSpaceIndex || ""}
+                            onChange={(e) => handleValuationChange('floorSpaceIndex', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        />
                     </div>
+                </div>
+            </div>
 
             {/* UNIT MAINTENANCE */}
             <div className="mb-6 p-6 bg-fuchsia-50 rounded-2xl border border-fuchsia-100">
                 <h4 className="font-bold text-gray-900 mb-4">Unit Maintenance</h4>
                 <div className="grid grid-cols-1 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">How is the maintenance of the Flat ?</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">How is the maintenance of the Flat ?</Label>
                         <select
                             value={formData.pdfDetails?.unitMaintenance || ""}
                             onChange={(e) => handleValuationChange('unitMaintenance', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 px-3"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 px-3"
                         >
                             <option value="">Select</option>
                             <option value="Good">Good</option>
@@ -3726,53 +3726,53 @@ sale deed ? </Label>
             {/* UNIT CLASSIFICATION */}
             <div className="mb-6 p-6 bg-purple-50 rounded-2xl border border-purple-100">
                 <h4 className="font-bold text-gray-900 mb-4">Unit Classification</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Classification - Posh</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Classification - Posh</Label>
                         <Input
                             placeholder="e.g., Details"
                             value={formData.pdfDetails?.classificationPosh || ""}
                             onChange={(e) => handleValuationChange('classificationPosh', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label className="text-sm font-bold text-gray-900">Classification - Usage</Label>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Classification - Usage</Label>
                         <Input
                             placeholder="e.g., Residential/Commercial"
                             value={formData.pdfDetails?.classificationUsage || ""}
                             onChange={(e) => handleValuationChange('classificationUsage', e.target.value)}
                             disabled={!canEdit}
-                            className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />
                     </div>
                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">Is it owner occupied or tenanted?</Label>
-                         <select
-                             value={formData.pdfDetails?.ownerOccupancyStatus || ""}
-                             onChange={(e) => handleValuationChange('ownerOccupancyStatus', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 px-3"
-                         >
-                             <option value="">Select</option>
-                             <option value="Owner Occupied">Owner Occupied</option>
-                             <option value="Tenanted">Tenanted</option>
-                         </select>
-                     </div>
-                     <div className="space-y-2">
-                         <Label className="text-sm font-bold text-gray-900">If tenanted, what is the monthly rent?</Label>
-                         <Input
-                             placeholder="e.g., Amount"
-                             value={formData.pdfDetails?.monthlyRent || ""}
-                             onChange={(e) => handleValuationChange('monthlyRent', e.target.value)}
-                             disabled={!canEdit}
-                             className="h-10 text-sm rounded-lg border border-neutral-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                         />
-                     </div>
+                        <Label className="text-sm font-bold text-gray-900">Is it owner occupied or tenanted?</Label>
+                        <select
+                            value={formData.pdfDetails?.ownerOccupancyStatus || ""}
+                            onChange={(e) => handleValuationChange('ownerOccupancyStatus', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 px-3"
+                        >
+                            <option value="">Select</option>
+                            <option value="Owner Occupied">Owner Occupied</option>
+                            <option value="Tenanted">Tenanted</option>
+                        </select>
                     </div>
+                    <div className="space-y-2">
+                        <Label className="text-sm font-bold text-gray-900">If tenanted, what is the monthly rent?</Label>
+                        <Input
+                            placeholder="e.g., Amount"
+                            value={formData.pdfDetails?.monthlyRent || ""}
+                            onChange={(e) => handleValuationChange('monthlyRent', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        />
                     </div>
-                    </div>
+                </div>
+            </div>
+        </div>
     );
 
     if (!valuation) {
@@ -3865,22 +3865,22 @@ sale deed ? </Label>
                                 <form className="space-y-3" onSubmit={onFinish}>
 
                                     {/* Main Tab Navigation - Client/Documents/Valuation */}
-                                    <div className="flex flex-wrap gap-2 p-6 bg-gray-50 rounded-2xl border border-gray-200 mb-6">
+                                    <div className="flex gap-2 p-4 bg-gray-50 rounded-2xl border border-gray-200 mb-6 overflow-x-auto">
                                         {[
-                                            { id: 'client', label: 'CLIENT INFO', icon: FaUser },
-                                            { id: 'documents', label: 'DOCUMENTS', icon: FaFileAlt },
+                                            { id: 'client', label: 'CLIENT', icon: FaUser },
+                                            { id: 'documents', label: 'DOCS', icon: FaFileAlt },
                                             { id: 'valuation', label: 'VALUATION', icon: FaDollarSign }
                                         ].map(tab => (
                                             <button
                                                 key={tab.id}
                                                 type="button"
                                                 onClick={() => setActiveTab(tab.id)}
-                                                className={`px-4 py-2 rounded-full font-semibold text-sm transition-all flex items-center gap-2 ${activeTab === tab.id
+                                                className={`px-3 py-2 rounded-lg font-semibold text-xs whitespace-nowrap flex-shrink-0 transition-all flex items-center gap-1.5 ${activeTab === tab.id
                                                     ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                                                    : "bg-white border-2 border-gray-300 text-gray-900 hover:border-blue-500"
+                                                    : "bg-white border border-gray-300 text-gray-900 hover:border-blue-500"
                                                     }`}
                                             >
-                                                <tab.icon size={14} />
+                                                <tab.icon size={12} />
                                                 {tab.label}
                                             </button>
                                         ))}
@@ -3938,19 +3938,19 @@ sale deed ? </Label>
                                     {activeTab === 'valuation' && (
                                         <div>
                                             {/* Sub-tab Navigation */}
-                                            <div className="flex flex-wrap gap-2 p-6 bg-gray-50 rounded-2xl border border-gray-200 mb-6">
+                                            <div className="flex gap-2 p-4 bg-gray-50 rounded-2xl border border-gray-200 mb-6 overflow-x-auto">
                                                 {[
                                                     { id: 'general', label: 'GENERAL' },
                                                     { id: 'valuation', label: 'VALUATION' },
-                                                    { id: 'market', label: 'MARKET ANALYSIS' }
+                                                    { id: 'market', label: 'MARKET' }
                                                 ].map(tab => (
                                                     <button
                                                         key={tab.id}
                                                         type="button"
                                                         onClick={() => setActiveValuationSubTab(tab.id)}
-                                                        className={`px-4 py-2 rounded-full font-semibold text-sm transition-all ${activeValuationSubTab === tab.id
+                                                        className={`px-3 py-2 rounded-lg font-semibold text-xs whitespace-nowrap flex-shrink-0 transition-all ${activeValuationSubTab === tab.id
                                                             ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                                                            : "bg-white border-2 border-gray-300 text-gray-900 hover:border-blue-500"
+                                                            : "bg-white border border-gray-300 text-gray-900 hover:border-blue-500"
                                                             }`}
                                                     >
                                                         {tab.label}
@@ -3968,15 +3968,15 @@ sale deed ? </Label>
                                     )}
 
                                     {/* Submit Buttons */}
-                                    <div className="flex gap-2.5 pt-3 border-t border-neutral-200">
+                                    <div className="flex gap-2 pt-3 border-t border-neutral-200">
                                         <Button
                                             type="button"
                                             onClick={handleDownloadPDF}
                                             disabled={loading}
-                                            className="h-9 px-4 text-xs font-bold rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all shadow-md hover:shadow-lg disabled:opacity-60 flex items-center gap-2"
+                                            className="flex-1 h-9 text-xs font-bold rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all shadow-md hover:shadow-lg disabled:opacity-60 flex items-center justify-center gap-1.5 whitespace-nowrap"
                                         >
-                                            <FaDownload size={14} />
-                                            Download PDF
+                                            <FaDownload size={12} />
+                                            PDF
                                         </Button>
                                         {canEdit && (
                                             <>
@@ -3984,15 +3984,15 @@ sale deed ? </Label>
                                                     type="button"
                                                     onClick={onFinish}
                                                     disabled={loading}
-                                                    className="flex-1 h-9 text-xs font-bold rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-all shadow-md hover:shadow-lg disabled:opacity-60"
+                                                    className="flex-1 h-9 text-xs font-bold rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-all shadow-md hover:shadow-lg disabled:opacity-60 whitespace-nowrap"
                                                 >
-                                                    {loading ? "Saving..." : "Save Changes"}
+                                                    {loading ? "Saving..." : "Save"}
                                                 </Button>
                                                 <Button
                                                     type="button"
                                                     onClick={() => navigate("/dashboard")}
                                                     disabled={loading}
-                                                    className="flex-1 h-9 text-xs font-bold rounded-lg border border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50 text-neutral-900 transition-all"
+                                                    className="flex-1 h-9 text-xs font-bold rounded-lg border border-neutral-300 hover:border-neutral-400 hover:bg-neutral-50 text-neutral-900 transition-all whitespace-nowrap"
                                                 >
                                                     Back
                                                 </Button>
@@ -4005,7 +4005,7 @@ sale deed ? </Label>
                                                     type="button"
                                                     onClick={() => handleManagerAction("approve")}
                                                     disabled={loading}
-                                                    className="flex-1 h-9 text-xs font-bold rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all shadow-md hover:shadow-lg disabled:opacity-60"
+                                                    className="flex-1 h-9 text-xs font-bold rounded-lg bg-green-500 hover:bg-green-600 text-white transition-all shadow-md hover:shadow-lg disabled:opacity-60 whitespace-nowrap"
                                                 >
                                                     {loading ? "Processing..." : "Approve"}
                                                 </Button>
@@ -4013,7 +4013,7 @@ sale deed ? </Label>
                                                     type="button"
                                                     onClick={() => handleManagerAction("reject")}
                                                     disabled={loading}
-                                                    className="flex-1 h-9 text-xs font-bold rounded-lg bg-red-500 hover:bg-red-600 text-white transition-all shadow-md hover:shadow-lg disabled:opacity-60"
+                                                    className="flex-1 h-9 text-xs font-bold rounded-lg bg-red-500 hover:bg-red-600 text-white transition-all shadow-md hover:shadow-lg disabled:opacity-60 whitespace-nowrap"
                                                 >
                                                     {loading ? "Processing..." : "Reject"}
                                                 </Button>
