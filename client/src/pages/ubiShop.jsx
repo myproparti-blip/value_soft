@@ -1167,19 +1167,19 @@ const EditValuationPage = ({ user, onLogin }) => {
                     stateGovernmentEnactments: formData.pdfDetails?.govtEnactmentsCovered || ""
                 },
 
-                // Property Boundaries
+                // Property Boundaries - Plot (Section 12a)
                 propertyBoundaries: {
                     plotBoundaries: {
-                        north: formData.pdfDetails?.boundariesPlotNorth || "",
-                        south: formData.pdfDetails?.boundariesPlotSouth || "",
-                        east: formData.pdfDetails?.boundariesPlotEast || "",
-                        west: formData.pdfDetails?.boundariesPlotWest || ""
+                        north: formData.pdfDetails?.boundariesPlotNorthDeed || "",
+                        south: formData.pdfDetails?.boundariesPlotSouthDeed || "",
+                        east: formData.pdfDetails?.boundariesPlotEastDeed || "",
+                        west: formData.pdfDetails?.boundariesPlotWestDeed || ""
                     },
                     shopBoundaries: {
-                        north: formData.pdfDetails?.boundariesShopNorth || "",
-                        south: formData.pdfDetails?.boundariesShopSouth || "",
-                        east: formData.pdfDetails?.boundariesShopEast || "",
-                        west: formData.pdfDetails?.boundariesShopWest || ""
+                        north: formData.pdfDetails?.boundariesShopNorthDeed || "",
+                        south: formData.pdfDetails?.boundariesShopSouthDeed || "",
+                        east: formData.pdfDetails?.boundariesShopEastDeed || "",
+                        west: formData.pdfDetails?.boundariesShopWestDeed || ""
                     }
                 },
 
