@@ -24,14 +24,12 @@ const bofPhotoSchema = new mongoose.Schema({
 }, { _id: false });
 
 const bofPdfDetailsSchema = new mongoose.Schema({
-    // DOCUMENT HEADER
     formId: { type: String, default: "" },
     branch: { type: String, default: "" },
     valuationPurpose: { type: String, default: "" },
     inspectionDate: { type: String, default: "" },
     valuationMadeDate: { type: String, default: "" },
 
-    // MORTGAGE & VALUATION HISTORY
     mortgageDeed: { type: String, default: "" },
     mortgageDeedBetween: { type: String, default: "" },
     previousValuationReport: { type: String, default: "" },
@@ -47,9 +45,11 @@ const bofPdfDetailsSchema = new mongoose.Schema({
     occupancyCertificate: { type: String, default: "" },
     ownerNameAddress: { type: String, default: "" },
     briefDescriptionProperty: { type: String, default: "" },
+    listOfDocumentsProduced: { type: String, default: "" },
+
     ownerName: { type: String, default: "" },
 
-    // PROPERTY DESCRIPTION / LOCATION OF PROPERTY - SECTION 8
+    // PROPERTY DESCRIPTION / LOCATION OF PROPERTY
     plotSurveyNo: { type: String, default: "" },
     doorNo: { type: String, default: "" },
     tpVillage: { type: String, default: "" },
@@ -62,7 +62,6 @@ const bofPdfDetailsSchema = new mongoose.Schema({
     otherApprovedPlanDetails: { type: String, default: "" },
     valuesApprovedPlan: { type: String, default: "" },
 
-    // POSTAL ADDRESS & AREA CLASSIFICATION - SECTION 8
     postalAddress: { type: String, default: "" },
     cityTown: { type: String, default: "" },
     residentialArea: { type: Boolean, default: false },
@@ -70,45 +69,55 @@ const bofPdfDetailsSchema = new mongoose.Schema({
     industrialArea: { type: Boolean, default: false },
     locationOfProperty: { type: String, default: "" },
 
-    // INDUSTRIAL AREA DETAILS - SECTION 9
+    // INDUSTRIAL AREA DETAILS - Section 9
     areaClassification: { type: String, default: "" },
     urbanClassification: { type: String, default: "" },
     governmentType: { type: String, default: "" },
     govtEnactmentsCovered: { type: String, default: "" },
 
-    // BOUNDARIES OF PROPERTY - SECTION 12
-    boundariesPlotNorth: { type: String, default: "" },
-    boundariesPlotSouth: { type: String, default: "" },
-    boundariesPlotEast: { type: String, default: "" },
-    boundariesPlotWest: { type: String, default: "" },
-    boundariesShopNorth: { type: String, default: "" },
-    boundariesShopSouth: { type: String, default: "" },
-    boundariesShopEast: { type: String, default: "" },
-    boundariesShopWest: { type: String, default: "" },
+    // BOUNDARIES OF PROPERTY - Section 12
+    boundariesPlotNorthDeed: { type: String, default: "" },
+    boundariesPlotNorthActual: { type: String, default: "" },
+    boundariesPlotSouthDeed: { type: String, default: "" },
+    boundariesPlotSouthActual: { type: String, default: "" },
+    boundariesPlotEastDeed: { type: String, default: "" },
+    boundariesPlotEastActual: { type: String, default: "" },
+    boundariesPlotWestDeed: { type: String, default: "" },
+    boundariesPlotWestActual: { type: String, default: "" },
+    boundariesShopNorthDeed: { type: String, default: "" },
+    boundariesShopNorthActual: { type: String, default: "" },
+    boundariesShopSouthDeed: { type: String, default: "" },
+    boundariesShopSouthActual: { type: String, default: "" },
+    boundariesShopEastDeed: { type: String, default: "" },
+    boundariesShopEastActual: { type: String, default: "" },
+    boundariesShopWestDeed: { type: String, default: "" },
+    boundariesShopWestActual: { type: String, default: "" },
 
-    // DIMENSIONS OF THE UNIT - SECTION 13
+    // DIMENSIONS OF THE UNIT - Section 13
     dimensionsDeed: { type: String, default: "" },
     dimensionsActual: { type: String, default: "" },
 
-    // EXTENT OF THE UNIT - SECTION 14
+    // EXTENT OF THE UNIT - Section 14
     extentOfUnit: { type: String, default: "" },
     latitudeLongitude: { type: String, default: "" },
     floorSpaceIndex: { type: String, default: "" },
 
-    // EXTENT OF SITE CONSIDERED FOR VALUATION - SECTION 15
+    // EXTENT OF SITE CONSIDERED FOR VALUATION - Section 15
     extentOfSiteValuation: { type: String, default: "" },
 
     // SECTION 16 - OCCUPANCY
     rentReceivedPerMonth: { type: String, default: "" },
 
-    // APARTMENT BUILDING DETAILS - SECTION II
+    // APARTMENT BUILDING DETAILS - Section II
     apartmentNature: { type: String, default: "" },
     apartmentLocation: { type: String, default: "" },
-    apartmentTSNo: { type: String, default: "" },
+    apartmentCTSNo: { type: String, default: "" },
+    apartmentSectorNo: { type: String, default: "" },
     apartmentBlockNo: { type: String, default: "" },
     apartmentWardNo: { type: String, default: "" },
     apartmentVillageMunicipalityCounty: { type: String, default: "" },
-    apartmentDoorNoStreetRoadPinCode: { type: String, default: "" },
+    apartmentDoorNoStreetRoad: { type: String, default: "" },
+    apartmentPinCode: { type: String, default: "" },
 
     // APARTMENT BUILDING SUBSECTIONS
     descriptionOfLocalityResidentialCommercialMixed: { type: String, default: "" },
@@ -126,6 +135,7 @@ const bofPdfDetailsSchema = new mongoose.Schema({
     distressValue: { type: String, default: "" },
     saleDeedValue: { type: String, default: "" },
     agreementCircleRate: { type: String, default: "" },
+    agreementValue: { type: String, default: "" },
     valueCircleRate: { type: String, default: "" },
     insurableValue: { type: String, default: "" },
     totalJantriValue: { type: String, default: "" },
@@ -135,6 +145,7 @@ const bofPdfDetailsSchema = new mongoose.Schema({
     carpetAreaFlat: { type: String, default: "" },
 
     // MONTHLY RENT
+    ownerOccupancyStatus: { type: String, default: "" },
     monthlyRent: { type: String, default: "" },
 
     // MARKETABILITY SECTION
@@ -213,7 +224,9 @@ const bofPdfDetailsSchema = new mongoose.Schema({
     unitRoof: { type: String, default: "" },
     unitFlooring: { type: String, default: "" },
     unitDoors: { type: String, default: "" },
-    unitWindows: { type: String, default: "" },
+    unitBathAndWC: { type: String, default: "" },
+    unitElectricalWiring: { type: String, default: "" },
+    unitSpecification: { type: String, default: "" },
     unitFittings: { type: String, default: "" },
     unitFinishing: { type: String, default: "" },
 
@@ -256,6 +269,7 @@ const bofPdfDetailsSchema = new mongoose.Schema({
     carParkingOpenCovered: { type: String, default: "" },
     isCompoundWallExisting: { type: String, default: "" },
     isPavementLaidAroundBuilding: { type: String, default: "" },
+    othersFacility: { type: String, default: "" },
 
     // DECLARATIONS
     declarationB: { type: String, default: "" },
