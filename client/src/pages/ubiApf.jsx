@@ -198,6 +198,10 @@ const UbiApfEditForm = ({ user, onLogin }) => {
             // EXTENT OF SITE CONSIDERED FOR VALUATION - Section 15
             extentOfSiteValuation: '',
 
+            // MISSING VALUATION FIELDS FROM GENERAL TAB
+            listOfDocumentsProduced: '',
+            valuerCommentOnAuthenticity: '',
+
             // SECTION 16 - OCCUPANCY
             rentReceivedPerMonth: '',
 
@@ -1164,11 +1168,19 @@ const UbiApfEditForm = ({ user, onLogin }) => {
     };
 
     const mapDataToForm = (data) => {
-        setFormData(prev => ({
-            ...prev,
-            ...data,
-            pdfDetails: { ...prev.pdfDetails, ...data.pdfDetails }
-        }));
+        setFormData(prev => {
+            // Create a new pdfDetails object by merging prev defaults with incoming data
+            const mergedPdfDetails = {
+                ...prev.pdfDetails,
+                ...(data.pdfDetails || {})
+            };
+
+            return {
+                ...prev,
+                ...data,
+                pdfDetails: mergedPdfDetails
+            };
+        });
     };
 
     const canEdit = isLoggedIn && (
@@ -1205,15 +1217,37 @@ const UbiApfEditForm = ({ user, onLogin }) => {
 
     const handleSave = async () => {
         try {
-            dispatch(showLoader());
-            await updateUbiApfForm(id, formData, user.username, user.role, user.clientId);
+            dispatch(showLoader("Saving form..."));
+
+            // Prepare complete payload with all data
+            const payload = {
+                ...formData,
+                // Ensure pdfDetails is included with all fields
+                pdfDetails: {
+                    ...formData.pdfDetails,
+                    // Auto-include calculation fields for valuation results
+                    lastUpdatedBy: user.username,
+                    lastUpdatedByRole: user.role
+                },
+                // Metadata
+                lastUpdatedAt: new Date().toISOString(),
+                status: formData.status || 'pending'
+            };
+
+            console.log("[handleSave] Saving UBI APF form with payload:", {
+                id,
+                username: user.username,
+                pdfDetailsFieldsCount: Object.keys(payload.pdfDetails || {}).length
+            });
+
+            await updateUbiApfForm(id, payload, user.username, user.role, user.clientId);
             invalidateCache();
             dispatch(hideLoader());
-            showSuccess('BOF Maharashtra form saved successfully');
+            showSuccess('UBI APF form saved successfully');
         } catch (error) {
-            console.error("Error saving BOF Maharashtra form:", error);
+            console.error("Error saving UBI APF form:", error);
             dispatch(hideLoader());
-            showError('Failed to save BOF Maharashtra form');
+            showError(error.message || 'Failed to save UBI APF form');
         }
     };
 
@@ -2222,20 +2256,17 @@ const UbiApfEditForm = ({ user, onLogin }) => {
     );
 
     const renderValuationTab = () => {
-        // Helper function to format numbers as Indian currency
         const formatIndianCurrency = (value) => {
             if (!value) return '₹0.00';
             const num = parseFloat(value) || 0;
             return '₹' + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         };
 
-        // Helper function to round to nearest 1000
         const roundToNearestThousand = (value) => {
             const num = parseFloat(value) || 0;
             return Math.round(num / 1000) * 1000;
         };
 
-        // Calculate total valuation from all items
         const calculateTotalValuation = () => {
             const values = [
                 parseFloat(formData.pdfDetails?.presentValue) || 0,
@@ -2254,12 +2285,990 @@ const UbiApfEditForm = ({ user, onLogin }) => {
 
         const totalValuation = calculateTotalValuation();
         const roundFigureTotal = roundToNearestThousand(totalValuation);
-        const realisableValue = totalValuation * 0.9;
-        const distressValue = totalValuation * 0.8;
-        const insurableValue = totalValuation * 0.35;
 
         return (
             <div className="space-y-6">
+                {/* PAGE 1 - COST OF CONSTRUCTION */}
+                <div className="mb-6 p-6 bg-blue-50 rounded-2xl border border-blue-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Cost of Construction (Page 1)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Sub Area</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.subArea || ""} onChange={(e) => handleValuationChange('subArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Basement Floor</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.basementFloor || ""} onChange={(e) => handleValuationChange('basementFloor', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Ground Area</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.groundArea || ""} onChange={(e) => handleValuationChange('groundArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Socket Floor</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.socketFloor || ""} onChange={(e) => handleValuationChange('socketFloor', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Terrace Area</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.terraceArea || ""} onChange={(e) => handleValuationChange('terraceArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">1st Floor Construction</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.firstFloorConstruction || ""} onChange={(e) => handleValuationChange('firstFloorConstruction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">2nd Floor Construction</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.secondFloorConstruction || ""} onChange={(e) => handleValuationChange('secondFloorConstruction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">3rd Floor Construction</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.thirdFloorConstruction || ""} onChange={(e) => handleValuationChange('thirdFloorConstruction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">4th Floor Construction</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.fourthFloorConstruction || ""} onChange={(e) => handleValuationChange('fourthFloorConstruction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">5th Floor Construction</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.fifthFloorConstruction || ""} onChange={(e) => handleValuationChange('fifthFloorConstruction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">6th Floor Construction</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.sixthFloorConstruction || ""} onChange={(e) => handleValuationChange('sixthFloorConstruction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Glass House Floor</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.glassHouseFloor || ""} onChange={(e) => handleValuationChange('glassHouseFloor', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Total Area Amount</Label>
+                            <Input placeholder="e.g., Amount" value={formData.pdfDetails?.totalAreaAmount || ""} onChange={(e) => handleValuationChange('totalAreaAmount', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Value Cost Amount</Label>
+                            <Input placeholder="e.g., Amount" value={formData.pdfDetails?.valueCostAmount || ""} onChange={(e) => handleValuationChange('valueCostAmount', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Rate Per Sqft Amount</Label>
+                            <Input placeholder="e.g., Rate" value={formData.pdfDetails?.ratePerSqftAmount || ""} onChange={(e) => handleValuationChange('ratePerSqftAmount', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 2 - ABSTRACT OF PROPERTY */}
+                <div className="mb-6 p-6 bg-green-50 rounded-2xl border border-green-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Total Abstract of Property (Page 2)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Part A</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.partA || ""} onChange={(e) => handleValuationChange('partA', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Part B</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.partB || ""} onChange={(e) => handleValuationChange('partB', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Part C</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.partC || ""} onChange={(e) => handleValuationChange('partC', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Part D</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.partD || ""} onChange={(e) => handleValuationChange('partD', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Part E</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.partE || ""} onChange={(e) => handleValuationChange('partE', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Part F</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.partF || ""} onChange={(e) => handleValuationChange('partF', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 3 - GENERAL INFORMATION */}
+                <div className="mb-6 p-6 bg-yellow-50 rounded-2xl border border-yellow-100">
+                    <h4 className="font-bold text-gray-900 mb-4">General Information (Page 3)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">The Market Value of Above Property Is</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.theMarketValueOfAbovePropertyIs || ""} onChange={(e) => handleValuationChange('theMarketValueOfAbovePropertyIs', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">The Realisable Value of Above Property Is</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.theRealisableValueOfAbovePropertyIs || ""} onChange={(e) => handleValuationChange('theRealisableValueOfAbovePropertyIs', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">The Insurable Value of Above Property Is</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.theInsurableValueOfAbovePropertyIs || ""} onChange={(e) => handleValuationChange('theInsurableValueOfAbovePropertyIs', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Date</Label>
+                            <Input type="date" value={formData.pdfDetails?.date || ""} onChange={(e) => handleValuationChange('date', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Signature of Branch Manager</Label>
+                            <Input placeholder="e.g., Signature" value={formData.pdfDetails?.signatureOfBranchManagerWithOfficeSeal || ""} onChange={(e) => handleValuationChange('signatureOfBranchManagerWithOfficeSeal', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Signature of Approver</Label>
+                            <Input placeholder="e.g., Signature" value={formData.pdfDetails?.shashilantRDhumalSignatureOfApprover || ""} onChange={(e) => handleValuationChange('shashilantRDhumalSignatureOfApprover', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 mt-4">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Property Inspection Details</Label>
+                            <Textarea placeholder="Inspected property details" value={formData.pdfDetails?.theUndersignedHasInspectedThePropertyDetailedInTheValuationReportCrossVerifyTheFollowingDetailsAndFoundToBeAccurate || ""} onChange={(e) => handleValuationChange('theUndersignedHasInspectedThePropertyDetailedInTheValuationReportCrossVerifyTheFollowingDetailsAndFoundToBeAccurate', e.target.value)} disabled={!canEdit} className="text-xs rounded-lg border border-neutral-300 py-1 px-2" rows="2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Property Market Value Date</Label>
+                            <Input placeholder="e.g., Market value date" value={formData.pdfDetails?.thePropertyIsReasonablyMarketValueOn || ""} onChange={(e) => handleValuationChange('thePropertyIsReasonablyMarketValueOn', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Inspection and Fair Market Value</Label>
+                            <Input placeholder="e.g., Fair market value details" value={formData.pdfDetails?.theUndersignedHasInspectedAndSatisfiedThatTheFairAndReasonableMarketValueOn || ""} onChange={(e) => handleValuationChange('theUndersignedHasInspectedAndSatisfiedThatTheFairAndReasonableMarketValueOn', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 4 - ABSTRACT VALUES */}
+                <div className="mb-6 p-6 bg-purple-50 rounded-2xl border border-purple-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Abstract Values (Page 4)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Abstract Land</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.abstractLand || ""} onChange={(e) => handleValuationChange('abstractLand', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Abstract Building</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.abstractBuilding || ""} onChange={(e) => handleValuationChange('abstractBuilding', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Abstract Extra Items</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.abstractExtraItems || ""} onChange={(e) => handleValuationChange('abstractExtraItems', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Abstract Amenities</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.abstractAmenities || ""} onChange={(e) => handleValuationChange('abstractAmenities', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Abstract Miscellaneous</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.abstractMiscellaneous || ""} onChange={(e) => handleValuationChange('abstractMiscellaneous', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Abstract Services</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.abstractServices || ""} onChange={(e) => handleValuationChange('abstractServices', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Abstract Total Value</Label>
+                            <Input placeholder="e.g., Total Value" value={formData.pdfDetails?.abstractTotalValue || ""} onChange={(e) => handleValuationChange('abstractTotalValue', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">As Per Appraisal Opinion</Label>
+                            <Textarea placeholder="Opinion" value={formData.pdfDetails?.asAResultOfMyAppraisalAndAnalysisItIsMyConsideredOpinionThatThePresentFairMarketValue || ""} onChange={(e) => handleValuationChange('asAResultOfMyAppraisalAndAnalysisItIsMyConsideredOpinionThatThePresentFairMarketValue', e.target.value)} disabled={!canEdit} className="text-xs rounded-lg border border-neutral-300 py-1 px-2" rows="2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Value as on Valuation Date</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.valueOfTheAbovePropertyAsOnTheValuationDateIs || ""} onChange={(e) => handleValuationChange('valueOfTheAbovePropertyAsOnTheValuationDateIs', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Pre Valuation Rate Percentage</Label>
+                            <Input placeholder="e.g., Percentage" value={formData.pdfDetails?.preValuationRatePercentageWithDeductionWithRespectToTheAgreementValuePropertyDeed || ""} onChange={(e) => handleValuationChange('preValuationRatePercentageWithDeductionWithRespectToTheAgreementValuePropertyDeed', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 5 - PART A SERVICES DETAILS */}
+                <div className="mb-6 p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Part A - Services (Page 5)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Sr. No.</Label>
+                            <Input placeholder="e.g., 1" value={formData.pdfDetails?.srNo || ""} onChange={(e) => handleValuationChange('srNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Description</Label>
+                            <Input placeholder="e.g., Service" value={formData.pdfDetails?.description1 || ""} onChange={(e) => handleValuationChange('description1', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Amount (₹)</Label>
+                            <Input placeholder="e.g., Amount" value={formData.pdfDetails?.amountInRupees1 || ""} onChange={(e) => handleValuationChange('amountInRupees1', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        <h5 className="font-semibold text-gray-800 text-sm">Service Items (12 rows)</h5>
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-bold text-gray-900">Sr. No. {i}</Label>
+                                    <Input placeholder={`${i}`} value={formData.pdfDetails?.[`part1SrNo${i}`] || ""} onChange={(e) => handleValuationChange(`part1SrNo${i}`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-bold text-gray-900">Description {i}</Label>
+                                    <Input placeholder="e.g., Service item" value={formData.pdfDetails?.[`part1Description${i}`] || ""} onChange={(e) => handleValuationChange(`part1Description${i}`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-bold text-gray-900">Amount {i}</Label>
+                                    <Input placeholder="e.g., Amount" value={formData.pdfDetails?.[`part1Amount${i}`] || ""} onChange={(e) => handleValuationChange(`part1Amount${i}`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* PAGE 6 - PART B AMENITIES */}
+                <div className="mb-6 p-6 bg-pink-50 rounded-2xl border border-pink-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Part B - Amenities (Page 6)</h4>
+                    <div className="space-y-3 mb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Sr. No.</Label>
+                                <Input placeholder="Sr. No." value={formData.pdfDetails?.part2SrNo || ""} onChange={(e) => handleValuationChange('part2SrNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.part2Description || ""} onChange={(e) => handleValuationChange('part2Description', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Workbeds</Label>
+                                <Input placeholder="Workbeds" value={formData.pdfDetails?.part2Workbeds || ""} onChange={(e) => handleValuationChange('part2Workbeds', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    </div>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
+                        <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.[`part2Item${i}Description`] || ""} onChange={(e) => handleValuationChange(`part2Item${i}Description`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Amount</Label>
+                                <Input placeholder="Amount" value={formData.pdfDetails?.[`part2Item${i}Amount`] || ""} onChange={(e) => handleValuationChange(`part2Item${i}Amount`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    ))}
+                    <div className="space-y-1 mt-3">
+                        <Label className="text-xs font-bold text-gray-900">Part B Total</Label>
+                        <Input placeholder="Total" value={formData.pdfDetails?.part2Total || ""} onChange={(e) => handleValuationChange('part2Total', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                    </div>
+                </div>
+
+                {/* PAGE 7 - PART C MISCELLANEOUS */}
+                <div className="mb-6 p-6 bg-orange-50 rounded-2xl border border-orange-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Part C - Miscellaneous (Page 7)</h4>
+                    <div className="space-y-3 mb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Sr. No.</Label>
+                                <Input placeholder="Sr. No." value={formData.pdfDetails?.part3SrNo || ""} onChange={(e) => handleValuationChange('part3SrNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.part3Description || ""} onChange={(e) => handleValuationChange('part3Description', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    </div>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.[`part3Item${i}Description`] || ""} onChange={(e) => handleValuationChange(`part3Item${i}Description`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Amount</Label>
+                                <Input placeholder="Amount" value={formData.pdfDetails?.[`part3Item${i}Amount`] || ""} onChange={(e) => handleValuationChange(`part3Item${i}Amount`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    ))}
+                    <div className="space-y-1 mt-3">
+                        <Label className="text-xs font-bold text-gray-900">Part C Total</Label>
+                        <Input placeholder="Total" value={formData.pdfDetails?.part3Total || ""} onChange={(e) => handleValuationChange('part3Total', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                    </div>
+                </div>
+
+                {/* PAGE 8 - BUILDING DETAILS & FIXTURES */}
+                <div className="mb-6 p-6 bg-teal-50 rounded-2xl border border-teal-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Building Details & Fixtures (Page 8)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Compound Wall</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.compoundWall || ""} onChange={(e) => handleValuationChange('compoundWall', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Height</Label>
+                            <Input placeholder="e.g., Height" value={formData.pdfDetails?.height || ""} onChange={(e) => handleValuationChange('height', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Length</Label>
+                            <Input placeholder="e.g., Length" value={formData.pdfDetails?.length || ""} onChange={(e) => handleValuationChange('length', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Type of Construction</Label>
+                            <Input placeholder="e.g., Type" value={formData.pdfDetails?.typeOfConstruction || ""} onChange={(e) => handleValuationChange('typeOfConstruction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Electrical Installation</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.electricalInstallation || ""} onChange={(e) => handleValuationChange('electricalInstallation', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Type of Wiring</Label>
+                            <Input placeholder="e.g., Type" value={formData.pdfDetails?.typeOfWiring || ""} onChange={(e) => handleValuationChange('typeOfWiring', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Class of Fittings</Label>
+                            <Input placeholder="e.g., Class" value={formData.pdfDetails?.classOfFittings || ""} onChange={(e) => handleValuationChange('classOfFittings', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Number of Light Points</Label>
+                            <Input placeholder="e.g., Number" value={formData.pdfDetails?.numberOfLightPoints || ""} onChange={(e) => handleValuationChange('numberOfLightPoints', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Far Plugs</Label>
+                            <Input placeholder="e.g., Number" value={formData.pdfDetails?.farPlugs || ""} onChange={(e) => handleValuationChange('farPlugs', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Spare Plug</Label>
+                            <Input placeholder="e.g., Number" value={formData.pdfDetails?.sparePlug || ""} onChange={(e) => handleValuationChange('sparePlug', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Any Other Electrical Item</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.anyOtherElectricalItem || ""} onChange={(e) => handleValuationChange('anyOtherElectricalItem', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Plumbing Installation</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.plumbingInstallation || ""} onChange={(e) => handleValuationChange('plumbingInstallation', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">No. Water Class and Taps</Label>
+                            <Input placeholder="e.g., Number" value={formData.pdfDetails?.numberOfWaterClassAndTaps || ""} onChange={(e) => handleValuationChange('numberOfWaterClassAndTaps', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">No. Wash Basins</Label>
+                            <Input placeholder="e.g., Number" value={formData.pdfDetails?.noWashBasins || ""} onChange={(e) => handleValuationChange('noWashBasins', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">No. Urinals</Label>
+                            <Input placeholder="e.g., Number" value={formData.pdfDetails?.noUrinals || ""} onChange={(e) => handleValuationChange('noUrinals', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">No. Bathtubs</Label>
+                            <Input placeholder="e.g., Number" value={formData.pdfDetails?.noOfBathtubs || ""} onChange={(e) => handleValuationChange('noOfBathtubs', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Water Meter Taps Etc</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.waterMeterTapsEtc || ""} onChange={(e) => handleValuationChange('waterMeterTapsEtc', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Any Other Plumbing Fixture</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.anyOtherPlumbingFixture || ""} onChange={(e) => handleValuationChange('anyOtherPlumbingFixture', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 9 - ORNAMENTAL & EXTRA ITEMS */}
+                <div className="mb-6 p-6 bg-cyan-50 rounded-2xl border border-cyan-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Ornamental & Extra Items (Page 9)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Ornamental Floor</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.ornamentalFloor || ""} onChange={(e) => handleValuationChange('ornamentalFloor', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Ornamental Floor Amount</Label>
+                            <Input placeholder="e.g., Amount" value={formData.pdfDetails?.ornamentalFloorAmount || ""} onChange={(e) => handleValuationChange('ornamentalFloorAmount', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Stucco Veranda</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.stuccoVeranda || ""} onChange={(e) => handleValuationChange('stuccoVeranda', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Stucco Veranda Amount</Label>
+                            <Input placeholder="e.g., Amount" value={formData.pdfDetails?.stuccoVerandaAmount || ""} onChange={(e) => handleValuationChange('stuccoVerandaAmount', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Sheet Grills</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.sheetGrills || ""} onChange={(e) => handleValuationChange('sheetGrills', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Sheet Grills Amount</Label>
+                            <Input placeholder="e.g., Amount" value={formData.pdfDetails?.sheetGrillsAmount || ""} onChange={(e) => handleValuationChange('sheetGrillsAmount', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Overhead Water Tank</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.overheadWaterTank || ""} onChange={(e) => handleValuationChange('overheadWaterTank', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Overhead Water Tank Amount</Label>
+                            <Input placeholder="e.g., Amount" value={formData.pdfDetails?.overheadWaterTankAmount || ""} onChange={(e) => handleValuationChange('overheadWaterTankAmount', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Extra Shed Possible Gates</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.extraShedPossibleGates || ""} onChange={(e) => handleValuationChange('extraShedPossibleGates', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Extra Shed Possible Gates Amount</Label>
+                            <Input placeholder="e.g., Amount" value={formData.pdfDetails?.extraShedPossibleGatesAmount || ""} onChange={(e) => handleValuationChange('extraShedPossibleGatesAmount', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 10 - PART F SERVICES */}
+                <div className="mb-6 p-6 bg-rose-50 rounded-2xl border border-rose-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Part F - Services (Page 10)</h4>
+                    <div className="space-y-3 mb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Sr. No.</Label>
+                                <Input placeholder="Sr. No." value={formData.pdfDetails?.partFSrNo || ""} onChange={(e) => handleValuationChange('partFSrNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.partFDescription || ""} onChange={(e) => handleValuationChange('partFDescription', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Portico</Label>
+                                <Input placeholder="Portico" value={formData.pdfDetails?.partFPortico || ""} onChange={(e) => handleValuationChange('partFPortico', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    </div>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.[`partFItem${i}Description`] || ""} onChange={(e) => handleValuationChange(`partFItem${i}Description`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Amount</Label>
+                                <Input placeholder="Amount" value={formData.pdfDetails?.[`partFItem${i}Amount`] || ""} onChange={(e) => handleValuationChange(`partFItem${i}Amount`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    ))}
+                    <div className="space-y-1 mt-3">
+                        <Label className="text-xs font-bold text-gray-900">Part F Total</Label>
+                        <Input placeholder="Total" value={formData.pdfDetails?.partFTotal || ""} onChange={(e) => handleValuationChange('partFTotal', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                    </div>
+                </div>
+
+                {/* PAGE 11 - PART C EXTRA ITEMS */}
+                <div className="mb-6 p-6 bg-amber-50 rounded-2xl border border-amber-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Part C - Extra Items (Page 11)</h4>
+                    <div className="space-y-3 mb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Sr. No.</Label>
+                                <Input placeholder="Sr. No." value={formData.pdfDetails?.partCExtraSrNo || ""} onChange={(e) => handleValuationChange('partCExtraSrNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.partCExtraDescription || ""} onChange={(e) => handleValuationChange('partCExtraDescription', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Works Items</Label>
+                                <Input placeholder="Works Items" value={formData.pdfDetails?.partCExtraWorksItems || ""} onChange={(e) => handleValuationChange('partCExtraWorksItems', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    </div>
+                    {[1, 2, 3, 4, 5].map((i) => (
+                        <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.[`partCExtraItem${i}Description`] || ""} onChange={(e) => handleValuationChange(`partCExtraItem${i}Description`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Amount</Label>
+                                <Input placeholder="Amount" value={formData.pdfDetails?.[`partCExtraItem${i}Amount`] || ""} onChange={(e) => handleValuationChange(`partCExtraItem${i}Amount`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    ))}
+                    <div className="space-y-1 mt-3">
+                        <Label className="text-xs font-bold text-gray-900">Part C Extra Total</Label>
+                        <Input placeholder="Total" value={formData.pdfDetails?.partCExtraTotal || ""} onChange={(e) => handleValuationChange('partCExtraTotal', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                    </div>
+                </div>
+
+                {/* PAGE 12 - PART E MISCELLANEOUS */}
+                <div className="mb-6 p-6 bg-violet-50 rounded-2xl border border-violet-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Part E - Miscellaneous (Page 12)</h4>
+                    <div className="space-y-3 mb-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Sr. No.</Label>
+                                <Input placeholder="Sr. No." value={formData.pdfDetails?.partESrNo || ""} onChange={(e) => handleValuationChange('partESrNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.partEDescription || ""} onChange={(e) => handleValuationChange('partEDescription', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    </div>
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Description</Label>
+                                <Input placeholder="Description" value={formData.pdfDetails?.[`partEItem${i}Description`] || ""} onChange={(e) => handleValuationChange(`partEItem${i}Description`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs font-bold text-gray-900">Item {i} Amount</Label>
+                                <Input placeholder="Amount" value={formData.pdfDetails?.[`partEItem${i}Amount`] || ""} onChange={(e) => handleValuationChange(`partEItem${i}Amount`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                            </div>
+                        </div>
+                    ))}
+                    <div className="space-y-1 mt-3">
+                        <Label className="text-xs font-bold text-gray-900">Part E Total</Label>
+                        <Input placeholder="Total" value={formData.pdfDetails?.partETotal || ""} onChange={(e) => handleValuationChange('partETotal', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                    </div>
+                </div>
+
+                {/* PAGE 13 - BUILDING CONSTRUCTION DETAILS */}
+                <div className="mb-6 p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Building Construction Floor-wise (Page 13)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Sr. No.</Label>
+                            <Input placeholder="Sr. No." value={formData.pdfDetails?.buildingConstructionSrNo || ""} onChange={(e) => handleValuationChange('buildingConstructionSrNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Description</Label>
+                            <Input placeholder="Description" value={formData.pdfDetails?.buildingConstructionDescription || ""} onChange={(e) => handleValuationChange('buildingConstructionDescription', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Built Up Area</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.builtUpArea || ""} onChange={(e) => handleValuationChange('builtUpArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        {['Ground', '1st', '2nd', '3rd', '4th', '5th', '6th', 'Basement', 'GlassHouse'].map((floor, idx) => (
+                            <div key={idx} className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-bold text-gray-900">{floor} Floor Area</Label>
+                                    <Input placeholder="Area" value={formData.pdfDetails?.[`${floor.toLowerCase()}Floor`] || ""} onChange={(e) => handleValuationChange(`${floor.toLowerCase()}Floor`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-bold text-gray-900">{floor} Floor Rate</Label>
+                                    <Input placeholder="Rate" value={formData.pdfDetails?.[`${floor.toLowerCase()}FloorRate`] || ""} onChange={(e) => handleValuationChange(`${floor.toLowerCase()}FloorRate`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs font-bold text-gray-900">{floor} Floor Value</Label>
+                                    <Input placeholder="Value" value={formData.pdfDetails?.[`${floor.toLowerCase()}FloorValue`] || ""} onChange={(e) => handleValuationChange(`${floor.toLowerCase()}FloorValue`, e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="space-y-1 mt-4">
+                        <Label className="text-xs font-bold text-gray-900">Total Area Building</Label>
+                        <Input placeholder="Total Area" value={formData.pdfDetails?.totalAreaBuilding || ""} onChange={(e) => handleValuationChange('totalAreaBuilding', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                    </div>
+                </div>
+
+                {/* PAGE 13 - MEASUREMENT CARPET AREA */}
+                <div className="mb-6 p-6 bg-sky-50 rounded-2xl border border-sky-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Measurement Carpet Area (Page 13)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Carpet Area Sqft</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.carpetAreaSqft || ""} onChange={(e) => handleValuationChange('carpetAreaSqft', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Basement Floor Sqft</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.basementFloorSqft || ""} onChange={(e) => handleValuationChange('basementFloorSqft', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Ground Floor Sqft</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.groundFloorSqftMeasure || ""} onChange={(e) => handleValuationChange('groundFloorSqftMeasure', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Ground Floor Amount (₹)</Label>
+                            <Input placeholder="e.g., Amount" value={formData.pdfDetails?.groundFloorAmountInRupees || ""} onChange={(e) => handleValuationChange('groundFloorAmountInRupees', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Service Floor Carpet Area</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.serviceFloorCarpetArea || ""} onChange={(e) => handleValuationChange('serviceFloorCarpetArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Trace Area Carpet Area</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.traceAreaCarpetArea || ""} onChange={(e) => handleValuationChange('traceAreaCarpetArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">First Floor Carpet Area</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.firstFloorCarpetArea || ""} onChange={(e) => handleValuationChange('firstFloorCarpetArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Service Floor</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.serviceFloor || ""} onChange={(e) => handleValuationChange('serviceFloor', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Service Floor Rate</Label>
+                            <Input placeholder="e.g., Rate" value={formData.pdfDetails?.serviceFloorRate || ""} onChange={(e) => handleValuationChange('serviceFloorRate', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Service Floor Value</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.serviceFloorValue || ""} onChange={(e) => handleValuationChange('serviceFloorValue', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 14 - PLOT AREA & BUILT UP AREA */}
+                <div className="mb-6 p-6 bg-lime-50 rounded-2xl border border-lime-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Plot Area & Built Up Area (Page 14)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">West</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.west || ""} onChange={(e) => handleValuationChange('west', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Extent Area and Built Up Area</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.extentAreaAndBuildUpArea || ""} onChange={(e) => handleValuationChange('extentAreaAndBuildUpArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Plot Area as Per Sketched Plan</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.plotAreaAsPerSketchedPlan || ""} onChange={(e) => handleValuationChange('plotAreaAsPerSketchedPlan', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Plot Area in Built Up Area Sqft</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.plotAreaInBuildUpAreaInSqft || ""} onChange={(e) => handleValuationChange('plotAreaInBuildUpAreaInSqft', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Plot Area in Sqft</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.plotAreaInSqft || ""} onChange={(e) => handleValuationChange('plotAreaInSqft', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Build Up Area as Per Sketched Plan</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.buildUpAreaAsPerSketchedPlan || ""} onChange={(e) => handleValuationChange('buildUpAreaAsPerSketchedPlan', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Building Specifications Plot Layout</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.buildingSpecificationsPlotLayout || ""} onChange={(e) => handleValuationChange('buildingSpecificationsPlotLayout', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Floor Area Sqft</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.floorAreaSqft || ""} onChange={(e) => handleValuationChange('floorAreaSqft', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Rate of Construction Per Sqft</Label>
+                            <Input placeholder="e.g., Rate" value={formData.pdfDetails?.rateOfConstructionPerSqft || ""} onChange={(e) => handleValuationChange('rateOfConstructionPerSqft', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Value of Construction</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.valueOfConstruction || ""} onChange={(e) => handleValuationChange('valueOfConstruction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Rate of Construction Values</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.rateOfConstructionValues || ""} onChange={(e) => handleValuationChange('rateOfConstructionValues', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Building Specs Plot Layout Sqft Rate Value</Label>
+                            <Input placeholder="e.g., Value" value={formData.pdfDetails?.buildingSpecificationsPlotLayoutSqfRateValue || ""} onChange={(e) => handleValuationChange('buildingSpecificationsPlotLayoutSqfRateValue', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Deed Built Up Area Sqft</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.deedBuiltUpAreaSqft || ""} onChange={(e) => handleValuationChange('deedBuiltUpAreaSqft', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Estimated Repair Cost of Construction</Label>
+                            <Input placeholder="e.g., Cost" value={formData.pdfDetails?.estimatedRepairCostOfConstruction || ""} onChange={(e) => handleValuationChange('estimatedRepairCostOfConstruction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Floor Area Sqft Land</Label>
+                            <Input placeholder="e.g., Sq. ft." value={formData.pdfDetails?.floorAreaSqftLand || ""} onChange={(e) => handleValuationChange('floorAreaSqftLand', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Rate Per Sqft Land</Label>
+                            <Input placeholder="e.g., Rate" value={formData.pdfDetails?.ratePerSqftLand || ""} onChange={(e) => handleValuationChange('ratePerSqftLand', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Interior 0% Land</Label>
+                            <Input placeholder="e.g., Percentage" value={formData.pdfDetails?.interior0PercentLand || ""} onChange={(e) => handleValuationChange('interior0PercentLand', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Entrance Canopy Area</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.entranceCanopyArea || ""} onChange={(e) => handleValuationChange('entranceCanopyArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 15 - PROPERTY DETAILS */}
+                <div className="mb-6 p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Property Details (Page 15)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Location of Property</Label>
+                            <Input placeholder="e.g., Location" value={formData.pdfDetails?.locationOfProperty || ""} onChange={(e) => handleValuationChange('locationOfProperty', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Plot No.</Label>
+                            <Input placeholder="e.g., Plot No." value={formData.pdfDetails?.plotNo || ""} onChange={(e) => handleValuationChange('plotNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Survey No.</Label>
+                            <Input placeholder="e.g., Survey No." value={formData.pdfDetails?.surveyNo || ""} onChange={(e) => handleValuationChange('surveyNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Door No.</Label>
+                            <Input placeholder="e.g., Door No." value={formData.pdfDetails?.doorNo || ""} onChange={(e) => handleValuationChange('doorNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Taluka</Label>
+                            <Input placeholder="e.g., Taluka" value={formData.pdfDetails?.taluka || ""} onChange={(e) => handleValuationChange('taluka', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Mandal</Label>
+                            <Input placeholder="e.g., Mandal" value={formData.pdfDetails?.mandal || ""} onChange={(e) => handleValuationChange('mandal', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">District</Label>
+                            <Input placeholder="e.g., District" value={formData.pdfDetails?.district || ""} onChange={(e) => handleValuationChange('district', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">City/Town</Label>
+                            <Input placeholder="e.g., City" value={formData.pdfDetails?.cityTown || ""} onChange={(e) => handleValuationChange('cityTown', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Residential Area</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.residentialArea || ""} onChange={(e) => handleValuationChange('residentialArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Commercial Area</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.commercialArea || ""} onChange={(e) => handleValuationChange('commercialArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Industrial Area</Label>
+                            <Input placeholder="e.g., Area" value={formData.pdfDetails?.industrialArea || ""} onChange={(e) => handleValuationChange('industrialArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Classification of Area</Label>
+                            <Input placeholder="e.g., Classification" value={formData.pdfDetails?.classificationOfArea || ""} onChange={(e) => handleValuationChange('classificationOfArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Urban/Rural</Label>
+                            <Input placeholder="e.g., Urban/Rural" value={formData.pdfDetails?.urbanRural || ""} onChange={(e) => handleValuationChange('urbanRural', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Mile Semi Urban</Label>
+                            <Input placeholder="e.g., Mile" value={formData.pdfDetails?.mileSemUrban || ""} onChange={(e) => handleValuationChange('mileSemUrban', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Municipal Corporation As Per</Label>
+                            <Input placeholder="e.g., Municipal" value={formData.pdfDetails?.municipalCorporationAsPer || ""} onChange={(e) => handleValuationChange('municipalCorporationAsPer', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                    <div className="space-y-1 mt-4">
+                        <Label className="text-xs font-bold text-gray-900">Brief Description of Property</Label>
+                        <Textarea placeholder="Brief description" value={formData.pdfDetails?.briefDescriptionOfProperty || ""} onChange={(e) => handleValuationChange('briefDescriptionOfProperty', e.target.value)} disabled={!canEdit} className="text-xs rounded-lg border border-neutral-300 py-1 px-2" rows="2" />
+                    </div>
+                </div>
+
+                {/* BOUNDARIES OF PROPERTY */}
+                <div className="mb-6 p-6 bg-red-50 rounded-2xl border border-red-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Boundaries of Property</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Boundaries of the Property</Label>
+                            <Input placeholder="e.g., Description" value={formData.pdfDetails?.boundariesOfTheProperty || ""} onChange={(e) => handleValuationChange('boundariesOfTheProperty', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">North Boundary</Label>
+                            <Input placeholder="e.g., Boundary" value={formData.pdfDetails?.northBoundary || ""} onChange={(e) => handleValuationChange('northBoundary', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">South Boundary</Label>
+                            <Input placeholder="e.g., Boundary" value={formData.pdfDetails?.southBoundary || ""} onChange={(e) => handleValuationChange('southBoundary', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">East Boundary</Label>
+                            <Input placeholder="e.g., Boundary" value={formData.pdfDetails?.eastBoundary || ""} onChange={(e) => handleValuationChange('eastBoundary', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">West Boundary</Label>
+                            <Input placeholder="e.g., Boundary" value={formData.pdfDetails?.westBoundary || ""} onChange={(e) => handleValuationChange('westBoundary', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 16 - APARTMENT & STRUCTURE */}
+                <div className="mb-6 p-6 bg-fuchsia-50 rounded-2xl border border-fuchsia-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Apartment Building & Nature (Page 16)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Classification of Locality</Label>
+                            <Input placeholder="e.g., Classification" value={formData.pdfDetails?.classificationOfLocality || ""} onChange={(e) => handleValuationChange('classificationOfLocality', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Development of Surrounding Areas</Label>
+                            <Input placeholder="e.g., Development" value={formData.pdfDetails?.developmentOfSurroundingAreas || ""} onChange={(e) => handleValuationChange('developmentOfSurroundingAreas', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Possibility of Future Housing Mixing</Label>
+                            <Input placeholder="e.g., Possibility" value={formData.pdfDetails?.possibilityOfFutureHousingMixing || ""} onChange={(e) => handleValuationChange('possibilityOfFutureHousingMixing', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Feasibility of 1 to 2 Kms</Label>
+                            <Input placeholder="e.g., Feasibility" value={formData.pdfDetails?.feasibilityOf1To2Kms || ""} onChange={(e) => handleValuationChange('feasibilityOf1To2Kms', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Type of Structure Material</Label>
+                            <Input placeholder="e.g., Material" value={formData.pdfDetails?.typeOfStructureMaterial || ""} onChange={(e) => handleValuationChange('typeOfStructureMaterial', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Share of Land</Label>
+                            <Input placeholder="e.g., Share" value={formData.pdfDetails?.shareOfLand || ""} onChange={(e) => handleValuationChange('shareOfLand', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Type of Use</Label>
+                            <Input placeholder="e.g., Type" value={formData.pdfDetails?.typeOfUseToWhichItCanBePut || ""} onChange={(e) => handleValuationChange('typeOfUseToWhichItCanBePut', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Any Usage Restriction</Label>
+                            <Input placeholder="e.g., Restriction" value={formData.pdfDetails?.anyUsageRestriction || ""} onChange={(e) => handleValuationChange('anyUsageRestriction', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Is Plot in Town Planning</Label>
+                            <Input placeholder="e.g., Yes/No" value={formData.pdfDetails?.isPlotInTownPlanning || ""} onChange={(e) => handleValuationChange('isPlotInTownPlanning', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Corner Plot or Interior Facilities</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.cornerPlotOrInteriorFacilities || ""} onChange={(e) => handleValuationChange('cornerPlotOrInteriorFacilities', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Year of Road Availability</Label>
+                            <Input placeholder="e.g., Year" value={formData.pdfDetails?.yearOfRoadAvailability || ""} onChange={(e) => handleValuationChange('yearOfRoadAvailability', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Water Road Available Below or Above</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.waterRoadAvailableBelowOrAbove || ""} onChange={(e) => handleValuationChange('waterRoadAvailableBelowOrAbove', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Is A Land Area</Label>
+                            <Input placeholder="e.g., Yes/No" value={formData.pdfDetails?.isALandArea || ""} onChange={(e) => handleValuationChange('isALandArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Water Sewerage System</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.waterSewerageSystem || ""} onChange={(e) => handleValuationChange('waterSewerageSystem', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Apartment Nature</Label>
+                            <Input placeholder="e.g., Nature" value={formData.pdfDetails?.apartmentNature || ""} onChange={(e) => handleValuationChange('apartmentNature', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Apartment Location</Label>
+                            <Input placeholder="e.g., Location" value={formData.pdfDetails?.apartmentLocation || ""} onChange={(e) => handleValuationChange('apartmentLocation', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Apartment CTS No</Label>
+                            <Input placeholder="e.g., CTS No." value={formData.pdfDetails?.apartmentCTSNo || ""} onChange={(e) => handleValuationChange('apartmentCTSNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Apartment Sector No</Label>
+                            <Input placeholder="e.g., Sector No." value={formData.pdfDetails?.apartmentSectorNo || ""} onChange={(e) => handleValuationChange('apartmentSectorNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Apartment Block No</Label>
+                            <Input placeholder="e.g., Block No." value={formData.pdfDetails?.apartmentBlockNo || ""} onChange={(e) => handleValuationChange('apartmentBlockNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Apartment Ward No</Label>
+                            <Input placeholder="e.g., Ward No." value={formData.pdfDetails?.apartmentWardNo || ""} onChange={(e) => handleValuationChange('apartmentWardNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Apartment Village/Municipality/County</Label>
+                            <Input placeholder="e.g., Village" value={formData.pdfDetails?.apartmentVillageMunicipalityCounty || ""} onChange={(e) => handleValuationChange('apartmentVillageMunicipalityCounty', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Apartment Door No/Street Road</Label>
+                            <Input placeholder="e.g., Door No." value={formData.pdfDetails?.apartmentDoorNoStreetRoad || ""} onChange={(e) => handleValuationChange('apartmentDoorNoStreetRoad', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Apartment Pin Code</Label>
+                            <Input placeholder="e.g., Pin Code" value={formData.pdfDetails?.apartmentPinCode || ""} onChange={(e) => handleValuationChange('apartmentPinCode', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Number of Dwelling Units in Building</Label>
+                            <Input placeholder="e.g., Number" value={formData.pdfDetails?.numberOfDwellingUnitsInBuilding || ""} onChange={(e) => handleValuationChange('numberOfDwellingUnitsInBuilding', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Description of Locality</Label>
+                            <Input placeholder="e.g., Description" value={formData.pdfDetails?.descriptionOfLocalityResidentialCommercialMixed || ""} onChange={(e) => handleValuationChange('descriptionOfLocalityResidentialCommercialMixed', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                    </div>
+                </div>
+
+                {/* PAGE 17 - APPROVAL & AUTHORIZATION */}
+                <div className="mb-6 p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                    <h4 className="font-bold text-gray-900 mb-4">Approval & Authorization (Page 17)</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Construction As Per</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.constructionAsPer || ""} onChange={(e) => handleValuationChange('constructionAsPer', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Panchayat Municipality Search Report</Label>
+                            <Input placeholder="e.g., Report" value={formData.pdfDetails?.panchayatMunicipalitySearchReport || ""} onChange={(e) => handleValuationChange('panchayatMunicipalitySearchReport', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Water Covered Under Sale Deeds</Label>
+                            <Input placeholder="e.g., Covered/Not Covered" value={formData.pdfDetails?.watercoveredUnderSaleDeeds || ""} onChange={(e) => handleValuationChange('watercoveredUnderSaleDeeds', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Government Enactments Or Utilities</Label>
+                            <Input placeholder="e.g., Details" value={formData.pdfDetails?.governmentEnctmentsOrUtilitiesScheduledArea || ""} onChange={(e) => handleValuationChange('governmentEnctmentsOrUtilitiesScheduledArea', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Date Issue and Validity of Approved Plan</Label>
+                            <Input type="date" value={formData.pdfDetails?.dateIssueAndValidityOfApprovedPlan || ""} onChange={(e) => handleValuationChange('dateIssueAndValidityOfApprovedPlan', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Whether Generous On Authority</Label>
+                            <Input placeholder="e.g., Yes/No" value={formData.pdfDetails?.whetherGenerousOnAuthority || ""} onChange={(e) => handleValuationChange('whetherGenerousOnAuthority', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Any Other Comments or Authority</Label>
+                            <Input placeholder="e.g., Comments" value={formData.pdfDetails?.anyOtherCommentsOrAuthorityApprovedPlan || ""} onChange={(e) => handleValuationChange('anyOtherCommentsOrAuthorityApprovedPlan', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Purpose For Valuation</Label>
+                            <Input placeholder="e.g., Purpose" value={formData.pdfDetails?.purposeForValuation || ""} onChange={(e) => handleValuationChange('purposeForValuation', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Date of Inspection</Label>
+                            <Input type="date" value={formData.pdfDetails?.dateOfInspection || ""} onChange={(e) => handleValuationChange('dateOfInspection', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Date On Which Valuation Is Made</Label>
+                            <Input type="date" value={formData.pdfDetails?.dateOnWhichValuationIsMade || ""} onChange={(e) => handleValuationChange('dateOnWhichValuationIsMade', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">List of Documents Produced For Perusal</Label>
+                            <Textarea placeholder="e.g., Documents" value={formData.pdfDetails?.listOfDocumentsProducedForPerusal || ""} onChange={(e) => handleValuationChange('listOfDocumentsProducedForPerusal', e.target.value)} disabled={!canEdit} className="text-xs rounded-lg border border-neutral-300 py-1 px-2" rows="2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Protocol Documents</Label>
+                            <Input placeholder="e.g., Documents" value={formData.pdfDetails?.protocolDocuments || ""} onChange={(e) => handleValuationChange('protocolDocuments', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Sanctioned Plan Status</Label>
+                            <Input placeholder="e.g., Status" value={formData.pdfDetails?.sanctionedPlanStatus || ""} onChange={(e) => handleValuationChange('sanctionedPlanStatus', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Certificate Number</Label>
+                            <Input placeholder="e.g., Certificate No." value={formData.pdfDetails?.certificateNumber || ""} onChange={(e) => handleValuationChange('certificateNumber', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Building Completion Certificate</Label>
+                            <Input placeholder="e.g., Certificate" value={formData.pdfDetails?.buildingCompletionCertificate || ""} onChange={(e) => handleValuationChange('buildingCompletionCertificate', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Completion Certificate No</Label>
+                            <Input placeholder="e.g., Certificate No." value={formData.pdfDetails?.completionCertificateNo || ""} onChange={(e) => handleValuationChange('completionCertificateNo', e.target.value)} disabled={!canEdit} className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Owner Address Joint Owners</Label>
+                            <Textarea placeholder="e.g., Address" value={formData.pdfDetails?.ownerAddressJointOwners || ""} onChange={(e) => handleValuationChange('ownerAddressJointOwners', e.target.value)} disabled={!canEdit} className="text-xs rounded-lg border border-neutral-300 py-1 px-2" rows="2" />
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs font-bold text-gray-900">Joint Owners Details of Ownership</Label>
+                            <Textarea placeholder="e.g., Details" value={formData.pdfDetails?.jointOwnersDeDetailsOfJointOwnership || ""} onChange={(e) => handleValuationChange('jointOwnersDeDetailsOfJointOwnership', e.target.value)} disabled={!canEdit} className="text-xs rounded-lg border border-neutral-300 py-1 px-2" rows="2" />
+                        </div>
+                    </div>
+                </div>
                 {/* VALUATION ITEMS TABLE */}
                 <div className="mb-6 p-6 bg-rose-50 rounded-2xl border border-rose-100">
                     <h4 className="font-bold text-gray-900 mb-4 text-base">Valuation Details Table</h4>
@@ -2370,12 +3379,12 @@ const UbiApfEditForm = ({ user, onLogin }) => {
                     </div>
                 </div>
 
-                {/* VALUE OF FLAT - AUTO-CALCULATED RESULTS SECTION */}
+                {/* VALUE OF FLAT SECTION */}
                 <div className="mb-6 p-6 bg-teal-50 rounded-2xl border border-teal-100">
-                    <h4 className="font-bold text-gray-900 mb-4 text-base">Value of Flat - Auto-Calculated Results</h4>
+                    <h4 className="font-bold text-gray-900 mb-4 text-base">Value of Flat</h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-bold text-gray-900">Total Valuation (Market Value)</Label>
+                            <Label className="text-xs font-bold text-gray-900">Fair Market Value</Label>
                             <Input
                                 type="number"
                                 placeholder="Auto-calculated or enter value"
@@ -2386,7 +3395,7 @@ const UbiApfEditForm = ({ user, onLogin }) => {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-bold text-gray-900">Realisable Value (90%)</Label>
+                            <Label className="text-xs font-bold text-gray-900">Realizable Value</Label>
                             <Input
                                 type="number"
                                 placeholder="Auto-calculated or enter value"
@@ -2397,7 +3406,7 @@ const UbiApfEditForm = ({ user, onLogin }) => {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-bold text-gray-900">Distress Value (80%)</Label>
+                            <Label className="text-xs font-bold text-gray-900">Distress Value</Label>
                             <Input
                                 type="number"
                                 placeholder="Auto-calculated or enter value"
@@ -2408,12 +3417,23 @@ const UbiApfEditForm = ({ user, onLogin }) => {
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <Label className="text-xs font-bold text-gray-900">Insurable Value (35%)</Label>
+                            <Label className="text-xs font-bold text-gray-900">Sale Deed Value</Label>
                             <Input
                                 type="number"
-                                placeholder="Auto-calculated or enter value"
-                                value={formData.pdfDetails?.insurableValue || ""}
-                                onChange={(e) => handleValuationChange('insurableValue', e.target.value)}
+                                placeholder="Enter Sale Deed Value"
+                                value={formData.pdfDetails?.saleDeedValue || ""}
+                                onChange={(e) => handleValuationChange('saleDeedValue', e.target.value)}
+                                disabled={!canEdit}
+                                className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold text-gray-900">Agreement Circle Rate</Label>
+                            <Input
+                                type="number"
+                                placeholder="Enter Agreement Circle Rate"
+                                value={formData.pdfDetails?.agreementCircleRate || ""}
+                                onChange={(e) => handleValuationChange('agreementCircleRate', e.target.value)}
                                 disabled={!canEdit}
                                 className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
                             />
@@ -2436,6 +3456,28 @@ const UbiApfEditForm = ({ user, onLogin }) => {
                                 placeholder="Enter Value as per Circle Rate"
                                 value={formData.pdfDetails?.valueCircleRate || ""}
                                 onChange={(e) => handleValuationChange('valueCircleRate', e.target.value)}
+                                disabled={!canEdit}
+                                className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold text-gray-900">Insurable Value</Label>
+                            <Input
+                                type="number"
+                                placeholder="Auto-calculated or enter value"
+                                value={formData.pdfDetails?.insurableValue || ""}
+                                onChange={(e) => handleValuationChange('insurableValue', e.target.value)}
+                                disabled={!canEdit}
+                                className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <Label className="text-xs font-bold text-gray-900">Total Jantri Value</Label>
+                            <Input
+                                type="number"
+                                placeholder="Enter Total Jantri Value"
+                                value={formData.pdfDetails?.totalJantriValue || ""}
+                                onChange={(e) => handleValuationChange('totalJantriValue', e.target.value)}
                                 disabled={!canEdit}
                                 className="h-9 text-xs rounded-lg border border-teal-300 bg-white focus:border-teal-500 focus:ring-2 focus:ring-teal-200 px-3 w-full"
                             />
@@ -4181,12 +5223,21 @@ const UbiApfEditForm = ({ user, onLogin }) => {
                 <h4 className="font-bold text-gray-900 mb-4">Electricity Service Details</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     <div className="space-y-1">
-                        <Label className="text-xs font-bold text-gray-900">Electricity service connection number Meter
-                            card is in the name of </Label>
+                        <Label className="text-xs font-bold text-gray-900">Electricity service connection number</Label>
                         <Input
                             placeholder="e.g., Service Number"
                             value={formData.pdfDetails?.electricityServiceNo || ""}
                             onChange={(e) => handleValuationChange('electricityServiceNo', e.target.value)}
+                            disabled={!canEdit}
+                            className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <Label className="text-xs font-bold text-gray-900">Meter card is in the name of</Label>
+                        <Input
+                            placeholder="e.g., Name"
+                            value={formData.pdfDetails?.meterCardName || ""}
+                            onChange={(e) => handleValuationChange('meterCardName', e.target.value)}
                             disabled={!canEdit}
                             className="h-8 text-xs rounded-lg border border-neutral-300 py-1 px-2 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                         />

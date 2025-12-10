@@ -23,285 +23,123 @@ const ubiApfPhotoSchema = new mongoose.Schema({
 }, { _id: false });
 
 const ubiApfPdfDetailsSchema = new mongoose.Schema({
-   
-    // PROPERTY DETAILS
-    briefDescriptionOfProperty: { type: String, default: "" },
-    locationOfProperty: { type: String, default: "" },
-    plotNo: { type: String, default: "" },
-    surveyNo: { type: String, default: "" },
-    doorNo: { type: String, default: "" },
-    taluka: { type: String, default: "" },
-    mandal: { type: String, default: "" },
-    district: { type: String, default: "" },
-
-    // GENERAL PROPERTY INFO
-    cityTown: { type: String, default: "" },
-    residentialArea: { type: String, default: "" },
-    commercialArea: { type: String, default: "" },
-    industrialArea: { type: String, default: "" },
-    classificationOfArea: { type: String, default: "" },
-    height: { type: String, default: "" },
-    urbanRural: { type: String, default: "" },
-    mileSemUrban: { type: String, default: "" },
-    municipalCorporationAsPer: { type: String, default: "" },
-
-    // BOUNDARY & DIMENSIONS
-    boundariesOfTheProperty: { type: String, default: "" },
-    northBoundary: { type: String, default: "" },
-    southBoundary: { type: String, default: "" },
-    eastBoundary: { type: String, default: "" },
-    westBoundary: { type: String, default: "" },
-
-    // LAYOUT & MEASUREMENTS
-    plotLayoutNo: { type: String, default: "" },
-    sNo41: { type: String, default: "" },
-    sNo42: { type: String, default: "" },
-    sNo9: { type: String, default: "" },
-    asPerDeedNo: { type: String, default: "" },
-    asPerDeedArea: { type: String, default: "" },
-
-    // CONSTRUCTION DETAILS
-    constructionAsPer: { type: String, default: "" },
-    panchayatMunicipalitySearchReport: { type: String, default: "" },
-    watercoveredUnderSaleDeeds: { type: String, default: "" },
-    governmentEnctmentsOrUtilitiesScheduledArea: { type: String, default: "" },
-
-    // APPROVAL & VALIDITY
-    dateIssueAndValidityOfApprovedPlan: { type: String, default: "" },
-    whetherGenerousOnAuthority: { type: String, default: "" },
-    anyOtherCommentsOrAuthorityApprovedPlan: { type: String, default: "" },
-
-    // BUILDING CONSTRUCTION INFO
-    buildingConsistenceAs: { type: String, default: "" },
-    greyWordCompleted: { type: String, default: "" },
-    mrDwyingUnderwaiting: { type: String, default: "" },
-    approvedPlaneAssembly: { type: String, default: "" },
-
-    // BUILDING SPECIFICATIONS
-    buildingPlan: { type: String, default: "" },
-    groundFloorArea: { type: String, default: "" },
-    approvedPlan: { type: String, default: "" },
-
-    // VALUATION REPORT DETAILS
-    purposeForValuation: { type: String, default: "" },
-    dateOfInspection: { type: String, default: "" },
-    dateOnWhichValuationIsMade: { type: String, default: "" },
-    listOfDocumentsProducedForPerusal: { type: String, default: "" },
-    protocolDocuments: { type: String, default: "" },
-
-    // SANCTIONED PLAN
-    sanctionedPlanStatus: { type: String, default: "" },
-    certificateNumber: { type: String, default: "" },
-
-    // BUILDING COMPLETION
-    buildingCompletionCertificate: { type: String, default: "" },
-    completionCertificateNo: { type: String, default: "" },
-    ownerAddressJointOwners: { type: String, default: "" },
-    jointOwnersDeDetailsOfJointOwnership: { type: String, default: "" },
-
-    // APARTMENT BUILDING SECTION (Page 6)
-    classificationOfLocality: { type: String, default: "" },
-    developmentOfSurroundingAreas: { type: String, default: "" },
-    possibilityOfFutureHousingMixing: { type: String, default: "" },
-    feasibilityOf1To2Kms: { type: String, default: "" },
-    typeOfStructureMaterial: { type: String, default: "" },
-    shareOfLand: { type: String, default: "" },
-    typeOfUseToWhichItCanBePut: { type: String, default: "" },
-    anyUsageRestriction: { type: String, default: "" },
-    isPlotInTownPlanning: { type: String, default: "" },
-    cornerPlotOrInteriorFacilities: { type: String, default: "" },
-    yearOfRoadAvailability: { type: String, default: "" },
-    waterRoadAvailableBelowOrAbove: { type: String, default: "" },
-    isALandArea: { type: String, default: "" },
-    waterSewerageSystem: { type: String, default: "" },
-
-    // VALUATION DETAILS (Page 7)
-    assessedOrAdoptedRateForValuation: { type: String, default: "" },
-    estimatedRuleOfLand: { type: String, default: "" },
-    technicalDetailsOfBuilding: { type: String, default: "" },
-    typeOfBuildingVenture: { type: String, default: "" },
-    typeOfConstructionLandCeiling: { type: String, default: "" },
-    typeOfPropertyVenture: { type: String, default: "" },
-    yearOfProperty: { type: String, default: "" },
-    residualUseOfBuildingEstimated: { type: String, default: "" },
-    carpetAreaMeasurementDetails: { type: String, default: "" },
-
-    // PLOT & AREA DETAILS (Page 5)
-    plotAreaNorth: { type: String, default: "" },
-    plotAreaSouth: { type: String, default: "" },
-    plotAreaEast: { type: String, default: "" },
-    plotAreaWest: { type: String, default: "" },
-    extentOfArea: { type: String, default: "" },
-    plinthArea: { type: String, default: "" },
-    technicalDetailsOfStructure: { type: String, default: "" },
-    typeOfConstructionFrame: { type: String, default: "" },
-    yearOfConstruction: { type: String, default: "" },
-
-    // FLOOR AREA DETAILS (Page 8)
-    groundFloorAreaBuiltUp: { type: String, default: "" },
-    firstFloor: { type: String, default: "" },
-    secondFloor: { type: String, default: "" },
-    thirdFloor: { type: String, default: "" },
-    fourthFloor: { type: String, default: "" },
-    fifthFloor: { type: String, default: "" },
-    sixthFloor: { type: String, default: "" },
-    seventhFloor: { type: String, default: "" },
-    eighthFloor: { type: String, default: "" },
-    ninthFloor: { type: String, default: "" },
-    tenthFloor: { type: String, default: "" },
+    
+    // PAGE 1 - COST OF CONSTRUCTION AS PER ACTUAL MEASUREMENT
+    subArea: { type: String, default: "" },
     basementFloor: { type: String, default: "" },
-    totalCarpetArea: { type: String, default: "" },
-
-    // CONSTRUCTION SPECIFICATIONS (Page 9)
-    finishingWorkInProgress: { type: String, default: "" },
-    buildingPlanStructured: { type: String, default: "" },
-    dateIssueAndValidityOfLayout: { type: String, default: "" },
-    approvalAuthority: { type: String, default: "" },
-    weatherGenuinessOrAuthenticity: { type: String, default: "" },
-    anyOtherComments: { type: String, default: "" },
-    specificationConstructionFloorSlab: { type: String, default: "" },
-    foundationDescription: { type: String, default: "" },
-    basementDescription: { type: String, default: "" },
-    superstructureDescription: { type: String, default: "" },
-    entranceDoor: { type: String, default: "" },
-    otherDoor: { type: String, default: "" },
-    windows: { type: String, default: "" },
-    flooringShirtingDetails: { type: String, default: "" },
-    specialFinish: { type: String, default: "" },
-    roofingWeatherproofCourse: { type: String, default: "" },
-    drainage: { type: String, default: "" },
-    damp: { type: String, default: "" },
-    rccFrameOrRccSlab: { type: String, default: "" },
-    proposedETPPlantPerPCBNorms: { type: String, default: "" },
-
-    // PLOT CONSTRUCTION & LAYOUT DETAILS
-    compoundwall: { type: String, default: "" },
+    groundArea: { type: String, default: "" },
+    socketFloor: { type: String, default: "" },
+    terraceArea: { type: String, default: "" },
+    firstFloorConstruction: { type: String, default: "" },
+    secondFloorConstruction: { type: String, default: "" },
+    thirdFloorConstruction: { type: String, default: "" },
+    fourthFloorConstruction: { type: String, default: "" },
+    fifthFloorConstruction: { type: String, default: "" },
+    sixthFloorConstruction: { type: String, default: "" },
+    glassHouseFloor: { type: String, default: "" },
+    totalAreaAmount: { type: String, default: "" },
+    valueCostAmount: { type: String, default: "" },
+    ratePerSqftAmount: { type: String, default: "" },
+    
+    // PAGE 2 - TOTAL ABSTRACT OF THE ENTIRE PROPERTY (OWNED)
+    partA: { type: String, default: "" },
+    partB: { type: String, default: "" },
+    partC: { type: String, default: "" },
+    partD: { type: String, default: "" },
+    partE: { type: String, default: "" },
+    partF: { type: String, default: "" },
+    
+    // PAGE 3 - GENERAL INFORMATION
+    theMarketValueOfAbovePropertyIs: { type: String, default: "" },
+    theRealisableValueOfAbovePropertyIs: { type: String, default: "" },
+    theInsurableValueOfAbovePropertyIs: { type: String, default: "" },
+    place: { type: String, default: "" },
+    date: { type: String, default: "" },
+    signatureOfBranchManagerWithOfficeSeal: { type: String, default: "" },
+    shashilantRDhumalSignatureOfApprover: { type: String, default: "" },
+    theUndersignedHasInspectedThePropertyDetailedInTheValuationReportCrossVerifyTheFollowingDetailsAndFoundToBeAccurate: { type: String, default: "" },
+    thePropertyIsReasonablyMarketValueOn: { type: String, default: "" },
+    theUndersignedHasInspectedAndSatisfiedThatTheFairAndReasonableMarketValueOn: { type: String, default: "" },
+    
+    // PAGE 4 - TOTAL ABSTRACT OF ENTIRE PROPERTY
+    abstractLand: { type: String, default: "" },
+    abstractBuilding: { type: String, default: "" },
+    abstractExtraItems: { type: String, default: "" },
+    abstractAmenities: { type: String, default: "" },
+    abstractMiscellaneous: { type: String, default: "" },
+    abstractServices: { type: String, default: "" },
+    abstractTotalValue: { type: String, default: "" },
+    
+    asAResultOfMyAppraisalAndAnalysisItIsMyConsideredOpinionThatThePresentFairMarketValue: { type: String, default: "" },
+    valueOfTheAbovePropertyAsOnTheValuationDateIs: { type: String, default: "" },
+    preValuationRatePercentageWithDeductionWithRespectToTheAgreementValuePropertyDeed: { type: String, default: "" },
+    
+    // PAGE 5 - PART A - SERVICES
+    srNo: { type: String, default: "" },
+    description1: { type: String, default: "" },
+    amountInRupees1: { type: String, default: "" },
+    
+    // PAGE 5 - PART A - CONTINUED (12 rows with Sr. No., Description, Amount in Rupees)
+    part1SrNo1: { type: String, default: "" },
+    part1Description1: { type: String, default: "" },
+    part1Amount1: { type: String, default: "" },
+    part1SrNo2: { type: String, default: "" },
+    part1Description2: { type: String, default: "" },
+    part1Amount2: { type: String, default: "" },
+    part1SrNo3: { type: String, default: "" },
+    part1Description3: { type: String, default: "" },
+    part1Amount3: { type: String, default: "" },
+    part1SrNo4: { type: String, default: "" },
+    part1Description4: { type: String, default: "" },
+    part1Amount4: { type: String, default: "" },
+    part1SrNo5: { type: String, default: "" },
+    part1Description5: { type: String, default: "" },
+    part1Amount5: { type: String, default: "" },
+    
+    // PAGE 6 - PART A - AMENITIES (with Description and Amount in Rupees for 9 items)
+    part2SrNo: { type: String, default: "" },
+    part2Description: { type: String, default: "" },
+    part2Workbeds: { type: String, default: "" },
+    part2Item1Description: { type: String, default: "" },
+    part2Item1Amount: { type: String, default: "" },
+    part2Item2Description: { type: String, default: "" },
+    part2Item2Amount: { type: String, default: "" },
+    part2Item3Description: { type: String, default: "" },
+    part2Item3Amount: { type: String, default: "" },
+    part2Item4Description: { type: String, default: "" },
+    part2Item4Amount: { type: String, default: "" },
+    part2Item5Description: { type: String, default: "" },
+    part2Item5Amount: { type: String, default: "" },
+    part2Item6Description: { type: String, default: "" },
+    part2Item6Amount: { type: String, default: "" },
+    part2Item7Description: { type: String, default: "" },
+    part2Item7Amount: { type: String, default: "" },
+    part2Item8Description: { type: String, default: "" },
+    part2Item8Amount: { type: String, default: "" },
+    part2Item9Description: { type: String, default: "" },
+    part2Item9Amount: { type: String, default: "" },
+    part2Total: { type: String, default: "" },
+    
+    // PAGE 7 - PART C - MISCELLANEOUS
+    part3SrNo: { type: String, default: "" },
+    part3Description: { type: String, default: "" },
+    part3Item1Description: { type: String, default: "" },
+    part3Item1Amount: { type: String, default: "" },
+    part3Item2Description: { type: String, default: "" },
+    part3Item2Amount: { type: String, default: "" },
+    part3Item3Description: { type: String, default: "" },
+    part3Item3Amount: { type: String, default: "" },
+    part3Item4Description: { type: String, default: "" },
+    part3Item4Amount: { type: String, default: "" },
+    part3Item5Description: { type: String, default: "" },
+    part3Item5Amount: { type: String, default: "" },
+    part3Total: { type: String, default: "" },
+    
+    // PAGE 8 - DETAILS OF VALUATION OF BUILDING - COMPOUND WALL & FIXTURES
+    compoundWall: { type: String, default: "" },
     height: { type: String, default: "" },
     length: { type: String, default: "" },
     typeOfConstruction: { type: String, default: "" },
-    electricalInstallationPlot: { type: String, default: "" },
-    typeOfWiringPlot: { type: String, default: "" },
-    numberOfFittingPoints: { type: String, default: "" },
-    farPlugsPlot: { type: String, default: "" },
-    sparePlugPlot: { type: String, default: "" },
-    anyOtherItemPlot: { type: String, default: "" },
-    printingInstallation: { type: String, default: "" },
-    numberOfWaterClassAndTapsPlot: { type: String, default: "" },
-    noWashBasinsPlot: { type: String, default: "" },
-    noUrinalsPlot: { type: String, default: "" },
-    noOfBathtubsPlot: { type: String, default: "" },
-    waterMeterTapsPlot: { type: String, default: "" },
-    anyOtherFixturePlot: { type: String, default: "" },
-
-    // ORNAMENTAL FLOOR & AMENITIES (Page 12) - DETAILED ITEMS
-    ornamentalFloor: { type: String, default: "" },
-    ornamentalFloorAmount: { type: String, default: "" },
-    stuccoVeranda: { type: String, default: "" },
-    stuccoVerandaAmount: { type: String, default: "" },
-    sheetGrills: { type: String, default: "" },
-    sheetGrillsAmount: { type: String, default: "" },
-    overheadWaterTank: { type: String, default: "" },
-    overheadWaterTankAmount: { type: String, default: "" },
-    extraShedPossibleGates: { type: String, default: "" },
-    extraShedPossibleGatesAmount: { type: String, default: "" },
-    ornamentalTotal: { type: String, default: "" },
-
-    // PART C - AMENITIES (Revised)
-    partCAmenities1Description: { type: String, default: "" },
-    partCAmenities1AmountInRupees: { type: String, default: "" },
-    partCAmenities2Description: { type: String, default: "" },
-    partCAmenities2AmountInRupees: { type: String, default: "" },
-    partCAmenities3Description: { type: String, default: "" },
-    partCAmenities3AmountInRupees: { type: String, default: "" },
-    partCAmenities4Description: { type: String, default: "" },
-    partCAmenities4AmountInRupees: { type: String, default: "" },
-    partCAmenitiesTotal: { type: String, default: "" },
-
-    // PART D - AMENITIES (Revised - Workbeds section)
-    partDWorkbeds1Description: { type: String, default: "" },
-    partDWorkbeds1AmountInRupees: { type: String, default: "" },
-    partDWorkbeds2Description: { type: String, default: "" },
-    partDWorkbeds2AmountInRupees: { type: String, default: "" },
-    partDWorkbeds3Description: { type: String, default: "" },
-    partDWorkbeds3AmountInRupees: { type: String, default: "" },
-    partDWorkbeds4Description: { type: String, default: "" },
-    partDWorkbeds4AmountInRupees: { type: String, default: "" },
-    partDWorbedsTotal: { type: String, default: "" },
-
-    // AMENITIES DETAILED ITEMS FROM SCREENSHOT
-    amenitiesGlazedTubAndBed: { type: String, default: "" },
-    amenitiesGlazedTubAndBedAmount: { type: String, default: "" },
-    amenitiesExteriorStudAndBed: { type: String, default: "" },
-    amenitiesExteriorStudAndBedAmount: { type: String, default: "" },
-    amenitiesMaritalCeiling: { type: String, default: "" },
-    amenitiesMaritalCeilingAmount: { type: String, default: "" },
-
-    // PART E - MISCELLANEOUS (Revised)
-    partEMiscellaneous1Description: { type: String, default: "" },
-    partEMiscellaneous1AmountInRupees: { type: String, default: "" },
-    partEMiscellaneous2Description: { type: String, default: "" },
-    partEMiscellaneous2AmountInRupees: { type: String, default: "" },
-    partEMiscellaneous3Description: { type: String, default: "" },
-    partEMiscellaneous3AmountInRupees: { type: String, default: "" },
-    partEMiscellaneous4Description: { type: String, default: "" },
-    partEMiscellaneous4AmountInRupees: { type: String, default: "" },
-    partEMiscellaneousTotal: { type: String, default: "" },
-
-    // MISCELLANEOUS DETAILED ITEMS FROM SCREENSHOT
-    miscellaneousSeparateToiletRoom: { type: String, default: "" },
-    miscellaneousSeparateToiletRoomAmount: { type: String, default: "" },
-    miscellaneousSeparateLumberRoom: { type: String, default: "" },
-    miscellaneousSeparateLumberRoomAmount: { type: String, default: "" },
-    miscellaneousSeparateWaterTankSump: { type: String, default: "" },
-    miscellaneousSeparateWaterTankSumpAmount: { type: String, default: "" },
-    miscellaneousTreesGardening: { type: String, default: "" },
-    miscellaneousTreesGardeningAmount: { type: String, default: "" },
-
-    // BUILDING VALUATION DETAILS (Page 11)
-    estimatedRepairCostOfConstruction: { type: String, default: "" },
-    rateOfConstruction: { type: String, default: "" },
-    buildUpAreaInSqft: { type: String, default: "" },
-    groundFloorSqft: { type: String, default: "" },
-    groundFloorRateOfConstruction: { type: String, default: "" },
-    groundFloorValueOfConstruction: { type: String, default: "" },
-    secondFloorSqft: { type: String, default: "" },
-    secondFloorRateOfConstruction: { type: String, default: "" },
-    secondFloorValueOfConstruction: { type: String, default: "" },
-    thirdFloorSqft: { type: String, default: "" },
-    thirdFloorRateOfConstruction: { type: String, default: "" },
-    thirdFloorValueOfConstruction: { type: String, default: "" },
-    fourthFloorSqft: { type: String, default: "" },
-    fourthFloorRateOfConstruction: { type: String, default: "" },
-    fourthFloorValueOfConstruction: { type: String, default: "" },
-    fifthFloorSqft: { type: String, default: "" },
-    fifthFloorRateOfConstruction: { type: String, default: "" },
-    fifthFloorValueOfConstruction: { type: String, default: "" },
-    sixthFloorSqft: { type: String, default: "" },
-    sixthFloorRateOfConstruction: { type: String, default: "" },
-    sixthFloorValueOfConstruction: { type: String, default: "" },
-    basementFloorSqft: { type: String, default: "" },
-    basementFloorRateOfConstruction: { type: String, default: "" },
-    basementFloorValueOfConstruction: { type: String, default: "" },
-    carpetAreaInSqft: { type: String, default: "" },
-    carpetAreaRateOfConstruction: { type: String, default: "" },
-    carpetAreaValueOfConstruction: { type: String, default: "" },
-
-    // EXTRA ITEMS TABLE (Part C)
-    extraItemsLand: { type: String, default: "" },
-    extraItemsLandAmount: { type: String, default: "" },
-    extraItemsBuilding: { type: String, default: "" },
-    extraItemsBuildingAmount: { type: String, default: "" },
-    extraItemsExtra: { type: String, default: "" },
-    extraItemsExtraAmount: { type: String, default: "" },
-    extraItemsAmenities: { type: String, default: "" },
-    extraItemsAmenitiesAmount: { type: String, default: "" },
-    extraItemsMiscellaneous: { type: String, default: "" },
-    extraItemsMiscellaneousAmount: { type: String, default: "" },
-    extraItemsServices: { type: String, default: "" },
-    extraItemsServicesAmount: { type: String, default: "" },
-    extraItemsTotalValue: { type: String, default: "" },
-
-    // ELECTRICAL & PLUMBING INSTALLATIONS (Page 11)
     electricalInstallation: { type: String, default: "" },
     typeOfWiring: { type: String, default: "" },
     classOfFittings: { type: String, default: "" },
@@ -316,267 +154,199 @@ const ubiApfPdfDetailsSchema = new mongoose.Schema({
     noOfBathtubs: { type: String, default: "" },
     waterMeterTapsEtc: { type: String, default: "" },
     anyOtherPlumbingFixture: { type: String, default: "" },
-
-    // FIVE FEET AROUND PLOT
-    feetAroundPlot: { type: String, default: "" },
-    rcMasonryWallsUpToPlinth: { type: String, default: "" },
-    aboveRcMasonryWallsExternally: { type: String, default: "" },
-
-    // BUILDING VALUATION EXTRA DETAILS
-    estimatedRCCRepairCostOfConstruction: { type: String, default: "" },
+    
+    // PAGE 9 - DETAILS OF VALUATION OF BUILDING
+    ornamentalFloor: { type: String, default: "" },
+    ornamentalFloorAmount: { type: String, default: "" },
+    stuccoVeranda: { type: String, default: "" },
+    stuccoVerandaAmount: { type: String, default: "" },
+    sheetGrills: { type: String, default: "" },
+    sheetGrillsAmount: { type: String, default: "" },
+    overheadWaterTank: { type: String, default: "" },
+    overheadWaterTankAmount: { type: String, default: "" },
+    extraShedPossibleGates: { type: String, default: "" },
+    extraShedPossibleGatesAmount: { type: String, default: "" },
+    
+    // PAGE 10 - PART F - SERVICES
+    partFSrNo: { type: String, default: "" },
+    partFDescription: { type: String, default: "" },
+    partFPortico: { type: String, default: "" },
+    partFItem1Description: { type: String, default: "" },
+    partFItem1Amount: { type: String, default: "" },
+    partFItem2Description: { type: String, default: "" },
+    partFItem2Amount: { type: String, default: "" },
+    partFItem3Description: { type: String, default: "" },
+    partFItem3Amount: { type: String, default: "" },
+    partFItem4Description: { type: String, default: "" },
+    partFItem4Amount: { type: String, default: "" },
+    partFItem5Description: { type: String, default: "" },
+    partFItem5Amount: { type: String, default: "" },
+    partFTotal: { type: String, default: "" },
+    
+    // PAGE 11 - PART C EXTRA ITEMS
+    partCExtraSrNo: { type: String, default: "" },
+    partCExtraDescription: { type: String, default: "" },
+    partCExtraWorksItems: { type: String, default: "" },
+    partCExtraItem1Description: { type: String, default: "" },
+    partCExtraItem1Amount: { type: String, default: "" },
+    partCExtraItem2Description: { type: String, default: "" },
+    partCExtraItem2Amount: { type: String, default: "" },
+    partCExtraItem3Description: { type: String, default: "" },
+    partCExtraItem3Amount: { type: String, default: "" },
+    partCExtraItem4Description: { type: String, default: "" },
+    partCExtraItem4Amount: { type: String, default: "" },
+    partCExtraItem5Description: { type: String, default: "" },
+    partCExtraItem5Amount: { type: String, default: "" },
+    partCExtraTotal: { type: String, default: "" },
+    
+    // PAGE 12 - PART E - MISCELLANEOUS (Revised)
+    partESrNo: { type: String, default: "" },
+    partEDescription: { type: String, default: "" },
+    partEItem1Description: { type: String, default: "" },
+    partEItem1Amount: { type: String, default: "" },
+    partEItem2Description: { type: String, default: "" },
+    partEItem2Amount: { type: String, default: "" },
+    partEItem3Description: { type: String, default: "" },
+    partEItem3Amount: { type: String, default: "" },
+    partEItem4Description: { type: String, default: "" },
+    partEItem4Amount: { type: String, default: "" },
+    partETotal: { type: String, default: "" },
+    
+    // PAGE 13 - BUILDING CONSTRUCTION - FLOOR WISE DETAILS
+    buildingConstructionSrNo: { type: String, default: "" },
+    buildingConstructionDescription: { type: String, default: "" },
+    builtUpArea: { type: String, default: "" },
+    groundFloor: { type: String, default: "" },
+    groundFloorRate: { type: String, default: "" },
+    groundFloorValue: { type: String, default: "" },
+    firstFloor: { type: String, default: "" },
+    firstFloorRate: { type: String, default: "" },
+    firstFloorValue: { type: String, default: "" },
+    secondFloor: { type: String, default: "" },
+    secondFloorRate: { type: String, default: "" },
+    secondFloorValue: { type: String, default: "" },
+    thirdFloor: { type: String, default: "" },
+    thirdFloorRate: { type: String, default: "" },
+    thirdFloorValue: { type: String, default: "" },
+    fourthFloor: { type: String, default: "" },
+    fourthFloorRate: { type: String, default: "" },
+    fourthFloorValue: { type: String, default: "" },
+    fifthFloor: { type: String, default: "" },
+    fifthFloorRate: { type: String, default: "" },
+    fifthFloorValue: { type: String, default: "" },
+    sixthFloor: { type: String, default: "" },
+    sixthFloorRate: { type: String, default: "" },
+    sixthFloorValue: { type: String, default: "" },
+    basementFloor: { type: String, default: "" },
+    basementFloorRate: { type: String, default: "" },
+    basementFloorValue: { type: String, default: "" },
+    glassHouse: { type: String, default: "" },
+    glassHouseRate: { type: String, default: "" },
+    totalAreaBuilding: { type: String, default: "" },
+    
+    // PAGE 13 - MEASUREMENT CARPET AREA
+    carpetAreaSqft: { type: String, default: "" },
+    basementFloorSqft: { type: String, default: "" },
+    groundFloorSqftMeasure: { type: String, default: "" },
+    groundFloorAmountInRupees: { type: String, default: "" },
+    serviceFloorCarpetArea: { type: String, default: "" },
+    traceAreaCarpetArea: { type: String, default: "" },
+    firstFloorCarpetArea: { type: String, default: "" },
+    serviceFloor: { type: String, default: "" },
+    serviceFloorRate: { type: String, default: "" },
+    serviceFloorValue: { type: String, default: "" },
+    
+    // PAGE 14 - PLOT AREA & BUILT UP AREA
+    west: { type: String, default: "" },
+    extentAreaAndBuildUpArea: { type: String, default: "" },
+    plotAreaAsPerSketchedPlan: { type: String, default: "" },
+    plotAreaInBuildUpAreaInSqft: { type: String, default: "" },
+    plotAreaInSqft: { type: String, default: "" },
+    buildUpAreaAsPerSketchedPlan: { type: String, default: "" },
+    buildingSpecificationsPlotLayout: { type: String, default: "" },
     floorAreaSqft: { type: String, default: "" },
     rateOfConstructionPerSqft: { type: String, default: "" },
     valueOfConstruction: { type: String, default: "" },
     rateOfConstructionValues: { type: String, default: "" },
-
-    // SERVICES (Part F)
-    services1Description: { type: String, default: "" },
-    services1Amount: { type: String, default: "" },
-    waterSupplyArrangements: { type: String, default: "" },
-    waterSupplyArrangementsAmount: { type: String, default: "" },
-    undergroundStorageCapacity: { type: String, default: "" },
-    undergroundStorageCapacityAmount: { type: String, default: "" },
-    drainageArrangements: { type: String, default: "" },
-    drainageArrangementsAmount: { type: String, default: "" },
-    compoundWall: { type: String, default: "" },
-    compoundWallAmount: { type: String, default: "" },
-    siteDevelopment: { type: String, default: "" },
-    siteDevelopmentAmount: { type: String, default: "" },
-    swimmingPool: { type: String, default: "" },
-    swimmingPoolAmount: { type: String, default: "" },
-    servicesTotal: { type: String, default: "" },
-
-    // PROPERTY VALUATION NARRATIVE
-    abstractOfEntireProperty: { type: String, default: "" },
-    partALandAmount: { type: String, default: "" },
-    partBBuildingAmount: { type: String, default: "" },
-    partCExtraItemsAmount: { type: String, default: "" },
-    partDExtraItemsAmount: { type: String, default: "" },
-    partEExtraItemsAmount: { type: String, default: "" },
-    partFServicesAmount: { type: String, default: "" },
-    totalAbstractValue: { type: String, default: "" },
-
-    // FAIR MARKET VALUE OPINION
-    fairMarketValueOpinion: { type: String, default: "" },
-    fairMarketValueAmount: { type: String, default: "" },
-    propertyAnalysisStatement: { type: String, default: "" },
-    openMarketValueStatement: { type: String, default: "" },
-
-    // DETAILS OF VALUATION OF BUILDING
-    buildingValuationCompoundWall: { type: String, default: "" },
-    buildingValuationHeight: { type: String, default: "" },
-    buildingValuationLength: { type: String, default: "" },
-    buildingValuationTypeOfConstruction: { type: String, default: "" },
-    buildingValuationElectricalInstallation: { type: String, default: "" },
-    buildingValuationTypeOfWiring: { type: String, default: "" },
-    buildingValuationClassOfFittings: { type: String, default: "" },
-    buildingValuationNumberOfLightPoints: { type: String, default: "" },
-    buildingValuationFarPlugs: { type: String, default: "" },
-    buildingValuationSparePlug: { type: String, default: "" },
-    buildingValuationAnyOtherElectricalItem: { type: String, default: "" },
-    buildingValuationPlumbingInstallation: { type: String, default: "" },
-    buildingValuationNumberOfWaterClassAndTaps: { type: String, default: "" },
-    buildingValuationNoWashBasins: { type: String, default: "" },
-    buildingValuationNoUrinals: { type: String, default: "" },
-    buildingValuationNoOfBathtubs: { type: String, default: "" },
-    buildingValuationWaterMeterTapsEtc: { type: String, default: "" },
-    buildingValuationAnyOtherPlumbingFixture: { type: String, default: "" },
-
-    // PART C - EXTRA ITEMS WITH FLOOR WISE DETAILS
-    partCExtraItemsFloorWise: { type: String, default: "" },
-    partCExtraItemsGroundFloor: { type: String, default: "" },
-    partCExtraItemsServiceFloor: { type: String, default: "" },
-    partCExtraItemsFirstFloor: { type: String, default: "" },
-    partCExtraItemsSecondFloor: { type: String, default: "" },
-    partCExtraItemsThirdFloor: { type: String, default: "" },
-    partCExtraItemsFourthFloor: { type: String, default: "" },
-    partCExtraItemsFifthFloor: { type: String, default: "" },
-    partCExtraItemsSixthFloor: { type: String, default: "" },
-    partCExtraItemsBasementFloor: { type: String, default: "" },
-    partCExtraItemsCarotyArea: { type: String, default: "" },
-
-    // PART C - EXTRA ITEMS WITH SQFt AND CONSTRUCTION RATES
-    partCExtraItemsSqftGroundFloor: { type: String, default: "" },
-    partCExtraItemsSqftServiceFloor: { type: String, default: "" },
-    partCExtraItemsSqftFirstFloor: { type: String, default: "" },
-    partCExtraItemsSqftSecondFloor: { type: String, default: "" },
-    partCExtraItemsSqftThirdFloor: { type: String, default: "" },
-    partCExtraItemsSqftFourthFloor: { type: String, default: "" },
-    partCExtraItemsSqftFifthFloor: { type: String, default: "" },
-    partCExtraItemsSqftSixthFloor: { type: String, default: "" },
-    partCExtraItemsSqftBasementFloor: { type: String, default: "" },
-    partCExtraItemsSqftCarpetArea: { type: String, default: "" },
-
-    // PART C - EXTRA ITEMS CONSTRUCTION RATE
-    partCExtraItemsRateGroundFloor: { type: String, default: "" },
-    partCExtraItemsRateServiceFloor: { type: String, default: "" },
-    partCExtraItemsRateFirstFloor: { type: String, default: "" },
-    partCExtraItemsRateSecondFloor: { type: String, default: "" },
-    partCExtraItemsRateThirdFloor: { type: String, default: "" },
-    partCExtraItemsRateFourthFloor: { type: String, default: "" },
-    partCExtraItemsRateFifthFloor: { type: String, default: "" },
-    partCExtraItemsRateSixthFloor: { type: String, default: "" },
-    partCExtraItemsRateBasementFloor: { type: String, default: "" },
-    partCExtraItemsRateCarpetArea: { type: String, default: "" },
-
-    // PART C - EXTRA ITEMS VALUE OF CONSTRUCTION
-    partCExtraItemsValueGroundFloor: { type: String, default: "" },
-    partCExtraItemsValueServiceFloor: { type: String, default: "" },
-    partCExtraItemsValueFirstFloor: { type: String, default: "" },
-    partCExtraItemsValueSecondFloor: { type: String, default: "" },
-    partCExtraItemsValueThirdFloor: { type: String, default: "" },
-    partCExtraItemsValueFourthFloor: { type: String, default: "" },
-    partCExtraItemsValueFifthFloor: { type: String, default: "" },
-    partCExtraItemsValueSixthFloor: { type: String, default: "" },
-    partCExtraItemsValueBasementFloor: { type: String, default: "" },
-    partCExtraItemsValueCarpetArea: { type: String, default: "" },
-
-    // AGE OF BUILDING DEPRECIATION
-    ageOfBuildingYears: { type: String, default: "" },
-    lifeOfBuilding: { type: String, default: "" },
-    depreciationPercentage: { type: String, default: "" },
-    depreciatedBuildingRate: { type: String, default: "" },
-
-    // LAND VALUATION SECTION
+    buildingSpecificationsPlotLayoutSqfRateValue: { type: String, default: "" },
+    deedBuiltUpAreaSqft: { type: String, default: "" },
+    estimatedRepairCostOfConstruction: { type: String, default: "" },
     floorAreaSqftLand: { type: String, default: "" },
     ratePerSqftLand: { type: String, default: "" },
     interior0PercentLand: { type: String, default: "" },
     entranceCanopyArea: { type: String, default: "" },
-
-    // PART A - LAND (Detailed with amounts)
-    partALand1Description: { type: String, default: "" },
-    partALand1Amount: { type: String, default: "" },
-    partALand2Description: { type: String, default: "" },
-    partALand2Amount: { type: String, default: "" },
-    partALand3Description: { type: String, default: "" },
-    partALand3Amount: { type: String, default: "" },
-    partALand4Description: { type: String, default: "" },
-    partALand4Amount: { type: String, default: "" },
-    partALandTotal: { type: String, default: "" },
-
-    // PART B - BUILDING (Detailed)
-    partBBuilding1Description: { type: String, default: "" },
-    partBBuilding1Amount: { type: String, default: "" },
-    partBBuilding2Description: { type: String, default: "" },
-    partBBuilding2Amount: { type: String, default: "" },
-    partBBuilding3Description: { type: String, default: "" },
-    partBBuilding3Amount: { type: String, default: "" },
-    partBBuilding4Description: { type: String, default: "" },
-    partBBuilding4Amount: { type: String, default: "" },
-    partBBuildingTotal: { type: String, default: "" },
-
-    // PART F - SERVICES DETAILS 
-    partFServices1Description: { type: String, default: "" },
-    partFServices1Amount: { type: String, default: "" },
-    partFServices2Description: { type: String, default: "" },
-    partFServices2Amount: { type: String, default: "" },
-    partFServices3Description: { type: String, default: "" },
-    partFServices3Amount: { type: String, default: "" },
-    partFServices4Description: { type: String, default: "" },
-    partFServices4Amount: { type: String, default: "" },
-    partFServices5Description: { type: String, default: "" },
-    partFServices5Amount: { type: String, default: "" },
-
-    // ORNAMENTAL SECTION (Extended)
-    ornamental1Description: { type: String, default: "" },
-    ornamental1Amount: { type: String, default: "" },
-    ornamental2Description: { type: String, default: "" },
-    ornamental2Amount: { type: String, default: "" },
-    ornamental3Description: { type: String, default: "" },
-    ornamental3Amount: { type: String, default: "" },
-    ornamental4Description: { type: String, default: "" },
-    ornamental4Amount: { type: String, default: "" },
-    ornamental5Description: { type: String, default: "" },
-    ornamental5Amount: { type: String, default: "" },
-
-    // ADDITIONAL BUILDING DETAILS FROM LATEST SCREENSHOT
-    ageOfBuildingDescription: { type: String, default: "" },
-    lifeOfBuildingYears: { type: String, default: "" },
-    depreciationValue: { type: String, default: "" },
-    depreciatedRate: { type: String, default: "" },
-
-    // LAND DETAILS (Extended)
-    floorAreaDescription: { type: String, default: "" },
-    floorAreaSqftValue: { type: String, default: "" },
-    floorAreaToSqftFirstFloor: { type: String, default: "" },
-    floorAreaBuiltUpCompletion: { type: String, default: "" },
-    floorAreaCarpetArea: { type: String, default: "" },
-    floorAreaEntranceCanopyArea: { type: String, default: "" },
-
-    // RATES & VALUES (Extended)
-    rateOfConstructionPercentage: { type: String, default: "" },
-    depreciationPercentageValue: { type: String, default: "" },
-    yetOfProperty: { type: String, default: "" },
-
-    // INTERIOR & FINISH DETAILS
-    interiorExcellent: { type: String, default: "" },
-    interiorGood: { type: String, default: "" },
-    interiorPoor: { type: String, default: "" },
-
-    // COMPOUND WALL & FIXTURES
-    compoundWallMasonryHeight: { type: String, default: "" },
-    compoundWallFenceDetails: { type: String, default: "" },
-
-    // WATER & SANITATION
-    waterTankAboveGround: { type: String, default: "" },
-    waterTankUnderground: { type: String, default: "" },
-    waterTankRCCStorageCapacity: { type: String, default: "" },
-
-    // SITE DEVELOPMENT
-    siteDevelopmentDrainageDetails: { type: String, default: "" },
-    siteDevelopmentCompoundWallHeight: { type: String, default: "" },
-    siteDevelopmentTrees: { type: String, default: "" },
-
-    // FIRST FLOOR AREA SECTIONS
-    firstFloorNorthSection: { type: String, default: "" },
-    firstFloorSouthSection: { type: String, default: "" },
-    firstFloorEastSection: { type: String, default: "" },
-    firstFloorWestSection: { type: String, default: "" },
-
-    // ADDITIONAL DEPRECIATION & AGE FIELDS
-    ageOfBuildingMonths: { type: String, default: "" },
-    totalLifeOfBuilding: { type: String, default: "" },
-    remainingLifePercentage: { type: String, default: "" },
-
-    // ADDITIONAL MISSING FIELDS FROM SCREENSHOTS
-    portico: { type: String, default: "" },
-    porticoAmount: { type: String, default: "" },
-    description: { type: String, default: "" },
-    land: { type: String, default: "" },
-    building: { type: String, default: "" },
-    extraItems: { type: String, default: "" },
-    amenities: { type: String, default: "" },
-    miscellaneous: { type: String, default: "" },
-    services: { type: String, default: "" },
-    partACarpetArea: { type: String, default: "" },
-    partBCarpetArea: { type: String, default: "" },
-    partCCarpetArea: { type: String, default: "" },
-    partDCarpetArea: { type: String, default: "" },
-    partECarpetArea: { type: String, default: "" },
-    partFCarpetArea: { type: String, default: "" },
-
-    // ADDITIONAL BUILDING DETAILS
-    serviceFloor: { type: String, default: "" },
-    serviceFloorSqft: { type: String, default: "" },
-    serviceFloorRateOfConstruction: { type: String, default: "" },
-    serviceFloorValueOfConstruction: { type: String, default: "" },
-
-    // PARKING & GARAGE DETAILS
-    parkingFloorSqft: { type: String, default: "" },
-    parkingFloorRateOfConstruction: { type: String, default: "" },
-    parkingFloorValueOfConstruction: { type: String, default: "" },
-
-    // STILT FLOOR DETAILS
-    stiltFloor: { type: String, default: "" },
-    stiltFloorSqft: { type: String, default: "" },
-    stiltFloorRateOfConstruction: { type: String, default: "" },
-    stiltFloorValueOfConstruction: { type: String, default: "" },
-
-    // EXTRA COVERED AREA
-    extraCoveredArea: { type: String, default: "" },
-    extraCoveredAreaSqft: { type: String, default: "" },
-    extraCoveredAreaRateOfConstruction: { type: String, default: "" },
-    extraCoveredAreaValueOfConstruction: { type: String, default: "" }
+    
+    // PAGE 15 - PROPERTY DETAILS SECTION
+    locationOfProperty: { type: String, default: "" },
+    plotNo: { type: String, default: "" },
+    surveyNo: { type: String, default: "" },
+    doorNo: { type: String, default: "" },
+    taluka: { type: String, default: "" },
+    mandal: { type: String, default: "" },
+    district: { type: String, default: "" },
+    briefDescriptionOfProperty: { type: String, default: "" },
+    cityTown: { type: String, default: "" },
+    residentialArea: { type: String, default: "" },
+    commercialArea: { type: String, default: "" },
+    industrialArea: { type: String, default: "" },
+    classificationOfArea: { type: String, default: "" },
+    urbanRural: { type: String, default: "" },
+    mileSemUrban: { type: String, default: "" },
+    municipalCorporationAsPer: { type: String, default: "" },
+    
+    // BOUNDARIES OF PROPERTY
+    boundariesOfTheProperty: { type: String, default: "" },
+    northBoundary: { type: String, default: "" },
+    southBoundary: { type: String, default: "" },
+    eastBoundary: { type: String, default: "" },
+    westBoundary: { type: String, default: "" },
+    
+    // PAGE 16 - APARTMENT BUILDING & NATURE
+    classificationOfLocality: { type: String, default: "" },
+    developmentOfSurroundingAreas: { type: String, default: "" },
+    possibilityOfFutureHousingMixing: { type: String, default: "" },
+    feasibilityOf1To2Kms: { type: String, default: "" },
+    typeOfStructureMaterial: { type: String, default: "" },
+    shareOfLand: { type: String, default: "" },
+    typeOfUseToWhichItCanBePut: { type: String, default: "" },
+    anyUsageRestriction: { type: String, default: "" },
+    isPlotInTownPlanning: { type: String, default: "" },
+    cornerPlotOrInteriorFacilities: { type: String, default: "" },
+    yearOfRoadAvailability: { type: String, default: "" },
+    waterRoadAvailableBelowOrAbove: { type: String, default: "" },
+    isALandArea: { type: String, default: "" },
+    waterSewerageSystem: { type: String, default: "" },
+    apartmentNature: { type: String, default: "" },
+    apartmentLocation: { type: String, default: "" },
+    apartmentCTSNo: { type: String, default: "" },
+    apartmentSectorNo: { type: String, default: "" },
+    apartmentBlockNo: { type: String, default: "" },
+    apartmentWardNo: { type: String, default: "" },
+    apartmentVillageMunicipalityCounty: { type: String, default: "" },
+    apartmentDoorNoStreetRoad: { type: String, default: "" },
+    apartmentPinCode: { type: String, default: "" },
+    descriptionOfLocalityResidentialCommercialMixed: { type: String, default: "" },
+    numberOfDwellingUnitsInBuilding: { type: String, default: "" },
+    
+    // PAGE 17 - APPROVAL & AUTHORIZATION
+    constructionAsPer: { type: String, default: "" },
+    panchayatMunicipalitySearchReport: { type: String, default: "" },
+    watercoveredUnderSaleDeeds: { type: String, default: "" },
+    governmentEnctmentsOrUtilitiesScheduledArea: { type: String, default: "" },
+    dateIssueAndValidityOfApprovedPlan: { type: String, default: "" },
+    whetherGenerousOnAuthority: { type: String, default: "" },
+    anyOtherCommentsOrAuthorityApprovedPlan: { type: String, default: "" },
+    purposeForValuation: { type: String, default: "" },
+    dateOfInspection: { type: String, default: "" },
+    dateOnWhichValuationIsMade: { type: String, default: "" },
+    listOfDocumentsProducedForPerusal: { type: String, default: "" },
+    protocolDocuments: { type: String, default: "" },
+    sanctionedPlanStatus: { type: String, default: "" },
+    certificateNumber: { type: String, default: "" },
+    buildingCompletionCertificate: { type: String, default: "" },
+    completionCertificateNo: { type: String, default: "" },
+    ownerAddressJointOwners: { type: String, default: "" },
+    jointOwnersDeDetailsOfJointOwnership: { type: String, default: "" }
     }, { _id: false });
 
 const ubiApfSchema = new mongoose.Schema({
@@ -641,7 +411,7 @@ const ubiApfSchema = new mongoose.Schema({
 });
 ubiApfSchema.index({ clientId: 1, uniqueId: 1 }, { unique: true, sparse: true });
 
-ubiApfSchema.pre('save', function(next) {
+ubiApfSchema.pre('save', function (next) {
     this.updatedAt = new Date();
     next();
 });

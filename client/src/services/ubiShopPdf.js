@@ -2,879 +2,976 @@
 
 // Helper function to safely get nested values with NA fallback
 const safeGet = (obj, path, defaultValue = 'NA') => {
-  const value = path.split('.').reduce((acc, part) => acc?.[part], obj);
+    const value = path.split('.').reduce((acc, part) => acc?.[part], obj);
 
-  // Handle different value types
-  if (value === undefined || value === null || value === '') {
-    return defaultValue;
-  }
-
-  // Convert boolean to Yes/No for area checkboxes
-  if (typeof value === 'boolean') {
-    return value ? 'Yes' : 'No';
-  }
-
-  // If value is an object, try to extract string representation
-  if (typeof value === 'object') {
-    // Try common field names for document fields
-    if (path === 'agreementForSale' && value.agreementForSaleExecutedName) {
-      return value.agreementForSaleExecutedName;
+    // Handle different value types
+    if (value === undefined || value === null || value === '') {
+        return defaultValue;
     }
-    // For other objects, convert to JSON string or return NA
-    return defaultValue;
-  }
 
-  return value;
+    // Convert boolean to Yes/No for area checkboxes
+    if (typeof value === 'boolean') {
+        return value ? 'Yes' : 'No';
+    }
+
+    // If value is an object, try to extract string representation
+    if (typeof value === 'object') {
+        // Try common field names for document fields
+        if (path === 'agreementForSale' && value.agreementForSaleExecutedName) {
+            return value.agreementForSaleExecutedName;
+        }
+        // For other objects, convert to JSON string or return NA
+        return defaultValue;
+    }
+
+    return value;
 };
 
 // Helper function to format date as d/m/yyyy
 const formatDate = (dateString) => {
-  if (!dateString) return 'NA';
-  try {
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString; // Return original if invalid
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  } catch (e) {
-    return dateString;
-  }
+    if (!dateString) return 'NA';
+    try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return dateString; // Return original if invalid
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    } catch (e) {
+        return dateString;
+    }
 };
 
 // Helper function to extract address value from nested object or return as-is
 const extractAddressValue = (address) => {
-  if (!address) return '';
-  // If it's an object with fullAddress property, extract it
-  if (typeof address === 'object' && address.fullAddress) {
-    return address.fullAddress;
-  }
-  // If it's already a string, return it
-  if (typeof address === 'string') {
-    return address;
-  }
-  return '';
+    if (!address) return '';
+    // If it's an object with fullAddress property, extract it
+    if (typeof address === 'object' && address.fullAddress) {
+        return address.fullAddress;
+    }
+    // If it's already a string, return it
+    if (typeof address === 'string') {
+        return address;
+    }
+    return '';
+};
+
+// Helper function to extract image URL safely
+const extractImageUrl = (img) => {
+    if (!img) return '';
+
+    let url = '';
+
+    if (typeof img === 'string') {
+        url = img.trim();
+    } else if (typeof img === 'object') {
+        // Try multiple properties that might contain the URL
+        url = (img.url || img.preview || img.data || img.src || img.secure_url || '').toString().trim();
+    }
+
+    // Validate URL format
+    if (!url) return '';
+
+    // Accept data URIs, blob URLs, and HTTP(S) URLs
+    if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('http://') || url.startsWith('https://')) {
+        return url;
+    }
+
+    return '';
 };
 
 // Helper function to round value to nearest 1000
 const roundToNearest1000 = (value) => {
-  if (!value) return 'NA';
-  const num = parseFloat(String(value).replace(/[^0-9.-]/g, ''));
-  if (isNaN(num)) return value;
-  return Math.round(num / 1000) * 1000;
+    if (!value) return 'NA';
+    const num = parseFloat(String(value).replace(/[^0-9.-]/g, ''));
+    if (isNaN(num)) return value;
+    return Math.round(num / 1000) * 1000;
 };
 
 // Helper function to convert number to Indian words
 const numberToWords = (num) => {
-  if (!num || isNaN(num)) return '';
-  num = Math.round(parseFloat(num));
-  if (num === 0) return 'Zero';
+    if (!num || isNaN(num)) return '';
+    num = Math.round(parseFloat(num));
+    if (num === 0) return 'Zero';
 
-  const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-  const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
-  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
-  const scales = ['', 'Thousand', 'Lac', 'Crore'];
+    const ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+    const teens = ['Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+    const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+    const scales = ['', 'Thousand', 'Lac', 'Crore'];
 
-  const convertHundreds = (n) => {
-    let result = '';
-    const hundred = Math.floor(n / 100);
-    const remainder = n % 100;
+    const convertHundreds = (n) => {
+        let result = '';
+        const hundred = Math.floor(n / 100);
+        const remainder = n % 100;
 
-    if (hundred > 0) result += ones[hundred] + ' Hundred ';
-    if (remainder >= 20) {
-      result += tens[Math.floor(remainder / 10)] + ' ' + ones[remainder % 10] + ' ';
-    } else if (remainder >= 10) {
-      result += teens[remainder - 10] + ' ';
-    } else if (remainder > 0) {
-      result += ones[remainder] + ' ';
+        if (hundred > 0) result += ones[hundred] + ' Hundred ';
+        if (remainder >= 20) {
+            result += tens[Math.floor(remainder / 10)] + ' ' + ones[remainder % 10] + ' ';
+        } else if (remainder >= 10) {
+            result += teens[remainder - 10] + ' ';
+        } else if (remainder > 0) {
+            result += ones[remainder] + ' ';
+        }
+        return result;
+    };
+
+    let words = '';
+    let scale = 0;
+
+    while (num > 0 && scale < scales.length) {
+        let group = num % 1000;
+        if (scale === 1) group = num % 100;
+
+        if (group > 0) {
+            if (scale === 1) {
+                words = convertHundreds(group).replace('Hundred', '').trim() + ' ' + scales[scale] + ' ' + words;
+            } else {
+                words = convertHundreds(group) + scales[scale] + ' ' + words;
+            }
+        }
+
+        num = Math.floor(num / (scale === 0 ? 1000 : scale === 1 ? 100 : 1000));
+        scale++;
     }
-    return result;
-  };
 
-  let words = '';
-  let scale = 0;
-
-  while (num > 0 && scale < scales.length) {
-    let group = num % 1000;
-    if (scale === 1) group = num % 100;
-
-    if (group > 0) {
-      if (scale === 1) {
-        words = convertHundreds(group).replace('Hundred', '').trim() + ' ' + scales[scale] + ' ' + words;
-      } else {
-        words = convertHundreds(group) + scales[scale] + ' ' + words;
-      }
-    }
-
-    num = Math.floor(num / (scale === 0 ? 1000 : scale === 1 ? 100 : 1000));
-    scale++;
-  }
-
-  return words.trim().toUpperCase();
+    return words.trim().toUpperCase();
 };
 
 // Helper function to calculate percentage of value
 const calculatePercentage = (baseValue, percentage) => {
-  if (!baseValue) return 0;
-  const num = parseFloat(String(baseValue).replace(/[^0-9.-]/g, ''));
-  if (isNaN(num)) return 0;
-  return Math.round((num * percentage) / 100);
+    if (!baseValue) return 0;
+    const num = parseFloat(String(baseValue).replace(/[^0-9.-]/g, ''));
+    if (isNaN(num)) return 0;
+    return Math.round((num * percentage) / 100);
 };
 
 // Helper function to format currency with words
 const formatCurrencyWithWords = (value, percentage = 100) => {
-  if (!value) return 'NA';
-  const num = parseFloat(String(value).replace(/[^0-9.-]/g, ''));
-  if (isNaN(num)) return value;
+    if (!value) return 'NA';
+    const num = parseFloat(String(value).replace(/[^0-9.-]/g, ''));
+    if (isNaN(num)) return value;
 
-  const finalValue = Math.round((num * percentage) / 100);
-  const words = numberToWords(finalValue);
-  const formatted = finalValue.toLocaleString('en-IN');
+    const finalValue = Math.round((num * percentage) / 100);
+    const words = numberToWords(finalValue);
+    const formatted = finalValue.toLocaleString('en-IN');
 
-  return `₹ ${formatted}/- (${words})`;
+    return `₹ ${formatted}/- (${words})`;
 };
 
 // Helper function to get image dimensions and optimize for PDF
 const getImageDimensions = (imageUrl) => {
-  // Default dimensions
-  let width = 500;
-  let height = 400;
+    // Default dimensions
+    let width = 500;
+    let height = 400;
 
-  // Ensure imageUrl is a string
-  if (!imageUrl || typeof imageUrl !== 'string') {
+    // Ensure imageUrl is a string
+    if (!imageUrl || typeof imageUrl !== 'string') {
+        return { width, height };
+    }
+
+    // If image is base64 or data URI, return defaults
+    if (imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) {
+        return { width, height };
+    }
+
+    // For location images, use larger dimensions
+    if (imageUrl.includes('location')) {
+        return { width: 500, height: 450 };
+    }
+
     return { width, height };
-  }
-
-  // If image is base64 or data URI, return defaults
-  if (imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) {
-    return { width, height };
-  }
-
-  // For location images, use larger dimensions
-  if (imageUrl.includes('location')) {
-    return { width: 500, height: 450 };
-  }
-
-  return { width, height };
 };
 
 // Helper function to validate and format image for PDF
 const getImageSource = (imageUrl) => {
-  // Ensure imageUrl is a string
-  if (!imageUrl || typeof imageUrl !== 'string') {
-    return '';
-  }
+    // Ensure imageUrl is a string
+    if (!imageUrl || typeof imageUrl !== 'string') {
+        return '';
+    }
 
-  // If already base64 or data URI, use directly
-  if (imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) {
-    return imageUrl;
-  }
+    // Trim whitespace
+    imageUrl = imageUrl.trim();
 
-  // For regular URLs, they'll be loaded by html2canvas
-  return imageUrl;
+    // Return empty if still invalid after trim
+    if (!imageUrl) {
+        return '';
+    }
+
+    // If already base64 or data URI, use directly
+    if (imageUrl.startsWith('data:') || imageUrl.startsWith('blob:')) {
+        return imageUrl;
+    }
+
+    // For regular URLs, ensure it's valid
+    try {
+        // Try to construct a URL - this validates the URL format
+        new URL(imageUrl);
+        return imageUrl;
+    } catch (e) {
+        console.warn('Invalid image URL:', imageUrl.substring(0, 100), e?.message);
+        return '';
+    }
 };
 
 // Helper function to normalize data structure - flatten nested objects from database
 const normalizeDataForPDF = (data = {}) => {
-  if (!data) return {};
+    if (!data) return {};
 
-  let normalized = { ...data };
+    let normalized = { ...data };
 
-  // If data comes from MongoDB with nested objects, flatten them
-  if (data.documentInformation) {
-    normalized = {
-      ...normalized,
-      branch: data.documentInformation.branch || normalized.branch,
-      dateOfInspection: data.documentInformation.dateOfInspection || normalized.dateOfInspection,
-      dateOfValuation: data.documentInformation.dateOfValuation || normalized.dateOfValuation,
-      valuationPurpose: data.documentInformation.valuationPurpose || normalized.valuationPurpose
-    };
-  }
-
-  if (data.ownerDetails) {
-    normalized = {
-      ...normalized,
-      ownerNameAddress: data.ownerDetails.ownerNameAddress || normalized.ownerNameAddress,
-      briefDescriptionProperty: data.ownerDetails.propertyDescription || normalized.briefDescriptionProperty
-    };
-  }
-
-  if (data.locationOfProperty) {
-    normalized = {
-      ...normalized,
-      plotSurveyNo: data.locationOfProperty.plotSurveyNo || normalized.plotSurveyNo,
-      doorNo: data.locationOfProperty.doorNo || normalized.doorNo,
-      tpVillage: data.locationOfProperty.tsVillage || normalized.tpVillage,
-      wardTaluka: data.locationOfProperty.wardTaluka || normalized.wardTaluka,
-      mandalDistrict: data.locationOfProperty.mandalDistrict || normalized.mandalDistrict,
-      layoutPlanIssueDate: data.locationOfProperty.dateLayoutIssueValidity || normalized.layoutPlanIssueDate,
-      approvedMapAuthority: data.locationOfProperty.approvedMapIssuingAuthority || normalized.approvedMapAuthority
-    };
-  }
-
-  if (data.cityAreaType) {
-    normalized = {
-      ...normalized,
-      cityTown: data.cityAreaType.cityTown || normalized.cityTown
-    };
-  }
-
-  if (data.areaClassification) {
-    normalized = {
-      ...normalized,
-      areaClassification: data.areaClassification.areaClassification || normalized.areaClassification,
-      urbanClassification: data.areaClassification.areaType || normalized.urbanClassification,
-      governmentType: data.areaClassification.govGovernance || normalized.governmentType,
-      govtEnactmentsCovered: data.areaClassification.stateGovernmentEnactments || normalized.govtEnactmentsCovered
-    };
-  }
-
-  // Map postal address and area fields from locationOfProperty or pdfDetails
-  if (data.locationOfProperty) {
-    normalized = {
-      ...normalized,
-      postalAddress: extractAddressValue(data.locationOfProperty.postalAddress) || normalized.postalAddress,
-      residentialArea: data.locationOfProperty.residentialArea || normalized.residentialArea,
-      commercialArea: data.locationOfProperty.commercialArea || normalized.commercialArea,
-      industrialArea: data.locationOfProperty.industrialArea || normalized.industrialArea,
-      areaClassification: data.locationOfProperty.areaClassification || normalized.areaClassification
-    };
-  }
-
-  // Map authentication and verification fields from pdfDetails (highest priority)
-  if (data.pdfDetails) {
-    normalized = {
-      ...normalized,
-      authenticityVerified: data.pdfDetails.authenticityVerified || normalized.authenticityVerified,
-      valuerCommentOnAuthenticity: data.pdfDetails.valuerCommentOnAuthenticity || normalized.valuerCommentOnAuthenticity,
-      postalAddress: extractAddressValue(data.pdfDetails.postalAddress) || normalized.postalAddress,
-      residentialArea: data.pdfDetails.residentialArea !== undefined ? data.pdfDetails.residentialArea : normalized.residentialArea,
-      commercialArea: data.pdfDetails.commercialArea !== undefined ? data.pdfDetails.commercialArea : normalized.commercialArea,
-      industrialArea: data.pdfDetails.industrialArea !== undefined ? data.pdfDetails.industrialArea : normalized.industrialArea,
-      areaClassification: data.pdfDetails.areaClassification || normalized.areaClassification
-    };
-  }
-
-  if (data.propertyBoundaries?.plotBoundaries) {
-    normalized = {
-      ...normalized,
-      boundariesPlotNorth: data.propertyBoundaries.plotBoundaries.north || normalized.boundariesPlotNorth,
-      boundariesPlotSouth: data.propertyBoundaries.plotBoundaries.south || normalized.boundariesPlotSouth,
-      boundariesPlotEast: data.propertyBoundaries.plotBoundaries.east || normalized.boundariesPlotEast,
-      boundariesPlotWest: data.propertyBoundaries.plotBoundaries.west || normalized.boundariesPlotWest
-    };
-  }
-
-  if (data.propertyDimensions) {
-    normalized = {
-      ...normalized,
-      dimensionsDeed: data.propertyDimensions.dimensionsAsPerDeed || normalized.dimensionsDeed,
-      dimensionsActual: data.propertyDimensions.actualDimensions || normalized.dimensionsActual,
-      extentOfUnit: data.propertyDimensions.extent || normalized.extentOfUnit,
-      latitudeLongitude: data.propertyDimensions.latitudeLongitudeCoordinates || normalized.latitudeLongitude,
-      extentOfSiteValuation: data.propertyDimensions.extentSiteConsideredValuation || normalized.extentOfSiteValuation
-    };
-  }
-
-  if (data.rateInfo) {
-    normalized = {
-      ...normalized,
-      comparableRate: data.rateInfo.comparableRateSimilarUnit || normalized.comparableRate,
-      adoptedBasicCompositeRate: data.rateInfo.adoptedBasicCompositeRate || normalized.adoptedBasicCompositeRate,
-      buildingServicesRate: data.rateInfo.buildingServicesRate || normalized.buildingServicesRate,
-      landOthersRate: data.rateInfo.landOthersRate || normalized.landOthersRate
-    };
-  }
-
-  if (data.rateValuation) {
-    normalized = {
-      ...normalized,
-      comparableRate: data.rateValuation.comparableRateSimilarUnitPerSqft || normalized.comparableRate,
-      adoptedBasicCompositeRate: data.rateValuation.adoptedBasicCompositeRatePerSqft || normalized.adoptedBasicCompositeRate,
-      buildingServicesRate: data.rateValuation.buildingServicesRatePerSqft || normalized.buildingServicesRate,
-      landOthersRate: data.rateValuation.landOthersRatePerSqft || normalized.landOthersRate
-    };
-  }
-
-  if (data.compositeRateDepreciation) {
-    normalized = {
-      ...normalized,
-      depreciatedBuildingRate: data.compositeRateDepreciation.depreciatedBuildingRatePerSqft || normalized.depreciatedBuildingRate,
-      replacementCostServices: data.compositeRateDepreciation.replacementCostUnitServicesPerSqft || normalized.replacementCostServices,
-      buildingAge: data.compositeRateDepreciation.ageOfBuildingYears || normalized.buildingAge,
-      buildingLife: data.compositeRateDepreciation.lifeOfBuildingEstimatedYears || normalized.buildingLife,
-      depreciationPercentage: data.compositeRateDepreciation.depreciationPercentageSalvage || normalized.depreciationPercentage,
-      deprecatedRatio: data.compositeRateDepreciation.depreciatedRatioBuilding || normalized.deprecatedRatio,
-      totalCompositeRate: data.compositeRateDepreciation.totalCompositeRatePerSqft || normalized.totalCompositeRate,
-      rateForLandOther: data.compositeRateDepreciation.rateLandOtherV3IIPerSqft || normalized.rateForLandOther,
-      guidelineRate: data.compositeRateDepreciation.guidelineRatePerSqm || normalized.guidelineRate
-    };
-  }
-
-  if (data.compositeRate) {
-    normalized = {
-      ...normalized,
-      depreciatedBuildingRate: data.compositeRate.depreciatedBuildingRate || normalized.depreciatedBuildingRate,
-      replacementCostServices: data.compositeRate.replacementCostUnitServices || normalized.replacementCostServices,
-      buildingAge: data.compositeRate.ageOfBuilding || normalized.buildingAge,
-      buildingLife: data.compositeRate.lifeOfBuildingEstimated || normalized.buildingLife,
-      depreciationPercentage: data.compositeRate.depreciationPercentageSalvage || normalized.depreciationPercentage,
-      deprecatedRatio: data.compositeRate.depreciatedRatioBuilding || normalized.deprecatedRatio,
-      totalCompositeRate: data.compositeRate.totalCompositeRate || normalized.totalCompositeRate,
-      rateForLandOther: data.compositeRate.rateLandOtherV3II || normalized.rateForLandOther,
-      guidelineRate: data.compositeRate.guidelineRateRegistrar || normalized.guidelineRate
-    };
-  }
-
-  if (data.valuationResults) {
-    normalized = {
-      ...normalized,
-      fairMarketValue: data.valuationResults.fairMarketValue || normalized.fairMarketValue,
-      realizableValue: data.valuationResults.realizableValue || normalized.realizableValue,
-      distressValue: data.valuationResults.distressValue || normalized.distressValue,
-      saleDeedValue: data.valuationResults.saleDeedValue || normalized.saleDeedValue,
-      insurableValue: data.valuationResults.insurableValue || normalized.insurableValue,
-      rentReceivedPerMonth: data.valuationResults.rentReceivedPerMonth || normalized.rentReceivedPerMonth,
-      marketability: data.valuationResults.marketability || normalized.marketability
-    };
-  }
-
-  if (data.buildingConstruction) {
-    normalized = {
-      ...normalized,
-      yearOfConstruction: data.buildingConstruction.yearOfConstruction || normalized.yearOfConstruction,
-      numberOfFloors: data.buildingConstruction.numberOfFloors || normalized.numberOfFloors,
-      numberOfDwellingUnits: data.buildingConstruction.numberOfDwellingUnits || normalized.numberOfDwellingUnits,
-      typeOfStructure: data.buildingConstruction.typeOfStructure || normalized.typeOfStructure,
-      qualityOfConstruction: data.buildingConstruction.qualityOfConstruction || normalized.qualityOfConstruction,
-      appearanceOfBuilding: data.buildingConstruction.appearanceOfBuilding || normalized.appearanceOfBuilding,
-      maintenanceOfBuilding: data.buildingConstruction.maintenanceOfBuilding || normalized.maintenanceOfBuilding
-    };
-  }
-
-  // Map electricityService data
-  if (data.electricityService) {
-    normalized = {
-      ...normalized,
-      electricityServiceConnectionNo: data.electricityService.electricityServiceConnectionNo || normalized.electricityServiceConnectionNo,
-      meterCardName: data.electricityService.meterCardName || normalized.meterCardName
-    };
-  }
-
-  // Map unitTax data
-  if (data.unitTax) {
-    normalized = {
-      ...normalized,
-      assessmentNo: data.unitTax.assessmentNo || normalized.assessmentNo,
-      taxPaidName: data.unitTax.taxPaidName || normalized.taxPaidName,
-      taxAmount: data.unitTax.taxAmount || normalized.taxAmount
-    };
-  }
-
-  // Map unitMaintenance data
-  if (data.unitMaintenance) {
-    normalized = {
-      ...normalized,
-      unitMaintenance: data.unitMaintenance.unitMaintenanceStatus || normalized.unitMaintenance
-    };
-  }
-
-  // Map unitSpecifications data
-  if (data.unitSpecifications) {
-    normalized = {
-      ...normalized,
-      floorUnit: data.unitSpecifications.floorLocation || normalized.floorUnit,
-      doorNoUnit: data.unitSpecifications.doorNoUnit || normalized.doorNoUnit,
-      roofUnit: data.unitSpecifications.roof || normalized.roofUnit,
-      flooringUnit: data.unitSpecifications.flooring || normalized.flooringUnit,
-      doorsUnit: data.unitSpecifications.doors || normalized.doorsUnit,
-      windowsUnit: data.unitSpecifications.windows || normalized.windowsUnit,
-      fittingsUnit: data.unitSpecifications.fittings || normalized.fittingsUnit,
-      finishingUnit: data.unitSpecifications.finishing || normalized.finishingUnit
-    };
-  }
-
-  // Map unitAreaDetails data
-  if (data.unitAreaDetails) {
-    normalized = {
-      ...normalized,
-      undividedLandArea: data.unitAreaDetails.undividedLandAreaSaleDeed || normalized.undividedLandArea,
-      plinthArea: data.unitAreaDetails.plinthAreaUnit || normalized.plinthArea,
-      carpetArea: data.unitAreaDetails.carpetAreaUnit || normalized.carpetArea
-    };
-  }
-
-  // Map unitClassification data
-  if (data.unitClassification) {
-    normalized = {
-      ...normalized,
-      floorSpaceIndex: data.unitClassification.floorSpaceIndex || normalized.floorSpaceIndex,
-      unitClassification: data.unitClassification.unitClassification || normalized.unitClassification,
-      residentialOrCommercial: data.unitClassification.residentialOrCommercial || normalized.residentialOrCommercial,
-      ownerOccupiedOrLetOut: data.unitClassification.ownerOccupiedOrLetOut || normalized.ownerOccupiedOrLetOut,
-      numberOfDwellingUnits: data.unitClassification.numberOfDwellingUnits || normalized.numberOfDwellingUnits
-    };
-  }
-
-  // Map apartmentLocation data
-  if (data.apartmentLocation) {
-    normalized = {
-      ...normalized,
-      apartmentNature: data.apartmentLocation.apartmentNature || normalized.apartmentNature,
-      apartmentLocation: data.apartmentLocation.apartmentLocation || normalized.apartmentLocation,
-      apartmentTSNo: data.apartmentLocation.tsNo || normalized.apartmentTSNo,
-      apartmentBlockNo: data.apartmentLocation.blockNo || normalized.apartmentBlockNo,
-      apartmentWardNo: data.apartmentLocation.wardNo || normalized.apartmentWardNo,
-      apartmentVillageMunicipalityCounty: data.apartmentLocation.villageOrMunicipality || normalized.apartmentVillageMunicipalityCounty,
-      apartmentDoorNoStreetRoadPinCode: data.apartmentLocation.doorNoStreetRoadPinCode || normalized.apartmentDoorNoStreetRoadPinCode
-    };
-  }
-
-  // Map monthlyRent data
-  if (data.monthlyRent) {
-    normalized = {
-      ...normalized,
-      monthlyRent: data.monthlyRent.ifRentedMonthlyRent || normalized.monthlyRent
-    };
-  }
-
-  // Map marketability data
-  if (data.marketability) {
-    normalized = {
-      ...normalized,
-      marketability: data.marketability.howIsMarketability || normalized.marketability,
-      favoringFactors: data.marketability.factorsFavouringExtraPotential || normalized.favoringFactors,
-      negativeFactors: data.marketability.negativeFactorsAffectingValue || normalized.negativeFactors
-    };
-  }
-
-  // Map signatureReport data
-  if (data.signatureReport) {
-    normalized = {
-      ...normalized,
-      valuationPlace: data.signatureReport.place || normalized.valuationPlace,
-      valuationDate: data.signatureReport.signatureDate || normalized.valuationDate,
-      valuersName: data.signatureReport.signerName || normalized.valuersName,
-      reportDate: data.signatureReport.reportDate || normalized.reportDate
-    };
-  }
-
-  // Map additionalFlatDetails data
-  if (data.additionalFlatDetails) {
-    normalized = {
-      ...normalized,
-      areaUsage: data.additionalFlatDetails.areaUsage || normalized.areaUsage,
-      carpetArea: data.additionalFlatDetails.carpetAreaFlat || normalized.carpetArea
-    };
-  }
-
-  // Map guidelineRate data
-  if (data.guidelineRate) {
-    normalized = {
-      ...normalized,
-      guidelineRate: data.guidelineRate.guidelineRatePerSqm || normalized.guidelineRate
-    };
-  }
-
-  // Map document fields from documentsProduced (MongoDB structure - primary source)
-  if (data.documentsProduced) {
-    normalized.agreementForSale = data.documentsProduced.photocopyCopyAgreement || normalized.agreementForSale;
-    normalized.commencementCertificate = data.documentsProduced.commencementCertificate || normalized.commencementCertificate;
-    normalized.occupancyCertificate = data.documentsProduced.occupancyCertificate || normalized.occupancyCertificate;
-  }
-
-  // Map document fields from pdfDetails if available (fallback)
-  if (data.pdfDetails) {
-    normalized.agreementForSale = normalized.agreementForSale || data.pdfDetails.agreementForSale || data.pdfDetails.agreementSaleExecutedName;
-    normalized.commencementCertificate = normalized.commencementCertificate || data.pdfDetails.commencementCertificate;
-    normalized.occupancyCertificate = normalized.occupancyCertificate || data.pdfDetails.occupancyCertificate;
-  }
-
-  // Map document fields from agreementForSale nested object
-  if (data.agreementForSale?.agreementForSaleExecutedName) {
-    normalized.agreementForSale = normalized.agreementForSale || data.agreementForSale.agreementForSaleExecutedName;
-  }
-
-  // Also check root level fields (direct properties from response)
-  normalized.agreementForSale = normalized.agreementForSale || data.agreementForSale;
-  normalized.commencementCertificate = normalized.commencementCertificate || data.commencementCertificate;
-  normalized.occupancyCertificate = normalized.occupancyCertificate || data.occupancyCertificate;
-
-  // Map missing valuation detail fields from pdfDetails
-  if (data.pdfDetails) {
-    normalized.ratePerSqft = data.pdfDetails.presentValueRate || normalized.ratePerSqft;
-    normalized.valuationItem1 = data.pdfDetails.presentValue || normalized.valuationItem1;
-    normalized.totalEstimatedValue = data.pdfDetails.totalValuationItems || normalized.totalEstimatedValue;
-    normalized.totalValueSay = data.pdfDetails.totalValueSay || data.pdfDetails.totalValuationItems || normalized.totalValueSay;
-
-    // Valuation details items mapping - from valuationDetailsTable array
-    if (data.pdfDetails.valuationDetailsTable?.details && Array.isArray(data.pdfDetails.valuationDetailsTable.details)) {
-      normalized.valuationDetailsTable = data.pdfDetails.valuationDetailsTable;
+    // If data comes from MongoDB with nested objects, flatten them
+    if (data.documentInformation) {
+        normalized = {
+            ...normalized,
+            branch: data.documentInformation.branch || normalized.branch,
+            dateOfInspection: data.documentInformation.dateOfInspection || normalized.dateOfInspection,
+            dateOfValuation: data.documentInformation.dateOfValuation || normalized.dateOfValuation,
+            valuationPurpose: data.documentInformation.valuationPurpose || normalized.valuationPurpose
+        };
     }
 
-    // Fallback individual field mapping for backward compatibility
-    normalized.carpetArea = data.pdfDetails.carpetArea || normalized.carpetArea;
-    normalized.wardrobes = data.pdfDetails.wardrobes || normalized.wardrobes;
-    normalized.showcases = data.pdfDetails.showcases || normalized.showcases;
-    normalized.kitchenArrangements = data.pdfDetails.kitchenArrangements || normalized.kitchenArrangements;
-    normalized.superfineFinish = data.pdfDetails.superfineFinish || normalized.superfineFinish;
-    normalized.interiorDecorations = data.pdfDetails.interiorDecorations || normalized.interiorDecorations;
-    normalized.electricityDeposits = data.pdfDetails.electricityDeposits || normalized.electricityDeposits;
-    normalized.collapsibleGates = data.pdfDetails.collapsibleGates || normalized.collapsibleGates;
-    normalized.potentialValue = data.pdfDetails.potentialValue || normalized.potentialValue;
-    normalized.otherItems = data.pdfDetails.otherItems || normalized.otherItems;
+    if (data.ownerDetails) {
+        normalized = {
+            ...normalized,
+            ownerNameAddress: data.ownerDetails.ownerNameAddress || normalized.ownerNameAddress,
+            briefDescriptionProperty: data.ownerDetails.propertyDescription || normalized.briefDescriptionProperty
+        };
+    }
 
-    // Valuation results mapping
-    normalized.marketValue = data.pdfDetails.fairMarketValue || normalized.marketValue;
-    normalized.marketValueWords = data.pdfDetails.fairMarketValueWords || normalized.marketValueWords;
-    normalized.finalMarketValue = data.pdfDetails.fairMarketValue || normalized.finalMarketValue;
-    normalized.finalMarketValueWords = data.pdfDetails.fairMarketValueWords || normalized.finalMarketValueWords;
-    normalized.realisableValue = data.pdfDetails.realizableValue || normalized.realisableValue;
-    normalized.realisableValueWords = data.pdfDetails.realizableValue || normalized.realisableValueWords;
-    normalized.finalDistressValue = data.pdfDetails.distressValue || normalized.finalDistressValue;
-    normalized.finalDistressValueWords = data.pdfDetails.distressValue || normalized.finalDistressValueWords;
-    normalized.readyReckonerValue = data.pdfDetails.totalJantriValue || normalized.readyReckonerValue;
-    normalized.readyReckonerValueWords = data.pdfDetails.totalJantriValue || normalized.readyReckonerValueWords;
-    normalized.insurableValueWords = data.pdfDetails.insurableValue || normalized.insurableValueWords;
-  }
+    if (data.locationOfProperty) {
+        normalized = {
+            ...normalized,
+            plotSurveyNo: data.locationOfProperty.plotSurveyNo || normalized.plotSurveyNo,
+            doorNo: data.locationOfProperty.doorNo || normalized.doorNo,
+            tpVillage: data.locationOfProperty.tsVillage || normalized.tpVillage,
+            wardTaluka: data.locationOfProperty.wardTaluka || normalized.wardTaluka,
+            mandalDistrict: data.locationOfProperty.mandalDistrict || normalized.mandalDistrict,
+            layoutPlanIssueDate: data.locationOfProperty.dateLayoutIssueValidity || normalized.layoutPlanIssueDate,
+            approvedMapAuthority: data.locationOfProperty.approvedMapIssuingAuthority || normalized.approvedMapAuthority
+        };
+    }
 
-  return normalized;
+    if (data.cityAreaType) {
+        normalized = {
+            ...normalized,
+            cityTown: data.cityAreaType.cityTown || normalized.cityTown
+        };
+    }
+
+    if (data.areaClassification) {
+        normalized = {
+            ...normalized,
+            areaClassification: data.areaClassification.areaClassification || normalized.areaClassification,
+            urbanClassification: data.areaClassification.areaType || normalized.urbanClassification,
+            governmentType: data.areaClassification.govGovernance || normalized.governmentType,
+            govtEnactmentsCovered: data.areaClassification.stateGovernmentEnactments || normalized.govtEnactmentsCovered
+        };
+    }
+
+    // Map postal address and area fields from locationOfProperty or pdfDetails
+    if (data.locationOfProperty) {
+        normalized = {
+            ...normalized,
+            postalAddress: extractAddressValue(data.locationOfProperty.postalAddress) || normalized.postalAddress,
+            residentialArea: data.locationOfProperty.residentialArea || normalized.residentialArea,
+            commercialArea: data.locationOfProperty.commercialArea || normalized.commercialArea,
+            industrialArea: data.locationOfProperty.industrialArea || normalized.industrialArea,
+            areaClassification: data.locationOfProperty.areaClassification || normalized.areaClassification
+        };
+    }
+
+    // Map authentication and verification fields from pdfDetails (highest priority)
+    if (data.pdfDetails) {
+        normalized = {
+            ...normalized,
+            authenticityVerified: data.pdfDetails.authenticityVerified || normalized.authenticityVerified,
+            valuerCommentOnAuthenticity: data.pdfDetails.valuerCommentOnAuthenticity || normalized.valuerCommentOnAuthenticity,
+            postalAddress: extractAddressValue(data.pdfDetails.postalAddress) || normalized.postalAddress,
+            residentialArea: data.pdfDetails.residentialArea !== undefined ? data.pdfDetails.residentialArea : normalized.residentialArea,
+            commercialArea: data.pdfDetails.commercialArea !== undefined ? data.pdfDetails.commercialArea : normalized.commercialArea,
+            industrialArea: data.pdfDetails.industrialArea !== undefined ? data.pdfDetails.industrialArea : normalized.industrialArea,
+            areaClassification: data.pdfDetails.areaClassification || normalized.areaClassification
+        };
+    }
+
+    if (data.propertyBoundaries?.plotBoundaries) {
+        normalized = {
+            ...normalized,
+            boundariesPlotNorth: data.propertyBoundaries.plotBoundaries.north || normalized.boundariesPlotNorth,
+            boundariesPlotSouth: data.propertyBoundaries.plotBoundaries.south || normalized.boundariesPlotSouth,
+            boundariesPlotEast: data.propertyBoundaries.plotBoundaries.east || normalized.boundariesPlotEast,
+            boundariesPlotWest: data.propertyBoundaries.plotBoundaries.west || normalized.boundariesPlotWest
+        };
+    }
+
+    if (data.propertyDimensions) {
+        normalized = {
+            ...normalized,
+            dimensionsDeed: data.propertyDimensions.dimensionsAsPerDeed || normalized.dimensionsDeed,
+            dimensionsActual: data.propertyDimensions.actualDimensions || normalized.dimensionsActual,
+            extentOfUnit: data.propertyDimensions.extent || normalized.extentOfUnit,
+            latitudeLongitude: data.propertyDimensions.latitudeLongitudeCoordinates || normalized.latitudeLongitude,
+            extentOfSiteValuation: data.propertyDimensions.extentSiteConsideredValuation || normalized.extentOfSiteValuation
+        };
+    }
+
+    if (data.rateInfo) {
+        normalized = {
+            ...normalized,
+            comparableRate: data.rateInfo.comparableRateSimilarUnit || normalized.comparableRate,
+            adoptedBasicCompositeRate: data.rateInfo.adoptedBasicCompositeRate || normalized.adoptedBasicCompositeRate,
+            buildingServicesRate: data.rateInfo.buildingServicesRate || normalized.buildingServicesRate,
+            landOthersRate: data.rateInfo.landOthersRate || normalized.landOthersRate
+        };
+    }
+
+    if (data.rateValuation) {
+        normalized = {
+            ...normalized,
+            comparableRate: data.rateValuation.comparableRateSimilarUnitPerSqft || normalized.comparableRate,
+            adoptedBasicCompositeRate: data.rateValuation.adoptedBasicCompositeRatePerSqft || normalized.adoptedBasicCompositeRate,
+            buildingServicesRate: data.rateValuation.buildingServicesRatePerSqft || normalized.buildingServicesRate,
+            landOthersRate: data.rateValuation.landOthersRatePerSqft || normalized.landOthersRate
+        };
+    }
+
+    if (data.compositeRateDepreciation) {
+        normalized = {
+            ...normalized,
+            depreciatedBuildingRate: data.compositeRateDepreciation.depreciatedBuildingRatePerSqft || normalized.depreciatedBuildingRate,
+            replacementCostServices: data.compositeRateDepreciation.replacementCostUnitServicesPerSqft || normalized.replacementCostServices,
+            buildingAge: data.compositeRateDepreciation.ageOfBuildingYears || normalized.buildingAge,
+            buildingLife: data.compositeRateDepreciation.lifeOfBuildingEstimatedYears || normalized.buildingLife,
+            depreciationPercentage: data.compositeRateDepreciation.depreciationPercentageSalvage || normalized.depreciationPercentage,
+            deprecatedRatio: data.compositeRateDepreciation.depreciatedRatioBuilding || normalized.deprecatedRatio,
+            totalCompositeRate: data.compositeRateDepreciation.totalCompositeRatePerSqft || normalized.totalCompositeRate,
+            rateForLandOther: data.compositeRateDepreciation.rateLandOtherV3IIPerSqft || normalized.rateForLandOther,
+            guidelineRate: data.compositeRateDepreciation.guidelineRatePerSqm || normalized.guidelineRate
+        };
+    }
+
+    if (data.compositeRate) {
+        normalized = {
+            ...normalized,
+            depreciatedBuildingRate: data.compositeRate.depreciatedBuildingRate || normalized.depreciatedBuildingRate,
+            replacementCostServices: data.compositeRate.replacementCostUnitServices || normalized.replacementCostServices,
+            buildingAge: data.compositeRate.ageOfBuilding || normalized.buildingAge,
+            buildingLife: data.compositeRate.lifeOfBuildingEstimated || normalized.buildingLife,
+            depreciationPercentage: data.compositeRate.depreciationPercentageSalvage || normalized.depreciationPercentage,
+            deprecatedRatio: data.compositeRate.depreciatedRatioBuilding || normalized.deprecatedRatio,
+            totalCompositeRate: data.compositeRate.totalCompositeRate || normalized.totalCompositeRate,
+            rateForLandOther: data.compositeRate.rateLandOtherV3II || normalized.rateForLandOther,
+            guidelineRate: data.compositeRate.guidelineRateRegistrar || normalized.guidelineRate
+        };
+    }
+
+    if (data.valuationResults) {
+        normalized = {
+            ...normalized,
+            fairMarketValue: data.valuationResults.fairMarketValue || normalized.fairMarketValue,
+            realizableValue: data.valuationResults.realizableValue || normalized.realizableValue,
+            distressValue: data.valuationResults.distressValue || normalized.distressValue,
+            saleDeedValue: data.valuationResults.saleDeedValue || normalized.saleDeedValue,
+            insurableValue: data.valuationResults.insurableValue || normalized.insurableValue,
+            rentReceivedPerMonth: data.valuationResults.rentReceivedPerMonth || normalized.rentReceivedPerMonth,
+            marketability: data.valuationResults.marketability || normalized.marketability
+        };
+    }
+
+    if (data.buildingConstruction) {
+        normalized = {
+            ...normalized,
+            yearOfConstruction: data.buildingConstruction.yearOfConstruction || normalized.yearOfConstruction,
+            numberOfFloors: data.buildingConstruction.numberOfFloors || normalized.numberOfFloors,
+            numberOfDwellingUnits: data.buildingConstruction.numberOfDwellingUnits || normalized.numberOfDwellingUnits,
+            typeOfStructure: data.buildingConstruction.typeOfStructure || normalized.typeOfStructure,
+            qualityOfConstruction: data.buildingConstruction.qualityOfConstruction || normalized.qualityOfConstruction,
+            appearanceOfBuilding: data.buildingConstruction.appearanceOfBuilding || normalized.appearanceOfBuilding,
+            maintenanceOfBuilding: data.buildingConstruction.maintenanceOfBuilding || normalized.maintenanceOfBuilding
+        };
+    }
+
+    // Map electricityService data
+    if (data.electricityService) {
+        normalized = {
+            ...normalized,
+            electricityServiceConnectionNo: data.electricityService.electricityServiceConnectionNo || normalized.electricityServiceConnectionNo,
+            meterCardName: data.electricityService.meterCardName || normalized.meterCardName
+        };
+    }
+
+    // Map unitTax data
+    if (data.unitTax) {
+        normalized = {
+            ...normalized,
+            assessmentNo: data.unitTax.assessmentNo || normalized.assessmentNo,
+            taxPaidName: data.unitTax.taxPaidName || normalized.taxPaidName,
+            taxAmount: data.unitTax.taxAmount || normalized.taxAmount
+        };
+    }
+
+    // Map unitMaintenance data (from nested object OR from pdfDetails form data)
+    if (data.unitMaintenance) {
+       normalized = {
+           ...normalized,
+           unitMaintenance: data.unitMaintenance.unitMaintenanceStatus || normalized.unitMaintenance
+       };
+    }
+    // Also check pdfDetails for direct unitMaintenance value (form data)
+    if (data.pdfDetails?.unitMaintenance && !normalized.unitMaintenance) {
+       normalized.unitMaintenance = data.pdfDetails.unitMaintenance;
+    }
+
+    // Map unitSpecifications data
+    if (data.unitSpecifications) {
+       normalized = {
+           ...normalized,
+           floorUnit: data.unitSpecifications.floorLocation || normalized.floorUnit,
+           doorNoUnit: data.unitSpecifications.doorNoUnit || normalized.doorNoUnit,
+           roofUnit: data.unitSpecifications.roof || normalized.roofUnit,
+           flooringUnit: data.unitSpecifications.flooring || normalized.flooringUnit,
+           doorsUnit: data.unitSpecifications.doors || normalized.doorsUnit,
+           windowsUnit: data.unitSpecifications.windows || normalized.windowsUnit,
+           fittingsUnit: data.unitSpecifications.fittings || normalized.fittingsUnit,
+           finishingUnit: data.unitSpecifications.finishing || normalized.finishingUnit
+       };
+    }
+
+    // Map unitAreaDetails data
+    if (data.unitAreaDetails) {
+       normalized = {
+           ...normalized,
+           undividedLandArea: data.unitAreaDetails.undividedLandAreaSaleDeed || normalized.undividedLandArea,
+           plinthArea: data.unitAreaDetails.plinthAreaUnit || normalized.plinthArea,
+           carpetArea: data.unitAreaDetails.carpetAreaUnit || normalized.carpetArea
+       };
+    }
+
+    // Map unitClassification data (from nested object OR from pdfDetails form data)
+    if (data.unitClassification) {
+       normalized = {
+           ...normalized,
+           floorSpaceIndex: data.unitClassification.floorSpaceIndex || normalized.floorSpaceIndex,
+           unitClassification: data.unitClassification.unitClassification || normalized.unitClassification,
+           residentialOrCommercial: data.unitClassification.residentialOrCommercial || normalized.residentialOrCommercial,
+           ownerOccupiedOrLetOut: data.unitClassification.ownerOccupiedOrLetOut || normalized.ownerOccupiedOrLetOut,
+           numberOfDwellingUnits: data.unitClassification.numberOfDwellingUnits || normalized.numberOfDwellingUnits
+       };
+    }
+    // Also check pdfDetails for direct classificationPosh value (form data)
+    if (data.pdfDetails?.classificationPosh && !normalized.unitClassification) {
+       normalized.unitClassification = data.pdfDetails.classificationPosh;
+    }
+
+    // Map apartmentLocation data
+    if (data.apartmentLocation) {
+        normalized = {
+            ...normalized,
+            apartmentNature: data.apartmentLocation.apartmentNature || normalized.apartmentNature,
+            apartmentLocation: data.apartmentLocation.apartmentLocation || normalized.apartmentLocation,
+            apartmentTSNo: data.apartmentLocation.tsNo || normalized.apartmentTSNo,
+            apartmentBlockNo: data.apartmentLocation.blockNo || normalized.apartmentBlockNo,
+            apartmentWardNo: data.apartmentLocation.wardNo || normalized.apartmentWardNo,
+            apartmentVillageMunicipalityCounty: data.apartmentLocation.villageOrMunicipality || normalized.apartmentVillageMunicipalityCounty,
+            apartmentDoorNoStreetRoadPinCode: data.apartmentLocation.doorNoStreetRoadPinCode || normalized.apartmentDoorNoStreetRoadPinCode
+        };
+    }
+
+    // Map monthlyRent data
+    if (data.monthlyRent) {
+        normalized = {
+            ...normalized,
+            monthlyRent: data.monthlyRent.ifRentedMonthlyRent || normalized.monthlyRent
+        };
+    }
+
+    // Map marketability data
+    if (data.marketability) {
+        normalized = {
+            ...normalized,
+            marketability: data.marketability.howIsMarketability || normalized.marketability,
+            favoringFactors: data.marketability.factorsFavouringExtraPotential || normalized.favoringFactors,
+            negativeFactors: data.marketability.negativeFactorsAffectingValue || normalized.negativeFactors
+        };
+    }
+
+    // Map signatureReport data
+    if (data.signatureReport) {
+        normalized = {
+            ...normalized,
+            valuationPlace: data.signatureReport.place || normalized.valuationPlace,
+            valuationDate: data.signatureReport.signatureDate || normalized.valuationDate,
+            valuersName: data.signatureReport.signerName || normalized.valuersName,
+            reportDate: data.signatureReport.reportDate || normalized.reportDate
+        };
+    }
+
+    // Map additionalFlatDetails data
+    if (data.additionalFlatDetails) {
+        normalized = {
+            ...normalized,
+            areaUsage: data.additionalFlatDetails.areaUsage || normalized.areaUsage,
+            carpetArea: data.additionalFlatDetails.carpetAreaFlat || normalized.carpetArea
+        };
+    }
+
+    // Map guidelineRate data
+    if (data.guidelineRate) {
+        normalized = {
+            ...normalized,
+            guidelineRate: data.guidelineRate.guidelineRatePerSqm || normalized.guidelineRate
+        };
+    }
+
+    // Preserve image arrays - CRITICAL for PDF image display
+    // Filter out empty/null images IMMEDIATELY to prevent duplicates/empty containers
+    if (Array.isArray(data.propertyImages)) {
+        normalized.propertyImages = data.propertyImages.filter(img => {
+            if (!img) return false;
+            let url = '';
+            if (typeof img === 'string') {
+                url = img.trim();
+            } else if (typeof img === 'object') {
+                url = (img.url || img.preview || img.data || img.src || img.secure_url || '').toString().trim();
+            }
+            return url && url.length > 0 && typeof url === 'string';
+        });
+    }
+    if (Array.isArray(data.locationImages)) {
+        normalized.locationImages = data.locationImages.filter(img => {
+            if (!img) return false;
+            let url = '';
+            if (typeof img === 'string') {
+                url = img.trim();
+            } else if (typeof img === 'object') {
+                url = (img.url || img.preview || img.data || img.src || img.secure_url || '').toString().trim();
+            }
+            return url && url.length > 0 && typeof url === 'string';
+        });
+    }
+
+    // Map document fields from documentsProduced (MongoDB structure - primary source)
+    if (data.documentsProduced) {
+        normalized.agreementForSale = data.documentsProduced.photocopyCopyAgreement || normalized.agreementForSale;
+        normalized.commencementCertificate = data.documentsProduced.commencementCertificate || normalized.commencementCertificate;
+        normalized.occupancyCertificate = data.documentsProduced.occupancyCertificate || normalized.occupancyCertificate;
+    }
+
+    // Map document fields from pdfDetails if available (fallback)
+    if (data.pdfDetails) {
+        normalized.agreementForSale = normalized.agreementForSale || data.pdfDetails.agreementForSale || data.pdfDetails.agreementSaleExecutedName;
+        normalized.commencementCertificate = normalized.commencementCertificate || data.pdfDetails.commencementCertificate;
+        normalized.occupancyCertificate = normalized.occupancyCertificate || data.pdfDetails.occupancyCertificate;
+    }
+
+    // Map document fields from agreementForSale nested object
+    if (data.agreementForSale?.agreementForSaleExecutedName) {
+        normalized.agreementForSale = normalized.agreementForSale || data.agreementForSale.agreementForSaleExecutedName;
+    }
+
+    // Also check root level fields (direct properties from response)
+    normalized.agreementForSale = normalized.agreementForSale || data.agreementForSale;
+    normalized.commencementCertificate = normalized.commencementCertificate || data.commencementCertificate;
+    normalized.occupancyCertificate = normalized.occupancyCertificate || data.occupancyCertificate;
+
+    // Map missing valuation detail fields from pdfDetails
+    if (data.pdfDetails) {
+        normalized.ratePerSqft = data.pdfDetails.presentValueRate || normalized.ratePerSqft;
+        normalized.valuationItem1 = data.pdfDetails.presentValue || normalized.valuationItem1;
+        normalized.totalEstimatedValue = data.pdfDetails.totalValuationItems || normalized.totalEstimatedValue;
+        normalized.totalValueSay = data.pdfDetails.totalValueSay || data.pdfDetails.totalValuationItems || normalized.totalValueSay;
+
+        // Valuation details items mapping - from valuationDetailsTable array
+        if (data.pdfDetails.valuationDetailsTable?.details && Array.isArray(data.pdfDetails.valuationDetailsTable.details)) {
+            normalized.valuationDetailsTable = data.pdfDetails.valuationDetailsTable;
+        }
+
+        // Fallback individual field mapping for backward compatibility
+        normalized.carpetArea = data.pdfDetails.carpetArea || normalized.carpetArea;
+        normalized.wardrobes = data.pdfDetails.wardrobes || normalized.wardrobes;
+        normalized.showcases = data.pdfDetails.showcases || normalized.showcases;
+        normalized.kitchenArrangements = data.pdfDetails.kitchenArrangements || normalized.kitchenArrangements;
+        normalized.superfineFinish = data.pdfDetails.superfineFinish || normalized.superfineFinish;
+        normalized.interiorDecorations = data.pdfDetails.interiorDecorations || normalized.interiorDecorations;
+        normalized.electricityDeposits = data.pdfDetails.electricityDeposits || normalized.electricityDeposits;
+        normalized.collapsibleGates = data.pdfDetails.collapsibleGates || normalized.collapsibleGates;
+        normalized.potentialValue = data.pdfDetails.potentialValue || normalized.potentialValue;
+        normalized.otherItems = data.pdfDetails.otherItems || normalized.otherItems;
+
+        // Valuation results mapping
+        normalized.marketValue = data.pdfDetails.fairMarketValue || normalized.marketValue;
+        normalized.marketValueWords = data.pdfDetails.fairMarketValueWords || normalized.marketValueWords;
+        normalized.finalMarketValue = data.pdfDetails.fairMarketValue || normalized.finalMarketValue;
+        normalized.finalMarketValueWords = data.pdfDetails.fairMarketValueWords || normalized.finalMarketValueWords;
+        normalized.realisableValue = data.pdfDetails.realizableValue || normalized.realisableValue;
+        normalized.realisableValueWords = data.pdfDetails.realizableValue || normalized.realisableValueWords;
+        normalized.finalDistressValue = data.pdfDetails.distressValue || normalized.finalDistressValue;
+        normalized.finalDistressValueWords = data.pdfDetails.distressValue || normalized.finalDistressValueWords;
+        normalized.readyReckonerValue = data.pdfDetails.totalJantriValue || normalized.readyReckonerValue;
+        normalized.readyReckonerValueWords = data.pdfDetails.totalJantriValue || normalized.readyReckonerValueWords;
+        normalized.insurableValueWords = data.pdfDetails.insurableValue || normalized.insurableValueWords;
+    }
+
+    return normalized;
 };
 
 export function generateValuationReportHTML(data = {}) {
-  // Normalize data structure first - flatten nested MongoDB objects
-  const normalizedData = normalizeDataForPDF(data);
+    // Normalize data structure first - flatten nested MongoDB objects
+    const normalizedData = normalizeDataForPDF(data);
 
-  // Debug logging to verify data is being received
-  console.log('🔍 PDF Data Received:', {
-    hasData: !!data,
-    hasRootFields: {
-      uniqueId: !!data?.uniqueId,
-      bankName: !!data?.bankName,
-      clientName: !!data?.clientName,
-      city: !!data?.city
-    },
-    hasPdfDetails: !!data?.pdfDetails,
-    pdfDetailsKeys: Object.keys(data?.pdfDetails || {}).length,
-    pdfDetailsSample: {
-      postalAddress: data?.pdfDetails?.postalAddress,
-      residentialArea: data?.pdfDetails?.residentialArea,
-      areaClassification: data?.pdfDetails?.areaClassification,
-      inspectionDate: data?.pdfDetails?.inspectionDate,
-      agreementForSale: data?.pdfDetails?.agreementForSale
-    },
-    hasPropertyImages: data?.propertyImages?.length || 0,
-    hasLocationImages: data?.locationImages?.length || 0,
-    normalizedKeys: Object.keys(normalizedData).length
-  });
+    // Debug logging to verify data is being received
+    console.log('🔍 PDF Data Received:', {
+        hasData: !!data,
+        hasRootFields: {
+            uniqueId: !!data?.uniqueId,
+            bankName: !!data?.bankName,
+            clientName: !!data?.clientName,
+            city: !!data?.city
+        },
+        hasPdfDetails: !!data?.pdfDetails,
+        pdfDetailsKeys: Object.keys(data?.pdfDetails || {}).length,
+        pdfDetailsSample: {
+            postalAddress: data?.pdfDetails?.postalAddress,
+            residentialArea: data?.pdfDetails?.residentialArea,
+            areaClassification: data?.pdfDetails?.areaClassification,
+            inspectionDate: data?.pdfDetails?.inspectionDate,
+            agreementForSale: data?.pdfDetails?.agreementForSale
+        },
+        hasPropertyImages: data?.propertyImages?.length || 0,
+        hasLocationImages: data?.locationImages?.length || 0,
+        normalizedKeys: Object.keys(normalizedData).length
+    });
 
-  // Start with normalized data, then merge with root level data and pdfDetails
-  let pdfData = normalizedData;
+    // Start with normalized data, then merge with root level data and pdfDetails
+    let pdfData = normalizedData;
 
-  // Merge root level data first
-  pdfData = {
-    ...pdfData,
-    ...data
-  };
-
-  // Flatten pdfDetails into root level for easier access (pdfDetails has HIGHEST priority as it contains form data)
-  // This ensures ALL form fields from pdfDetails are available for the PDF template and overrides other sources
-  if (data?.pdfDetails && typeof data.pdfDetails === 'object') {
+    // Merge root level data first
     pdfData = {
-      ...pdfData,
-      ...data.pdfDetails 
+        ...pdfData,
+        ...data
     };
-  }
 
-  // Flatten facilities object if it exists
-  if (data?.facilities && typeof data.facilities === 'object') {
+    // Flatten pdfDetails into root level for easier access (pdfDetails has HIGHEST priority as it contains form data)
+    // This ensures ALL form fields from pdfDetails are available for the PDF template and overrides other sources
+    // BUT preserve propertyImages and locationImages arrays
+    if (data?.pdfDetails && typeof data.pdfDetails === 'object') {
+        const preservedPropertyImages = pdfData.propertyImages;
+        const preservedLocationImages = pdfData.locationImages;
+
+        pdfData = {
+            ...pdfData,
+            ...data.pdfDetails
+        };
+
+        // Restore image arrays if they exist
+        if (preservedPropertyImages) {
+            pdfData.propertyImages = preservedPropertyImages;
+        }
+        if (preservedLocationImages) {
+            pdfData.locationImages = preservedLocationImages;
+        }
+
+        // Map pdfDetails field names to template field names
+        // classificationPosh -> unitClassification (for PDF template)
+        if (data.pdfDetails.classificationPosh) {
+            pdfData.unitClassification = data.pdfDetails.classificationPosh;
+        } else if (typeof pdfData.unitClassification === 'object' && pdfData.unitClassification?.unitClassification) {
+            // Extract from nested object if it exists
+            pdfData.unitClassification = pdfData.unitClassification.unitClassification;
+        }
+        
+        // Ensure unitMaintenance is in pdfData (should already be there from spread)
+        if (data.pdfDetails.unitMaintenance) {
+            pdfData.unitMaintenance = data.pdfDetails.unitMaintenance;
+        } else if (typeof pdfData.unitMaintenance === 'object' && pdfData.unitMaintenance?.unitMaintenanceStatus) {
+            // Extract from nested object if it exists
+            pdfData.unitMaintenance = pdfData.unitMaintenance.unitMaintenanceStatus;
+        }
+
+        // DEBUG: Log field mapping
+        console.log('🔧 Field Mapping Debug:', {
+            allPdfDetailsKeys: Object.keys(data.pdfDetails),
+            classificationPosh: data.pdfDetails.classificationPosh,
+            unitMaintenance: data.pdfDetails.unitMaintenance,
+            pdfDataUnitClassification: pdfData.unitClassification,
+            pdfDataUnitMaintenance: pdfData.unitMaintenance,
+            pdfDetailsUnitMaintenance: data.pdfDetails.unitMaintenance,
+            pdfDetailsClassificationPosh: data.pdfDetails.classificationPosh
+        });
+    }
+
+    // Flatten facilities object if it exists
+    if (data?.facilities && typeof data.facilities === 'object') {
+        pdfData = {
+            ...pdfData,
+            ...data.facilities
+        };
+    }
+
+    // Comprehensive field name mapping for backward compatibility
     pdfData = {
-      ...pdfData,
-      ...data.facilities
+        ...pdfData,
+        // Basic info
+        branch: pdfData.branch || pdfData.pdfDetails?.branch,
+        valuationPurpose: pdfData.valuationPurpose || pdfData.pdfDetails?.valuationPurpose || pdfData.pdfDetails?.purposeOfValuation,
+        inspectionDate: pdfData.inspectionDate || pdfData.dateOfInspection || pdfData.pdfDetails?.inspectionDate || pdfData.pdfDetails?.dateOfInspection,
+        valuationMadeDate: pdfData.valuationMadeDate || pdfData.dateOfValuation || pdfData.pdfDetails?.valuationMadeDate || pdfData.pdfDetails?.dateOfValuationMade,
+        agreementForSale: pdfData.agreementForSale || pdfData.pdfDetails?.agreementForSale,
+        commencementCertificate: pdfData.commencementCertificate || pdfData.pdfDetails?.commencementCertificate,
+        occupancyCertificate: pdfData.occupancyCertificate || pdfData.pdfDetails?.occupancyCertificate,
+        ownerNameAddress: pdfData.ownerNameAddress || pdfData.pdfDetails?.ownerNameAddress,
+        briefDescriptionProperty: pdfData.briefDescriptionProperty || pdfData.pdfDetails?.briefDescriptionProperty,
+
+        // Location of property
+        plotNo: pdfData.plotNo || pdfData.plotSurveyNo || pdfData.pdfDetails?.plotSurveyNo,
+        doorNo: pdfData.doorNo || pdfData.pdfDetails?.doorNo,
+        tsNoVillage: pdfData.tsNoVillage || pdfData.tpVillage || pdfData.pdfDetails?.tpVillage,
+        wardTaluka: pdfData.wardTaluka || pdfData.pdfDetails?.wardTaluka,
+        mandalDistrict: pdfData.mandalDistrict || pdfData.pdfDetails?.mandalDistrict,
+        layoutIssueDate: pdfData.layoutIssueDate || pdfData.layoutPlanIssueDate || pdfData.pdfDetails?.layoutPlanIssueDate,
+        approvedMapAuthority: pdfData.approvedMapAuthority || pdfData.pdfDetails?.approvedMapAuthority,
+        mapVerified: pdfData.mapVerified || pdfData.authenticityVerified,
+        valuersComments: pdfData.valuersComments || pdfData.valuerCommentOnAuthenticity,
+        postalAddress: extractAddressValue(pdfData.postalAddress) || extractAddressValue(pdfData.pdfDetails?.postalAddress),
+        cityTown: pdfData.cityTown || pdfData.pdfDetails?.cityTown,
+        residentialArea: pdfData.residentialArea,
+        commercialArea: pdfData.commercialArea,
+        industrialArea: pdfData.industrialArea,
+        areaClassification: pdfData.areaClassification || pdfData.pdfDetails?.areaClassification,
+        urbanType: pdfData.urbanType || pdfData.urbanClassification || pdfData.pdfDetails?.urbanClassification,
+        jurisdictionType: pdfData.jurisdictionType || pdfData.governmentType || pdfData.pdfDetails?.governmentType,
+        enactmentCovered: pdfData.enactmentCovered || pdfData.govtEnactmentsCovered || pdfData.pdfDetails?.govtEnactmentsCovered,
+
+        // Boundaries
+        boundariesPlotNorthDeed: pdfData.boundariesPlotNorthDeed || pdfData.pdfDetails?.boundariesPlotNorthDeed,
+        boundariesPlotNorthActual: pdfData.boundariesPlotNorthActual || pdfData.pdfDetails?.boundariesPlotNorthActual,
+        boundariesPlotSouthDeed: pdfData.boundariesPlotSouthDeed || pdfData.pdfDetails?.boundariesPlotSouthDeed,
+        boundariesPlotSouthActual: pdfData.boundariesPlotSouthActual || pdfData.pdfDetails?.boundariesPlotSouthActual,
+        boundariesPlotEastDeed: pdfData.boundariesPlotEastDeed || pdfData.pdfDetails?.boundariesPlotEastDeed,
+        boundariesPlotEastActual: pdfData.boundariesPlotEastActual || pdfData.pdfDetails?.boundariesPlotEastActual,
+        boundariesPlotWestDeed: pdfData.boundariesPlotWestDeed || pdfData.pdfDetails?.boundariesPlotWestDeed,
+        boundariesPlotWestActual: pdfData.boundariesPlotWestActual || pdfData.pdfDetails?.boundariesPlotWestActual,
+        boundariesShopNorthDeed: pdfData.boundariesShopNorthDeed || pdfData.pdfDetails?.boundariesShopNorthDeed,
+        boundariesShopNorthActual: pdfData.boundariesShopNorthActual || pdfData.pdfDetails?.boundariesShopNorthActual,
+        boundariesShopSouthDeed: pdfData.boundariesShopSouthDeed || pdfData.pdfDetails?.boundariesShopSouthDeed,
+        boundariesShopSouthActual: pdfData.boundariesShopSouthActual || pdfData.pdfDetails?.boundariesShopSouthActual,
+        boundariesShopEastDeed: pdfData.boundariesShopEastDeed || pdfData.pdfDetails?.boundariesShopEastDeed,
+        boundariesShopEastActual: pdfData.boundariesShopEastActual || pdfData.pdfDetails?.boundariesShopEastActual,
+        boundariesShopWestDeed: pdfData.boundariesShopWestDeed || pdfData.pdfDetails?.boundariesShopWestDeed,
+        boundariesShopWestActual: pdfData.boundariesShopWestActual || pdfData.pdfDetails?.boundariesShopWestActual,
+        // Legacy fields for backward compatibility
+        boundariesPlotNorth: pdfData.boundariesPlotNorth,
+        boundariesPlotSouth: pdfData.boundariesPlotSouth,
+        boundariesPlotEast: pdfData.boundariesPlotEast,
+        boundariesPlotWest: pdfData.boundariesPlotWest,
+        boundariesShopNorth: pdfData.boundariesShopNorth,
+        boundariesShopSouth: pdfData.boundariesShopSouth,
+        boundariesShopEast: pdfData.boundariesShopEast,
+        boundariesShopWest: pdfData.boundariesShopWest,
+
+        // Dimensions
+        dimensionsDeed: pdfData.dimensionsDeed,
+        dimensionsActual: pdfData.dimensionsActual,
+        extentUnit: pdfData.extentUnit || pdfData.extent || pdfData.extentOfUnit,
+        coordinates: pdfData.coordinates,
+        latitudeLongitude: pdfData.latitudeLongitude,
+        extentSiteValuation: pdfData.extentSiteValuation || pdfData.extentOfSiteValuation,
+
+        // Apartment Building
+        apartmentNature: pdfData.apartmentNature,
+        apartmentLocation: pdfData.apartmentLocation,
+        apartmentTSNo: pdfData.apartmentTSNo || pdfData.tsNo || pdfData.apartmentLocation?.tsNo,
+        apartmentBlockNo: pdfData.apartmentBlockNo || pdfData.blockNo,
+        apartmentWardNo: pdfData.apartmentWardNo || pdfData.wardNo,
+        apartmentMunicipality: pdfData.apartmentMunicipality || pdfData.apartmentVillageMunicipalityCounty || pdfData.villageOrMunicipality,
+        apartmentDoorNoPin: pdfData.apartmentDoorNoPin || pdfData.apartmentDoorNoStreetRoadPinCode || pdfData.doorNoStreetRoadPinCode,
+        localityDescription: pdfData.localityDescription || pdfData.descriptionOfLocalityResidentialCommercialMixed,
+        yearConstruction: pdfData.yearConstruction || pdfData.yearOfConstruction,
+        numberOfFloors: pdfData.numberOfFloors,
+        structureType: pdfData.structureType || pdfData.typeOfStructure,
+        numberOfDwellingUnits: pdfData.numberOfDwellingUnits || pdfData.dwellingUnits || pdfData.numberOfDwellingUnitsInBuilding,
+        qualityConstruction: pdfData.qualityConstruction || pdfData.qualityOfConstruction,
+        buildingAppearance: pdfData.buildingAppearance || pdfData.appearanceOfBuilding,
+        buildingMaintenance: pdfData.buildingMaintenance || pdfData.maintenanceOfBuilding,
+        unitMaintenance: pdfData.unitMaintenance || pdfData.unitMaintenanceStatus || pdfData.pdfDetails?.unitMaintenance || data?.unitMaintenance?.unitMaintenanceStatus,
+        unitClassification: pdfData.unitClassification || pdfData.pdfDetails?.classificationPosh || data?.unitClassification?.unitClassification,
+        facilityLift: pdfData.facilityLift || pdfData.liftAvailable,
+        facilityWater: pdfData.facilityWater || pdfData.protectedWaterSupply,
+        facilitySump: pdfData.facilitySump || pdfData.undergroundSewerage,
+        facilityParking: pdfData.facilityParking || pdfData.carParkingType || pdfData.carParkingOpenCovered,
+        compoundWall: pdfData.compoundWall || pdfData.compoundWallExisting || pdfData.isCompoundWallExisting,
+        pavement: pdfData.pavement || pdfData.pavementAroundBuilding || pdfData.isPavementLaidAroundBuilding,
+
+        // Unit (with multiple name variants)
+        floorUnit: pdfData.floorUnit || pdfData.floorLocation || pdfData.unitFloor || pdfData.pdfDetails?.unitFloor,
+        doorNoUnit: pdfData.doorNoUnit || pdfData.unitDoorNo || pdfData.pdfDetails?.unitDoorNo,
+        roofUnit: pdfData.roofUnit || pdfData.roof || pdfData.unitRoof || pdfData.pdfDetails?.unitRoof,
+        flooringUnit: pdfData.flooringUnit || pdfData.flooring || pdfData.unitFlooring || pdfData.pdfDetails?.unitFlooring,
+        doorsUnit: pdfData.doorsUnit || pdfData.doors || pdfData.unitDoors || pdfData.pdfDetails?.unitDoors,
+        windowsUnit: pdfData.windowsUnit || pdfData.windows || pdfData.unitWindows || pdfData.pdfDetails?.unitWindows,
+        fittingsUnit: pdfData.fittingsUnit || pdfData.fittings || pdfData.unitFittings || pdfData.pdfDetails?.unitFittings,
+        finishingUnit: pdfData.finishingUnit || pdfData.finishing || pdfData.unitFinishing || pdfData.pdfDetails?.unitFinishing,
+        electricityConnectionNo: pdfData.electricityConnectionNo || pdfData.electricityServiceNo || pdfData.electricityServiceConnectionNo || pdfData.pdfDetails?.electricityServiceNo,
+        agreementForSale: pdfData.agreementForSale || pdfData.agreementSaleExecutedName || pdfData.pdfDetails?.agreementSaleExecutedName,
+        undividedLandArea: pdfData.undividedLandArea || pdfData.undividedAreaLand || pdfData.undividedArea || pdfData.pdfDetails?.undividedAreaLand,
+        assessmentNo: pdfData.assessmentNo || pdfData.pdfDetails?.assessmentNo || data?.unitTax?.assessmentNo,
+        taxPaidName: pdfData.taxPaidName || pdfData.pdfDetails?.taxPaidName || data?.unitTax?.taxPaidName,
+        taxAmount: pdfData.taxAmount || pdfData.pdfDetails?.taxAmount || data?.unitTax?.taxAmount,
+        meterCardName: pdfData.meterCardName || pdfData.pdfDetails?.meterCardName,
+
+        // Valuation values
+        carpetArea: pdfData.carpetArea || pdfData.carpetAreaFlat || pdfData.pdfDetails?.carpetAreaFlat,
+        plinthArea: pdfData.plinthArea || pdfData.pdfDetails?.plinthArea,
+        undividedLandArea: pdfData.undividedLandArea || pdfData.undividedLandAreaSaleDeed || pdfData.undividedAreaLand || pdfData.pdfDetails?.undividedAreaLand,
+        ratePerSqft: pdfData.ratePerSqft || pdfData.presentValueRate || pdfData.adoptedBasicCompositeRate || pdfData.pdfDetails?.presentValueRate || pdfData.pdfDetails?.adoptedBasicCompositeRate,
+        marketValue: pdfData.marketValue || pdfData.fairMarketValue || pdfData.pdfDetails?.fairMarketValue,
+        marketValueWords: pdfData.marketValueWords || pdfData.fairMarketValueWords || pdfData.pdfDetails?.fairMarketValueWords || pdfData.pdfDetails?.fairMarketValue,
+        distressValue: pdfData.distressValue || pdfData.pdfDetails?.distressValue,
+        distressValueWords: pdfData.distressValueWords || pdfData.pdfDetails?.distressValueWords || pdfData.pdfDetails?.distressValue,
+        saleDeedValue: pdfData.saleDeedValue || pdfData.pdfDetails?.saleDeedValue,
+        finalMarketValue: pdfData.finalMarketValue || pdfData.fairMarketValue || pdfData.pdfDetails?.fairMarketValue,
+        finalMarketValueWords: pdfData.finalMarketValueWords || pdfData.fairMarketValueWords || pdfData.pdfDetails?.fairMarketValueWords || pdfData.pdfDetails?.fairMarketValue,
+        realisableValue: pdfData.realisableValue || pdfData.realizableValue || pdfData.pdfDetails?.realizableValue,
+        realisableValueWords: pdfData.realisableValueWords || pdfData.pdfDetails?.realisableValueWords || pdfData.pdfDetails?.realizableValue,
+        finalDistressValue: pdfData.finalDistressValue || pdfData.distressValue || pdfData.pdfDetails?.distressValue,
+        finalDistressValueWords: pdfData.finalDistressValueWords || pdfData.distressValueWords || pdfData.pdfDetails?.distressValueWords || pdfData.pdfDetails?.distressValue,
+        readyReckonerValue: pdfData.readyReckonerValue || pdfData.totalJantriValue || pdfData.pdfDetails?.readyReckonerValue || pdfData.pdfDetails?.totalJantriValue,
+        readyReckonerValueWords: pdfData.readyReckonerValueWords || pdfData.totalJantriValue || pdfData.pdfDetails?.readyReckonerValueWords || pdfData.pdfDetails?.readyReckonerValue || pdfData.pdfDetails?.totalJantriValue,
+        readyReckonerYear: pdfData.readyReckonerYear || pdfData.pdfDetails?.readyReckonerYear || new Date().getFullYear(),
+        insurableValue: pdfData.insurableValue || pdfData.pdfDetails?.insurableValue,
+        insurableValueWords: pdfData.insurableValueWords || pdfData.pdfDetails?.insurableValueWords || pdfData.pdfDetails?.insurableValue,
+        monthlyRent: pdfData.monthlyRent || pdfData.pdfDetails?.monthlyRent,
+        rentReceivedPerMonth: pdfData.rentReceivedPerMonth || pdfData.pdfDetails?.rentReceivedPerMonth || pdfData.pdfDetails?.monthlyRent,
+        marketability: pdfData.marketability || pdfData.pdfDetails?.marketability,
+        marketabilityRating: pdfData.marketability || pdfData.pdfDetails?.marketability,
+        favoringFactors: pdfData.favoringFactors || pdfData.pdfDetails?.favoringFactors,
+        negativeFactors: pdfData.negativeFactors || pdfData.pdfDetails?.negativeFactors,
+        compositeRateAnalysis: pdfData.comparableRate,
+        newConstructionRate: pdfData.adoptedBasicCompositeRate,
+
+        // Signature & Report
+        valuationPlace: pdfData.valuationPlace || pdfData.place,
+        valuationDate: pdfData.valuationDate || pdfData.signatureDate,
+        valuersName: pdfData.valuersName || pdfData.signerName,
+        valuersCompany: pdfData.valuersCompany,
+        valuersLicense: pdfData.valuersLicense,
+        reportDate: pdfData.reportDate,
+
+        // Rate information
+        comparableRate: pdfData.comparableRate || pdfData.pdfDetails?.comparableRate,
+        adoptedBasicCompositeRate: pdfData.adoptedBasicCompositeRate || pdfData.pdfDetails?.adoptedBasicCompositeRate,
+        buildingServicesRate: pdfData.buildingServicesRate || pdfData.pdfDetails?.buildingServicesRate,
+        landOthersRate: pdfData.landOthersRate || pdfData.pdfDetails?.landOthersRate,
+        guidelineRate: pdfData.guidelineRate || pdfData.pdfDetails?.guidelineRate,
+
+        // Depreciation & Rate
+        depreciatedBuildingRateFinal: pdfData.depreciatedBuildingRateFinal || pdfData.depreciatedBuildingRate || pdfData.pdfDetails?.depreciatedBuildingRate,
+        replacementCostServices: pdfData.replacementCostServices || pdfData.pdfDetails?.replacementCostServices,
+        buildingAgeDepreciation: pdfData.buildingAgeDepreciation || pdfData.buildingAge || pdfData.pdfDetails?.buildingAge,
+        buildingLifeEstimated: pdfData.buildingLifeEstimated || pdfData.buildingLife || pdfData.pdfDetails?.buildingLife,
+        depreciationPercentageFinal: pdfData.depreciationPercentageFinal || pdfData.depreciationPercentage || pdfData.pdfDetails?.depreciationPercentage,
+        depreciatedRatio: pdfData.depreciatedRatio || pdfData.deprecatedRatio || pdfData.pdfDetails?.deprecatedRatio,
+        totalCompositeRate: pdfData.totalCompositeRate || pdfData.pdfDetails?.totalCompositeRate,
+        rateLandOther: pdfData.rateLandOther || pdfData.rateForLandOther || pdfData.pdfDetails?.rateForLandOther,
+        totalEstimatedValue: pdfData.totalEstimatedValue || pdfData.totalValuationItems || pdfData.pdfDetails?.totalValuationItems,
+        totalValueSay: pdfData.totalValueSay || pdfData.pdfDetails?.totalValueSay,
+
+        // Valuation items - Qty/Rate/Value variants
+        valuationItem1: pdfData.valuationItem1 || pdfData.presentValue || pdfData.pdfDetails?.presentValue,
+        presentValueQty: pdfData.presentValueQty || pdfData.pdfDetails?.presentValueQty,
+        presentValueRate: pdfData.presentValueRate || pdfData.pdfDetails?.presentValueRate,
+        wardrobesQty: pdfData.wardrobesQty || pdfData.pdfDetails?.wardrobesQty,
+        wardrobesRate: pdfData.wardrobesRate || pdfData.pdfDetails?.wardrobesRate,
+        wardrobes: pdfData.wardrobes || pdfData.pdfDetails?.wardrobes,
+        showcasesQty: pdfData.showcasesQty || pdfData.pdfDetails?.showcasesQty,
+        showcasesRate: pdfData.showcasesRate || pdfData.pdfDetails?.showcasesRate,
+        showcases: pdfData.showcases || pdfData.pdfDetails?.showcases,
+        kitchenArrangementsQty: pdfData.kitchenArrangementsQty || pdfData.pdfDetails?.kitchenArrangementsQty,
+        kitchenArrangementsRate: pdfData.kitchenArrangementsRate || pdfData.pdfDetails?.kitchenArrangementsRate,
+        kitchenArrangements: pdfData.kitchenArrangements || pdfData.pdfDetails?.kitchenArrangements,
+        superfineFinishQty: pdfData.superfineFinishQty || pdfData.pdfDetails?.superfineFinishQty,
+        superfineFinishRate: pdfData.superfineFinishRate || pdfData.pdfDetails?.superfineFinishRate,
+        superfineFinish: pdfData.superfineFinish || pdfData.pdfDetails?.superfineFinish,
+        interiorDecorationsQty: pdfData.interiorDecorationsQty || pdfData.pdfDetails?.interiorDecorationsQty,
+        interiorDecorationsRate: pdfData.interiorDecorationsRate || pdfData.pdfDetails?.interiorDecorationsRate,
+        interiorDecorations: pdfData.interiorDecorations || pdfData.pdfDetails?.interiorDecorations,
+        electricityDepositsQty: pdfData.electricityDepositsQty || pdfData.pdfDetails?.electricityDepositsQty,
+        electricityDepositsRate: pdfData.electricityDepositsRate || pdfData.pdfDetails?.electricityDepositsRate,
+        electricityDeposits: pdfData.electricityDeposits || pdfData.pdfDetails?.electricityDeposits,
+        collapsibleGatesQty: pdfData.collapsibleGatesQty || pdfData.pdfDetails?.collapsibleGatesQty,
+        collapsibleGatesRate: pdfData.collapsibleGatesRate || pdfData.pdfDetails?.collapsibleGatesRate,
+        collapsibleGates: pdfData.collapsibleGates || pdfData.pdfDetails?.collapsibleGates,
+        potentialValueQty: pdfData.potentialValueQty || pdfData.pdfDetails?.potentialValueQty,
+        potentialValueRate: pdfData.potentialValueRate || pdfData.pdfDetails?.potentialValueRate,
+        potentialValue: pdfData.potentialValue || pdfData.pdfDetails?.potentialValue,
+        otherItemsQty: pdfData.otherItemsQty || pdfData.pdfDetails?.otherItemsQty,
+        otherItemsRate: pdfData.otherItemsRate || pdfData.pdfDetails?.otherItemsRate,
+        otherItems: pdfData.otherItems || pdfData.pdfDetails?.otherItems,
+        totalValuationItems: pdfData.totalValuationItems || pdfData.pdfDetails?.totalValuationItems,
+
+        // Valuation Details Table
+        valuationDetailsTable: pdfData.valuationDetailsTable || pdfData.pdfDetails?.valuationDetailsTable,
+        classificationPosh: pdfData.pdfDetails?.classificationPosh || pdfData.unitClassification || pdfData.classificationPosh,
+        classificationUsage: pdfData.residentialOrCommercial || pdfData.classificationUsage || pdfData.pdfDetails?.classificationUsage,
+        residentialOrCommercial: pdfData.residentialOrCommercial || pdfData.classificationUsage || pdfData.pdfDetails?.classificationUsage,
+        classificationOwnership: pdfData.ownerOccupiedOrLetOut || pdfData.classificationOwnership || pdfData.pdfDetails?.classificationOwnership,
+        ownerOccupiedOrLetOut: pdfData.ownerOccupiedOrLetOut || pdfData.classificationOwnership || pdfData.pdfDetails?.classificationOwnership,
+        floorSpaceIndex: pdfData.floorSpaceIndex || pdfData.pdfDetails?.floorSpaceIndex,
+
+        // Banker & Declarations
+        bankerSignatureDate: pdfData.bankerSignatureDate,
+        declarationB: pdfData.declarationB,
+        declarationD: pdfData.declarationD,
+        declarationE: pdfData.declarationE,
+        declarationI: pdfData.declarationI,
+        declarationJ: pdfData.declarationJ,
+        memberSinceDate: pdfData.memberSinceDate,
+
+        // Additional info
+        assetBackgroundInfo: pdfData.assetBackgroundInfo,
+        valuationPurposeAuthority: pdfData.valuationPurposeAuthority,
+        valuersIdentity: pdfData.valuersIdentity,
+        valuersConflictDisclosure: pdfData.valuersConflictDisclosure,
+        dateOfAppointment: pdfData.dateOfAppointment,
+        inspectionsUndertaken: pdfData.inspectionsUndertaken,
+        informationSources: pdfData.informationSources,
+        valuationProcedures: pdfData.valuationProcedures,
+        reportRestrictions: pdfData.reportRestrictions,
+        majorFactors: pdfData.majorFactors,
+        additionalFactors: pdfData.additionalFactors,
+        caveatsLimitations: pdfData.caveatsLimitations,
+
+        // Additional flat details
+        areaUsage: pdfData.areaUsage,
+
+        // CRITICAL: Ensure images are preserved in final pdfData (with strict empty filtering)
+        propertyImages: (pdfData.propertyImages && pdfData.propertyImages.length > 0) ? pdfData.propertyImages : (data?.propertyImages && data.propertyImages.length > 0) ? data.propertyImages : [],
+        locationImages: (pdfData.locationImages && pdfData.locationImages.length > 0) ? pdfData.locationImages : (data?.locationImages && data.locationImages.length > 0) ? data.locationImages : []
     };
-  }
 
-  // Comprehensive field name mapping for backward compatibility
-  pdfData = {
-    ...pdfData,
-    // Basic info
-    branch: pdfData.branch || pdfData.pdfDetails?.branch,
-    valuationPurpose: pdfData.valuationPurpose || pdfData.pdfDetails?.valuationPurpose || pdfData.pdfDetails?.purposeOfValuation,
-    inspectionDate: pdfData.inspectionDate || pdfData.dateOfInspection || pdfData.pdfDetails?.inspectionDate || pdfData.pdfDetails?.dateOfInspection,
-    valuationMadeDate: pdfData.valuationMadeDate || pdfData.dateOfValuation || pdfData.pdfDetails?.valuationMadeDate || pdfData.pdfDetails?.dateOfValuationMade,
-    agreementForSale: pdfData.agreementForSale || pdfData.pdfDetails?.agreementForSale,
-    commencementCertificate: pdfData.commencementCertificate || pdfData.pdfDetails?.commencementCertificate,
-    occupancyCertificate: pdfData.occupancyCertificate || pdfData.pdfDetails?.occupancyCertificate,
-    ownerNameAddress: pdfData.ownerNameAddress || pdfData.pdfDetails?.ownerNameAddress,
-    briefDescriptionProperty: pdfData.briefDescriptionProperty || pdfData.pdfDetails?.briefDescriptionProperty,
+    // Debug: Log critical fields for troubleshooting
+    console.log('🔍 PDF Field Extraction Debug:', {
+        areaClassification: pdfData.areaClassification,
+        postalAddress: pdfData.postalAddress,
+        postalAddressRaw: data?.postalAddress,
+        pdfDetailsPostalAddress: data?.pdfDetails?.postalAddress,
+        cityTown: pdfData.cityTown,
+        urbanType: pdfData.urbanType
+    });
 
-    // Location of property
-    plotNo: pdfData.plotNo || pdfData.plotSurveyNo || pdfData.pdfDetails?.plotSurveyNo,
-    doorNo: pdfData.doorNo || pdfData.pdfDetails?.doorNo,
-    tsNoVillage: pdfData.tsNoVillage || pdfData.tpVillage || pdfData.pdfDetails?.tpVillage,
-    wardTaluka: pdfData.wardTaluka || pdfData.pdfDetails?.wardTaluka,
-    mandalDistrict: pdfData.mandalDistrict || pdfData.pdfDetails?.mandalDistrict,
-    layoutIssueDate: pdfData.layoutIssueDate || pdfData.layoutPlanIssueDate || pdfData.pdfDetails?.layoutPlanIssueDate,
-    approvedMapAuthority: pdfData.approvedMapAuthority || pdfData.pdfDetails?.approvedMapAuthority,
-    mapVerified: pdfData.mapVerified || pdfData.authenticityVerified,
-    valuersComments: pdfData.valuersComments || pdfData.valuerCommentOnAuthenticity,
-    postalAddress: extractAddressValue(pdfData.postalAddress) || extractAddressValue(pdfData.pdfDetails?.postalAddress),
-    cityTown: pdfData.cityTown || pdfData.pdfDetails?.cityTown,
-    residentialArea: pdfData.residentialArea,
-    commercialArea: pdfData.commercialArea,
-    industrialArea: pdfData.industrialArea,
-    areaClassification: pdfData.areaClassification || pdfData.pdfDetails?.areaClassification,
-    urbanType: pdfData.urbanType || pdfData.urbanClassification || pdfData.pdfDetails?.urbanClassification,
-    jurisdictionType: pdfData.jurisdictionType || pdfData.governmentType || pdfData.pdfDetails?.governmentType,
-    enactmentCovered: pdfData.enactmentCovered || pdfData.govtEnactmentsCovered || pdfData.pdfDetails?.govtEnactmentsCovered,
+    // NOTE: Images are now rendered in the PAGE 14+ section using allImages array
+    // The old propertyImagesHTML and locationImagesHTML variables have been removed to prevent duplication
 
-    // Boundaries
-    boundariesPlotNorthDeed: pdfData.boundariesPlotNorthDeed || pdfData.pdfDetails?.boundariesPlotNorthDeed,
-    boundariesPlotNorthActual: pdfData.boundariesPlotNorthActual || pdfData.pdfDetails?.boundariesPlotNorthActual,
-    boundariesPlotSouthDeed: pdfData.boundariesPlotSouthDeed || pdfData.pdfDetails?.boundariesPlotSouthDeed,
-    boundariesPlotSouthActual: pdfData.boundariesPlotSouthActual || pdfData.pdfDetails?.boundariesPlotSouthActual,
-    boundariesPlotEastDeed: pdfData.boundariesPlotEastDeed || pdfData.pdfDetails?.boundariesPlotEastDeed,
-    boundariesPlotEastActual: pdfData.boundariesPlotEastActual || pdfData.pdfDetails?.boundariesPlotEastActual,
-    boundariesPlotWestDeed: pdfData.boundariesPlotWestDeed || pdfData.pdfDetails?.boundariesPlotWestDeed,
-    boundariesPlotWestActual: pdfData.boundariesPlotWestActual || pdfData.pdfDetails?.boundariesPlotWestActual,
-    boundariesShopNorthDeed: pdfData.boundariesShopNorthDeed || pdfData.pdfDetails?.boundariesShopNorthDeed,
-    boundariesShopNorthActual: pdfData.boundariesShopNorthActual || pdfData.pdfDetails?.boundariesShopNorthActual,
-    boundariesShopSouthDeed: pdfData.boundariesShopSouthDeed || pdfData.pdfDetails?.boundariesShopSouthDeed,
-    boundariesShopSouthActual: pdfData.boundariesShopSouthActual || pdfData.pdfDetails?.boundariesShopSouthActual,
-    boundariesShopEastDeed: pdfData.boundariesShopEastDeed || pdfData.pdfDetails?.boundariesShopEastDeed,
-    boundariesShopEastActual: pdfData.boundariesShopEastActual || pdfData.pdfDetails?.boundariesShopEastActual,
-    boundariesShopWestDeed: pdfData.boundariesShopWestDeed || pdfData.pdfDetails?.boundariesShopWestDeed,
-    boundariesShopWestActual: pdfData.boundariesShopWestActual || pdfData.pdfDetails?.boundariesShopWestActual,
-    // Legacy fields for backward compatibility
-    boundariesPlotNorth: pdfData.boundariesPlotNorth,
-    boundariesPlotSouth: pdfData.boundariesPlotSouth,
-    boundariesPlotEast: pdfData.boundariesPlotEast,
-    boundariesPlotWest: pdfData.boundariesPlotWest,
-    boundariesShopNorth: pdfData.boundariesShopNorth,
-    boundariesShopSouth: pdfData.boundariesShopSouth,
-    boundariesShopEast: pdfData.boundariesShopEast,
-    boundariesShopWest: pdfData.boundariesShopWest,
+    // DEBUG: Log final pdfData before rendering
+    console.log('📋 Final pdfData before HTML rendering:', {
+       unitMaintenance: pdfData.unitMaintenance,
+       unitClassification: pdfData.unitClassification,
+       classificationPosh: pdfData.classificationPosh,
+       safeGetTest_unitMaintenance: safeGet(pdfData, 'unitMaintenance'),
+       safeGetTest_unitClassification: safeGet(pdfData, 'unitClassification')
+    });
 
-    // Dimensions
-    dimensionsDeed: pdfData.dimensionsDeed,
-    dimensionsActual: pdfData.dimensionsActual,
-    extentUnit: pdfData.extentUnit || pdfData.extent || pdfData.extentOfUnit,
-    coordinates: pdfData.coordinates,
-    latitudeLongitude: pdfData.latitudeLongitude,
-    extentSiteValuation: pdfData.extentSiteValuation || pdfData.extentOfSiteValuation,
-
-    // Apartment Building
-    apartmentNature: pdfData.apartmentNature,
-    apartmentLocation: pdfData.apartmentLocation,
-    apartmentTSNo: pdfData.apartmentTSNo || pdfData.tsNo || pdfData.apartmentLocation?.tsNo,
-    apartmentBlockNo: pdfData.apartmentBlockNo || pdfData.blockNo,
-    apartmentWardNo: pdfData.apartmentWardNo || pdfData.wardNo,
-    apartmentMunicipality: pdfData.apartmentMunicipality || pdfData.apartmentVillageMunicipalityCounty || pdfData.villageOrMunicipality,
-    apartmentDoorNoPin: pdfData.apartmentDoorNoPin || pdfData.apartmentDoorNoStreetRoadPinCode || pdfData.doorNoStreetRoadPinCode,
-    localityDescription: pdfData.localityDescription || pdfData.descriptionOfLocalityResidentialCommercialMixed,
-    yearConstruction: pdfData.yearConstruction || pdfData.yearOfConstruction,
-    numberOfFloors: pdfData.numberOfFloors,
-    structureType: pdfData.structureType || pdfData.typeOfStructure,
-    numberOfDwellingUnits: pdfData.numberOfDwellingUnits || pdfData.dwellingUnits || pdfData.numberOfDwellingUnitsInBuilding,
-    qualityConstruction: pdfData.qualityConstruction || pdfData.qualityOfConstruction,
-    buildingAppearance: pdfData.buildingAppearance || pdfData.appearanceOfBuilding,
-    buildingMaintenance: pdfData.buildingMaintenance || pdfData.maintenanceOfBuilding,
-    unitMaintenance: pdfData.unitMaintenance || pdfData.unitMaintenanceStatus || data?.unitMaintenance?.unitMaintenanceStatus,
-    unitClassification: pdfData.unitClassification || data?.unitClassification?.unitClassification,
-    facilityLift: pdfData.facilityLift || pdfData.liftAvailable,
-    facilityWater: pdfData.facilityWater || pdfData.protectedWaterSupply,
-    facilitySump: pdfData.facilitySump || pdfData.undergroundSewerage,
-    facilityParking: pdfData.facilityParking || pdfData.carParkingType || pdfData.carParkingOpenCovered,
-    compoundWall: pdfData.compoundWall || pdfData.compoundWallExisting || pdfData.isCompoundWallExisting,
-    pavement: pdfData.pavement || pdfData.pavementAroundBuilding || pdfData.isPavementLaidAroundBuilding,
-
-    // Unit (with multiple name variants)
-    floorUnit: pdfData.floorUnit || pdfData.floorLocation || pdfData.unitFloor || pdfData.pdfDetails?.unitFloor,
-    doorNoUnit: pdfData.doorNoUnit || pdfData.unitDoorNo || pdfData.pdfDetails?.unitDoorNo,
-    roofUnit: pdfData.roofUnit || pdfData.roof || pdfData.unitRoof || pdfData.pdfDetails?.unitRoof,
-    flooringUnit: pdfData.flooringUnit || pdfData.flooring || pdfData.unitFlooring || pdfData.pdfDetails?.unitFlooring,
-    doorsUnit: pdfData.doorsUnit || pdfData.doors || pdfData.unitDoors || pdfData.pdfDetails?.unitDoors,
-    windowsUnit: pdfData.windowsUnit || pdfData.windows || pdfData.unitWindows || pdfData.pdfDetails?.unitWindows,
-    fittingsUnit: pdfData.fittingsUnit || pdfData.fittings || pdfData.unitFittings || pdfData.pdfDetails?.unitFittings,
-    finishingUnit: pdfData.finishingUnit || pdfData.finishing || pdfData.unitFinishing || pdfData.pdfDetails?.unitFinishing,
-    electricityConnectionNo: pdfData.electricityConnectionNo || pdfData.electricityServiceNo || pdfData.electricityServiceConnectionNo || pdfData.pdfDetails?.electricityServiceNo,
-    agreementForSale: pdfData.agreementForSale || pdfData.agreementSaleExecutedName || pdfData.pdfDetails?.agreementSaleExecutedName,
-    undividedLandArea: pdfData.undividedLandArea || pdfData.undividedAreaLand || pdfData.undividedArea || pdfData.pdfDetails?.undividedAreaLand,
-    assessmentNo: pdfData.assessmentNo || pdfData.pdfDetails?.assessmentNo || data?.unitTax?.assessmentNo,
-    taxPaidName: pdfData.taxPaidName || pdfData.pdfDetails?.taxPaidName || data?.unitTax?.taxPaidName,
-    taxAmount: pdfData.taxAmount || pdfData.pdfDetails?.taxAmount || data?.unitTax?.taxAmount,
-    meterCardName: pdfData.meterCardName || pdfData.pdfDetails?.meterCardName,
-
-    // Valuation values
-    carpetArea: pdfData.carpetArea || pdfData.carpetAreaFlat || pdfData.pdfDetails?.carpetAreaFlat,
-    plinthArea: pdfData.plinthArea || pdfData.pdfDetails?.plinthArea,
-    undividedLandArea: pdfData.undividedLandArea || pdfData.undividedLandAreaSaleDeed || pdfData.undividedAreaLand || pdfData.pdfDetails?.undividedAreaLand,
-    ratePerSqft: pdfData.ratePerSqft || pdfData.presentValueRate || pdfData.adoptedBasicCompositeRate || pdfData.pdfDetails?.presentValueRate || pdfData.pdfDetails?.adoptedBasicCompositeRate,
-    marketValue: pdfData.marketValue || pdfData.fairMarketValue || pdfData.pdfDetails?.fairMarketValue,
-    marketValueWords: pdfData.marketValueWords || pdfData.fairMarketValueWords || pdfData.pdfDetails?.fairMarketValueWords || pdfData.pdfDetails?.fairMarketValue,
-    distressValue: pdfData.distressValue || pdfData.pdfDetails?.distressValue,
-    distressValueWords: pdfData.distressValueWords || pdfData.pdfDetails?.distressValueWords || pdfData.pdfDetails?.distressValue,
-    saleDeedValue: pdfData.saleDeedValue || pdfData.pdfDetails?.saleDeedValue,
-    finalMarketValue: pdfData.finalMarketValue || pdfData.fairMarketValue || pdfData.pdfDetails?.fairMarketValue,
-    finalMarketValueWords: pdfData.finalMarketValueWords || pdfData.fairMarketValueWords || pdfData.pdfDetails?.fairMarketValueWords || pdfData.pdfDetails?.fairMarketValue,
-    realisableValue: pdfData.realisableValue || pdfData.realizableValue || pdfData.pdfDetails?.realizableValue,
-    realisableValueWords: pdfData.realisableValueWords || pdfData.pdfDetails?.realisableValueWords || pdfData.pdfDetails?.realizableValue,
-    finalDistressValue: pdfData.finalDistressValue || pdfData.distressValue || pdfData.pdfDetails?.distressValue,
-    finalDistressValueWords: pdfData.finalDistressValueWords || pdfData.distressValueWords || pdfData.pdfDetails?.distressValueWords || pdfData.pdfDetails?.distressValue,
-    readyReckonerValue: pdfData.readyReckonerValue || pdfData.totalJantriValue || pdfData.pdfDetails?.readyReckonerValue || pdfData.pdfDetails?.totalJantriValue,
-    readyReckonerValueWords: pdfData.readyReckonerValueWords || pdfData.totalJantriValue || pdfData.pdfDetails?.readyReckonerValueWords || pdfData.pdfDetails?.readyReckonerValue || pdfData.pdfDetails?.totalJantriValue,
-    readyReckonerYear: pdfData.readyReckonerYear || pdfData.pdfDetails?.readyReckonerYear || new Date().getFullYear(),
-    insurableValue: pdfData.insurableValue || pdfData.pdfDetails?.insurableValue,
-    insurableValueWords: pdfData.insurableValueWords || pdfData.pdfDetails?.insurableValueWords || pdfData.pdfDetails?.insurableValue,
-    monthlyRent: pdfData.monthlyRent || pdfData.pdfDetails?.monthlyRent,
-    rentReceivedPerMonth: pdfData.rentReceivedPerMonth || pdfData.pdfDetails?.rentReceivedPerMonth || pdfData.pdfDetails?.monthlyRent,
-    marketability: pdfData.marketability || pdfData.pdfDetails?.marketability,
-    marketabilityRating: pdfData.marketability || pdfData.pdfDetails?.marketability,
-    favoringFactors: pdfData.favoringFactors || pdfData.pdfDetails?.favoringFactors,
-    negativeFactors: pdfData.negativeFactors || pdfData.pdfDetails?.negativeFactors,
-    compositeRateAnalysis: pdfData.comparableRate,
-    newConstructionRate: pdfData.adoptedBasicCompositeRate,
-
-    // Signature & Report
-    valuationPlace: pdfData.valuationPlace || pdfData.place,
-    valuationDate: pdfData.valuationDate || pdfData.signatureDate,
-    valuersName: pdfData.valuersName || pdfData.signerName,
-    valuersCompany: pdfData.valuersCompany,
-    valuersLicense: pdfData.valuersLicense,
-    reportDate: pdfData.reportDate,
-
-    // Rate information
-    comparableRate: pdfData.comparableRate || pdfData.pdfDetails?.comparableRate,
-    adoptedBasicCompositeRate: pdfData.adoptedBasicCompositeRate || pdfData.pdfDetails?.adoptedBasicCompositeRate,
-    buildingServicesRate: pdfData.buildingServicesRate || pdfData.pdfDetails?.buildingServicesRate,
-    landOthersRate: pdfData.landOthersRate || pdfData.pdfDetails?.landOthersRate,
-    guidelineRate: pdfData.guidelineRate || pdfData.pdfDetails?.guidelineRate,
-
-    // Depreciation & Rate
-    depreciatedBuildingRateFinal: pdfData.depreciatedBuildingRateFinal || pdfData.depreciatedBuildingRate || pdfData.pdfDetails?.depreciatedBuildingRate,
-    replacementCostServices: pdfData.replacementCostServices || pdfData.pdfDetails?.replacementCostServices,
-    buildingAgeDepreciation: pdfData.buildingAgeDepreciation || pdfData.buildingAge || pdfData.pdfDetails?.buildingAge,
-    buildingLifeEstimated: pdfData.buildingLifeEstimated || pdfData.buildingLife || pdfData.pdfDetails?.buildingLife,
-    depreciationPercentageFinal: pdfData.depreciationPercentageFinal || pdfData.depreciationPercentage || pdfData.pdfDetails?.depreciationPercentage,
-    depreciatedRatio: pdfData.depreciatedRatio || pdfData.deprecatedRatio || pdfData.pdfDetails?.deprecatedRatio,
-    totalCompositeRate: pdfData.totalCompositeRate || pdfData.pdfDetails?.totalCompositeRate,
-    rateLandOther: pdfData.rateLandOther || pdfData.rateForLandOther || pdfData.pdfDetails?.rateForLandOther,
-    totalEstimatedValue: pdfData.totalEstimatedValue || pdfData.totalValuationItems || pdfData.pdfDetails?.totalValuationItems,
-    totalValueSay: pdfData.totalValueSay || pdfData.pdfDetails?.totalValueSay,
-
-    // Valuation items - Qty/Rate/Value variants
-    valuationItem1: pdfData.valuationItem1 || pdfData.presentValue || pdfData.pdfDetails?.presentValue,
-    presentValueQty: pdfData.presentValueQty || pdfData.pdfDetails?.presentValueQty,
-    presentValueRate: pdfData.presentValueRate || pdfData.pdfDetails?.presentValueRate,
-    wardrobesQty: pdfData.wardrobesQty || pdfData.pdfDetails?.wardrobesQty,
-    wardrobesRate: pdfData.wardrobesRate || pdfData.pdfDetails?.wardrobesRate,
-    wardrobes: pdfData.wardrobes || pdfData.pdfDetails?.wardrobes,
-    showcasesQty: pdfData.showcasesQty || pdfData.pdfDetails?.showcasesQty,
-    showcasesRate: pdfData.showcasesRate || pdfData.pdfDetails?.showcasesRate,
-    showcases: pdfData.showcases || pdfData.pdfDetails?.showcases,
-    kitchenArrangementsQty: pdfData.kitchenArrangementsQty || pdfData.pdfDetails?.kitchenArrangementsQty,
-    kitchenArrangementsRate: pdfData.kitchenArrangementsRate || pdfData.pdfDetails?.kitchenArrangementsRate,
-    kitchenArrangements: pdfData.kitchenArrangements || pdfData.pdfDetails?.kitchenArrangements,
-    superfineFinishQty: pdfData.superfineFinishQty || pdfData.pdfDetails?.superfineFinishQty,
-    superfineFinishRate: pdfData.superfineFinishRate || pdfData.pdfDetails?.superfineFinishRate,
-    superfineFinish: pdfData.superfineFinish || pdfData.pdfDetails?.superfineFinish,
-    interiorDecorationsQty: pdfData.interiorDecorationsQty || pdfData.pdfDetails?.interiorDecorationsQty,
-    interiorDecorationsRate: pdfData.interiorDecorationsRate || pdfData.pdfDetails?.interiorDecorationsRate,
-    interiorDecorations: pdfData.interiorDecorations || pdfData.pdfDetails?.interiorDecorations,
-    electricityDepositsQty: pdfData.electricityDepositsQty || pdfData.pdfDetails?.electricityDepositsQty,
-    electricityDepositsRate: pdfData.electricityDepositsRate || pdfData.pdfDetails?.electricityDepositsRate,
-    electricityDeposits: pdfData.electricityDeposits || pdfData.pdfDetails?.electricityDeposits,
-    collapsibleGatesQty: pdfData.collapsibleGatesQty || pdfData.pdfDetails?.collapsibleGatesQty,
-    collapsibleGatesRate: pdfData.collapsibleGatesRate || pdfData.pdfDetails?.collapsibleGatesRate,
-    collapsibleGates: pdfData.collapsibleGates || pdfData.pdfDetails?.collapsibleGates,
-    potentialValueQty: pdfData.potentialValueQty || pdfData.pdfDetails?.potentialValueQty,
-    potentialValueRate: pdfData.potentialValueRate || pdfData.pdfDetails?.potentialValueRate,
-    potentialValue: pdfData.potentialValue || pdfData.pdfDetails?.potentialValue,
-    otherItemsQty: pdfData.otherItemsQty || pdfData.pdfDetails?.otherItemsQty,
-    otherItemsRate: pdfData.otherItemsRate || pdfData.pdfDetails?.otherItemsRate,
-    otherItems: pdfData.otherItems || pdfData.pdfDetails?.otherItems,
-    totalValuationItems: pdfData.totalValuationItems || pdfData.pdfDetails?.totalValuationItems,
-
-    // Valuation Details Table
-    valuationDetailsTable: pdfData.valuationDetailsTable || pdfData.pdfDetails?.valuationDetailsTable,
-    classificationPosh: pdfData.unitClassification || pdfData.classificationPosh || pdfData.pdfDetails?.classificationPosh,
-    unitClassification: pdfData.unitClassification || pdfData.classificationPosh || pdfData.pdfDetails?.classificationPosh,
-    classificationUsage: pdfData.residentialOrCommercial || pdfData.classificationUsage || pdfData.pdfDetails?.classificationUsage,
-    residentialOrCommercial: pdfData.residentialOrCommercial || pdfData.classificationUsage || pdfData.pdfDetails?.classificationUsage,
-    classificationOwnership: pdfData.ownerOccupiedOrLetOut || pdfData.classificationOwnership || pdfData.pdfDetails?.classificationOwnership,
-    ownerOccupiedOrLetOut: pdfData.ownerOccupiedOrLetOut || pdfData.classificationOwnership || pdfData.pdfDetails?.classificationOwnership,
-    floorSpaceIndex: pdfData.floorSpaceIndex || pdfData.pdfDetails?.floorSpaceIndex,
-
-    // Banker & Declarations
-    bankerSignatureDate: pdfData.bankerSignatureDate,
-    declarationB: pdfData.declarationB,
-    declarationD: pdfData.declarationD,
-    declarationE: pdfData.declarationE,
-    declarationI: pdfData.declarationI,
-    declarationJ: pdfData.declarationJ,
-    memberSinceDate: pdfData.memberSinceDate,
-
-    // Additional info
-    assetBackgroundInfo: pdfData.assetBackgroundInfo,
-    valuationPurposeAuthority: pdfData.valuationPurposeAuthority,
-    valuersIdentity: pdfData.valuersIdentity,
-    valuersConflictDisclosure: pdfData.valuersConflictDisclosure,
-    dateOfAppointment: pdfData.dateOfAppointment,
-    inspectionsUndertaken: pdfData.inspectionsUndertaken,
-    informationSources: pdfData.informationSources,
-    valuationProcedures: pdfData.valuationProcedures,
-    reportRestrictions: pdfData.reportRestrictions,
-    majorFactors: pdfData.majorFactors,
-    additionalFactors: pdfData.additionalFactors,
-    caveatsLimitations: pdfData.caveatsLimitations,
-
-    // Additional flat details
-    areaUsage: pdfData.areaUsage,
-
-    // Unit maintenance
-    unitMaintenance: pdfData.unitMaintenance
-  };
-
-  // Debug: Log critical fields for troubleshooting
-  console.log('🔍 PDF Field Extraction Debug:', {
-    areaClassification: pdfData.areaClassification,
-    postalAddress: pdfData.postalAddress,
-    postalAddressRaw: data?.postalAddress,
-    pdfDetailsPostalAddress: data?.pdfDetails?.postalAddress,
-    cityTown: pdfData.cityTown,
-    urbanType: pdfData.urbanType
-  });
-
-  // Generate images HTML section
-  const propertyImagesHTML = data.propertyImages && data.propertyImages.length > 0 ? `
-    <div class="section">
-      <div class="section-title">PROPERTY IMAGES</div>
-      <div class="section-content">
-        <div class="image-gallery">
-          ${data.propertyImages.map((img, idx) => {
-    const imgUrl = typeof img === 'string' ? img : (img.url || img.preview || '');
-    return imgUrl ? `<div class="image-item"><img src="${imgUrl}" alt="Property Image ${idx + 1}" /><div class="image-label">Property ${idx + 1}</div></div>` : '';
-  }).join('')}
-        </div>
-      </div>
-    </div>
-  ` : '';
-
-  const locationImagesHTML = data.locationImages && data.locationImages.length > 0 ? `
-    <div class="section">
-      <div class="section-title">LOCATION IMAGES</div>
-      <div class="section-content">
-        <div class="image-gallery">
-          ${data.locationImages.map((img, idx) => {
-    const imgUrl = typeof img === 'string' ? img : (img.url || img.preview || '');
-    return imgUrl ? `<div class="image-item"><img src="${imgUrl}" alt="Location Image ${idx + 1}" /><div class="image-label">Location ${idx + 1}</div></div>` : '';
-  }).join('')}
-        </div>
-      </div>
-    </div>
-  ` : '';
-
-  return `
+    return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1958,17 +2055,17 @@ export function generateValuationReportHTML(data = {}) {
     <div class="page" style="position: relative;">
     <div style="font-size: 8pt; line-height: 1.4; padding: 0;">
       ${(() => {
-      const totalValue = pdfData.valuationDetailsTable?.valuationTotal || safeGet(pdfData, 'totalValueSay') || pdfData.finalMarketValue || 0;
-      const extentValue = safeGet(pdfData, 'extentOfUnit') || safeGet(pdfData, 'dimensionsDeed') || 1;
-      const guidelineRate = safeGet(pdfData, 'guidelineRate') || 0;
+            const totalValue = pdfData.valuationDetailsTable?.valuationTotal || safeGet(pdfData, 'totalValueSay') || pdfData.finalMarketValue || 0;
+            const extentValue = safeGet(pdfData, 'extentOfUnit') || safeGet(pdfData, 'dimensionsDeed') || 1;
+            const guidelineRate = safeGet(pdfData, 'guidelineRate') || 0;
 
-      const marketValue = totalValue;
-      const realisableValue = calculatePercentage(totalValue, 90);
-      const distressValue = calculatePercentage(totalValue, 80);
-      const insurableValue = calculatePercentage(totalValue, 35);
-      const reckonerValue = Math.round(parseFloat(extentValue) * parseFloat(guidelineRate));
+            const marketValue = totalValue;
+            const realisableValue = calculatePercentage(totalValue, 90);
+            const distressValue = calculatePercentage(totalValue, 80);
+            const insurableValue = calculatePercentage(totalValue, 35);
+            const reckonerValue = Math.round(parseFloat(extentValue) * parseFloat(guidelineRate));
 
-      return `
+            return `
       <p style="margin-bottom: 6px;"><strong>specifications is ${formatCurrencyWithWords(totalValue, 100)}</strong></p>
       
       <p style="margin-bottom: 6px;">The distress value is <strong>${formatCurrencyWithWords(distressValue, 100)}</strong>.</p>
@@ -1985,7 +2082,7 @@ export function generateValuationReportHTML(data = {}) {
       
       <p style="margin-bottom: 6px;">THE INSURABLE VALUE IS <strong>${formatCurrencyWithWords(insurableValue, 100)}</strong></p>
         `;
-    })()}
+        })()}
       
       
       <p style="margin-top: 15px; margin-bottom: 3px;"><strong>PLACE : ${safeGet(pdfData, 'valuationPlace')}</strong></p>
@@ -2245,82 +2342,219 @@ construction quality.  </td>
 
       <!-- ========== PAGE 14+: PROPERTY AND LOCATION IMAGES ========== -->
       ${(() => {
-        // Helper to extract URL from image object or string
-        const extractImageUrl = (img) => {
-          if (!img) return '';
-          if (typeof img === 'string') return img;
-          if (typeof img === 'object' && img.url) return img.url;
-          return '';
-        };
-
-        const propertyImages = Array.isArray(pdfData.propertyImages) ? pdfData.propertyImages.filter(img => img) : [];
-        const locationImages = Array.isArray(pdfData.locationImages) ? pdfData.locationImages.filter(img => img) : [];
-        
-        const allImages = [
-          ...propertyImages.map((img, idx) => {
-            const imageUrl = extractImageUrl(img);
-            return {
-              url: getImageSource(imageUrl),
-              type: 'property',
-              label: 'Property Image ' + (idx + 1),
-              dims: getImageDimensions(imageUrl)
+            // Extract valid URLs from image objects - SINGLE SOURCE OF TRUTH
+            const extractValidUrl = (img) => {
+                if (!img) return '';
+                if (typeof img === 'string') {
+                    const url = img.trim();
+                    return url && url.length > 0 ? url : '';
+                } else if (typeof img === 'object') {
+                    const url = (img.url || img.preview || img.data || img.src || img.secure_url || '').toString().trim();
+                    return url && url.length > 0 ? url : '';
+                }
+                return '';
             };
-          }),
-          ...locationImages.map((img, idx) => {
-            const imageUrl = extractImageUrl(img);
-            return {
-              url: getImageSource(imageUrl),
-              type: 'location',
-              label: 'Location Image ' + (idx + 1),
-              dims: getImageDimensions(imageUrl)
-            };
-          })
-        ];
 
-        if (allImages.length === 0) {
-          return '';
-        }
+            // Filter out empty/null/falsy images - STRICT FILTERING to prevent empty placeholders
+            const propertyImages = Array.isArray(pdfData.propertyImages)
+                ? pdfData.propertyImages.filter(img => {
+                    const url = extractValidUrl(img);
+                    if (!url) {
+                        console.log(`  ⏭️ Filtering: Property image has empty/invalid URL`);
+                        return false;
+                    }
+                    return true;
+                })
+                : [];
+            const locationImages = Array.isArray(pdfData.locationImages)
+                ? pdfData.locationImages.filter(img => {
+                    const url = extractValidUrl(img);
+                    if (!url) {
+                        console.log(`  ⏭️ Filtering: Location image has empty/invalid URL`);
+                        return false;
+                    }
+                    return true;
+                })
+                : [];
 
-        let html = '';
-        let imagesOnCurrentPage = 0;
-        const maxImagesPerPage = 2;
+            console.log('🖼️ Image Debug - Input Arrays:', {
+                propertyImagesCount: propertyImages.length,
+                locationImagesCount: locationImages.length,
+                propertyImagesSample: propertyImages.slice(0, 2),
+                locationImagesSample: locationImages.slice(0, 2)
+            });
 
-        allImages.forEach((image, index) => {
-          if (imagesOnCurrentPage === 0) {
-            if (index > 0) {
-              html += '</div></div>';
+            // Build allImages with strict filtering - NO duplicates allowed
+            const allImages = [];
+            let propertyImageCount = 0;
+            let locationImageCount = 0;
+
+            // Process property images - STRICT validation to prevent empty placeholders
+            propertyImages.forEach((img, idx) => {
+                if (!img) {
+                    console.log(`⏭️ Property Image ${idx + 1}: Empty/null - SKIPPING`);
+                    return;
+                }
+
+                // Extract and validate URL
+                const baseUrl = extractValidUrl(img);
+                if (!baseUrl) {
+                    console.log(`⏭️ Property Image ${idx + 1}: No valid base URL - FILTERING OUT`);
+                    return;
+                }
+
+                const imageUrl = extractImageUrl(baseUrl);
+                if (!imageUrl) {
+                    console.log(`⏭️ Property Image ${idx + 1}: extractImageUrl failed - FILTERING OUT`);
+                    return;
+                }
+
+                const imageSource = getImageSource(imageUrl);
+                if (!imageSource || !imageSource.trim()) {
+                    console.log(`⏭️ Property Image ${idx + 1}: No valid source - FILTERING OUT`);
+                    return;
+                }
+
+                // Validate final source format
+                const trimmedSource = imageSource.trim();
+                if (!trimmedSource.startsWith('data:') && !trimmedSource.startsWith('blob:') && !trimmedSource.startsWith('http://') && !trimmedSource.startsWith('https://')) {
+                    console.log(`⏭️ Property Image ${idx + 1}: Invalid protocol - FILTERING OUT`);
+                    return;
+                }
+
+                propertyImageCount++;
+                allImages.push({
+                    url: trimmedSource,
+                    type: 'property',
+                    label: 'Property Image ' + propertyImageCount,
+                    dims: getImageDimensions(imageUrl)
+                });
+                console.log(`✅ Property Image ${propertyImageCount} added to PDF`);
+            });
+
+            // Process location images - STRICT validation to prevent empty placeholders
+            locationImages.forEach((img, idx) => {
+                if (!img) {
+                    console.log(`⏭️ Location Image ${idx + 1}: Empty/null - SKIPPING`);
+                    return;
+                }
+
+                // Extract and validate URL
+                const baseUrl = extractValidUrl(img);
+                if (!baseUrl) {
+                    console.log(`⏭️ Location Image ${idx + 1}: No valid base URL - FILTERING OUT`);
+                    return;
+                }
+
+                const imageUrl = extractImageUrl(baseUrl);
+                if (!imageUrl) {
+                    console.log(`⏭️ Location Image ${idx + 1}: extractImageUrl failed - FILTERING OUT`);
+                    return;
+                }
+
+                const imageSource = getImageSource(imageUrl);
+                if (!imageSource || !imageSource.trim()) {
+                    console.log(`⏭️ Location Image ${idx + 1}: No valid source - FILTERING OUT`);
+                    return;
+                }
+
+                // Validate final source format
+                const trimmedSource = imageSource.trim();
+                if (!trimmedSource.startsWith('data:') && !trimmedSource.startsWith('blob:') && !trimmedSource.startsWith('http://') && !trimmedSource.startsWith('https://')) {
+                    console.log(`⏭️ Location Image ${idx + 1}: Invalid protocol - FILTERING OUT`);
+                    return;
+                }
+
+                locationImageCount++;
+                allImages.push({
+                    url: trimmedSource,
+                    type: 'location',
+                    label: 'Location Image ' + locationImageCount,
+                    dims: getImageDimensions(imageUrl)
+                });
+                console.log(`✅ Location Image ${locationImageCount} added to PDF`);
+            });
+
+            console.log('✅ Final Images for PDF:', allImages.length);
+            console.log('📊 Processed Image Counts:', {
+                inputPropertyImages: propertyImages.length,
+                inputLocationImages: locationImages.length,
+                totalProcessed: allImages.length,
+                breakdown: {
+                    property: propertyImageCount,
+                    location: locationImageCount
+                }
+            });
+
+            if (allImages.length > 0) {
+                console.log('✅ Image URLs ready for PDF:', allImages.map((img, i) => ({
+                    type: img.type,
+                    label: img.label,
+                    urlStart: img.url ? img.url.substring(0, 80) : 'EMPTY'
+                })));
+            } else {
+                console.warn('⚠️ WARNING: allImages is empty after processing!');
             }
-            html += '<div class="page" style="position: relative; padding: 20px; page-break-after: always;"><div style="text-align: center;">';
-          }
 
-          const isLocationImage = image.type === 'location';
-          const imageWidth = '85%';
-          const imageHeight = isLocationImage ? '350px' : '280px';
-          const containerMargin = isLocationImage ? '15px 0 30px 0' : '10px 0 25px 0';
+            if (allImages.length === 0) {
+                console.warn('⚠️ No images found for PDF rendering');
+                return '';
+            }
 
-          const imgHtml = `<div style="margin: ${containerMargin}; text-align: center; page-break-inside: avoid;">
-              <p style="margin: 0 0 12px 0; font-weight: bold; font-size: 10pt; color: #333;">${image.label}</p>
-              <div style="display: inline-block; padding: 8px; border: 2px solid #999; background: #f9f9f9;">
+            let html = '';
+            let imagesOnCurrentPage = 0;
+            let pageOpened = false;
+            const maxImagesPerPage = 2;
+
+            allImages.forEach((image, index) => {
+                // All images have already been validated in the filtering step above
+                // No need for redundant checks - just render the images
+
+                // Open a new page container when starting OR when we've maxed out images on current page
+                if (imagesOnCurrentPage === 0) {
+                    // Close previous page if one was opened
+                    if (pageOpened) {
+                        html += '</div></div>';
+                    }
+                    // Open new page
+                    html += '<div class="page" style="position: relative; padding: 20px; page-break-after: always;"><div style="text-align: center;">';
+                    pageOpened = true;
+                }
+
+                const isLocationImage = image.type === 'location';
+                const imageWidth = '85%';
+                const imageHeight = isLocationImage ? '350px' : '280px';
+                const containerMargin = isLocationImage ? '15px 0 30px 0' : '10px 0 25px 0';
+
+                const imgHtml = `<div style="margin: ${containerMargin}; text-align: center; page-break-inside: avoid;" class="image-container" data-index="${index}">
+                <p style="margin: 0 0 12px 0; font-weight: bold; font-size: 10pt; color: #333;">${image.label}</p>
+                <div style="display: inline-block; padding: 8px; border: 2px solid #999; background: #f9f9f9; min-width: 400px; min-height: ${imageHeight};">
                 <img src="${image.url}" 
-                     style="width: ${imageWidth}; height: ${imageHeight}; object-fit: contain; display: block; margin: 0 auto;" 
+                     style="width: ${imageWidth}; height: ${imageHeight}; object-fit: contain; display: block; margin: 0 auto; background: #fff; max-width: 100%;" 
                      alt="${image.label}" 
-                     onerror="this.style.display='none'; this.parentElement.innerHTML='<p style=\"color:red; padding:20px;\">Image failed to load</p>'" />
-              </div>
-            </div>`;
-          html += imgHtml;
+                     data-src="${image.url}"
+                     data-index="${index}"
+                     class="pdf-image"
+                     crossorigin="anonymous"
+                     loading="eager" />
+                </div>
+                </div>`;
+                html += imgHtml;
+                console.log(`✅ Rendered image: ${image.label}`);
 
-          imagesOnCurrentPage++;
-          if (imagesOnCurrentPage >= maxImagesPerPage) {
-            imagesOnCurrentPage = 0;
-          }
-        });
+                imagesOnCurrentPage++;
+                if (imagesOnCurrentPage >= maxImagesPerPage) {
+                    imagesOnCurrentPage = 0;
+                }
+            });
 
-        if (imagesOnCurrentPage > 0 || allImages.length > 0) {
-          html += '</div></div>';
-        }
+            // Close the last page if any images were rendered
+            if (pageOpened) {
+                html += '</div></div>';
+            }
 
-        return html;
-      })()}
+            return html;
+        })()}
 
       </body>
       </html>
@@ -2328,13 +2562,13 @@ construction quality.  </td>
 }
 
 export async function generateRecordPDF(record) {
-  try {
-    console.log('📄 Generating PDF for record:', record?.uniqueId || record?.clientName || 'new');
-    return await generateRecordPDFOffline(record);
-  } catch (error) {
-    console.error('❌ PDF generation error:', error);
-    throw error;
-  }
+    try {
+        console.log('📄 Generating PDF for record:', record?.uniqueId || record?.clientName || 'new');
+        return await generateRecordPDFOffline(record);
+    } catch (error) {
+        console.error('❌ PDF generation error:', error);
+        throw error;
+    }
 }
 
 /**
@@ -2342,247 +2576,852 @@ export async function generateRecordPDF(record) {
  * Uses client-side generation with blob URL preview
  */
 export async function previewValuationPDF(record) {
-  try {
-    console.log('👁️ Generating PDF preview for:', record?.uniqueId || record?.clientName || 'new');
+    try {
+        console.log('👁️ Generating PDF preview for:', record?.uniqueId || record?.clientName || 'new');
 
-    // Dynamically import jsPDF and html2canvas
-    const { jsPDF } = await import('jspdf');
-    const html2canvas = (await import('html2canvas')).default;
+        // Dynamically import jsPDF and html2canvas
+        const { jsPDF } = await import('jspdf');
+        const html2canvas = (await import('html2canvas')).default;
 
-    // Generate HTML from the record data
-    const htmlContent = generateValuationReportHTML(record);
+        // Generate HTML from the record data
+        const htmlContent = generateValuationReportHTML(record);
 
-    // Create a temporary container
-    const container = document.createElement('div');
-    container.innerHTML = htmlContent;
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.top = '-9999px';
-    container.style.width = '210mm';
-    container.style.backgroundColor = '#ffffff';
-    container.style.fontSize = '9pt';
-    container.style.fontFamily = "'Calibri', 'Arial', sans-serif";
-    document.body.appendChild(container);
+        // Create a temporary container
+        const container = document.createElement('div');
+        container.innerHTML = htmlContent;
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.style.top = '-9999px';
+        container.style.width = '210mm';
+        container.style.backgroundColor = '#ffffff';
+        container.style.fontSize = '9pt';
+        container.style.fontFamily = "'Calibri', 'Arial', sans-serif";
+        document.body.appendChild(container);
 
-    // Convert HTML to canvas
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      allowTaint: true,
-      windowHeight: container.scrollHeight,
-      windowWidth: 793
-    });
+        // CRITICAL: Wait for images to load, then remove failed ones
+        const images = container.querySelectorAll('img.pdf-image');
+        const imagesToRemove = new Set();
 
-    // Remove temporary container
-    document.body.removeChild(container);
+        // First pass: check for images with invalid src attribute
+        images.forEach(img => {
+            const src = img.src || img.getAttribute('data-src');
+            const alt = img.getAttribute('alt') || 'unknown';
 
-    // Create PDF from canvas
-    const imgData = canvas.toDataURL('image/png');
-    const imgWidth = 210;
-    const pageHeight = 297;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            // If image has no src or invalid src, mark container for removal
+            if (!src || !src.trim() || src === 'undefined' || src === 'null') {
+                console.log(`⏭️ Invalid image src: ${alt}`);
+                let parentContainer = img.closest('.image-container');
+                if (parentContainer) {
+                    imagesToRemove.add(parentContainer);
+                    console.log(`⏭️ Marking for removal (invalid src): ${alt}`);
+                }
+            }
+        });
 
-    const pdf = new jsPDF('p', 'mm', 'A4');
-    let heightLeft = imgHeight;
-    let position = 0;
+        // Second pass: add error listeners to detect failed load attempts
+        await Promise.all(Array.from(images).map(img => {
+            return new Promise((resolve) => {
+                const alt = img.getAttribute('alt') || 'unknown';
+                const timeoutId = setTimeout(() => {
+                    // If image hasn't loaded after 5 seconds, mark for removal
+                    if (!img.complete || img.naturalHeight === 0) {
+                        console.log(`⏭️ Image timeout/failed to load: ${alt}`);
+                        let parentContainer = img.closest('.image-container');
+                        if (parentContainer) {
+                            imagesToRemove.add(parentContainer);
+                            console.log(`⏭️ Marking for removal (timeout): ${alt}`);
+                        }
+                    }
+                    resolve();
+                }, 5000);
 
-    // Add pages to PDF
-    while (heightLeft >= 0) {
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      position -= pageHeight;
-      if (heightLeft > 0) {
-        pdf.addPage();
-      }
+                img.onload = () => {
+                    clearTimeout(timeoutId);
+                    console.log(`✅ Image loaded successfully: ${alt}`);
+                    resolve();
+                };
+
+                img.onerror = () => {
+                    clearTimeout(timeoutId);
+                    console.log(`❌ Image failed to load: ${alt}`);
+                    let parentContainer = img.closest('.image-container');
+                    if (parentContainer) {
+                        imagesToRemove.add(parentContainer);
+                        console.log(`⏭️ Marking for removal (onerror): ${alt}`);
+                    }
+                    resolve();
+                };
+
+                // If already loaded, resolve immediately
+                if (img.complete) {
+                    clearTimeout(timeoutId);
+                    if (img.naturalHeight === 0) {
+                        console.log(`⏭️ Image failed (no height): ${alt}`);
+                        let parentContainer = img.closest('.image-container');
+                        if (parentContainer) {
+                            imagesToRemove.add(parentContainer);
+                            console.log(`⏭️ Marking for removal (no height): ${alt}`);
+                        }
+                    } else {
+                        console.log(`✅ Image already loaded: ${alt}`);
+                    }
+                    resolve();
+                }
+            });
+        }));
+
+        // Remove all marked containers
+        console.log(`🗑️ Removing ${imagesToRemove.size} failed/invalid image containers`);
+        imagesToRemove.forEach(el => {
+            const alt = el.querySelector('img')?.getAttribute('alt') || 'unknown';
+            console.log(`✂️ Removed container: ${alt}`);
+            el.remove();
+        });
+
+        // Convert HTML to canvas
+        const canvas = await html2canvas(container, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            allowTaint: true,
+            windowHeight: container.scrollHeight,
+            windowWidth: 793
+        });
+
+        // Remove temporary container
+        document.body.removeChild(container);
+
+        // Create PDF from canvas
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        const pdf = new jsPDF('p', 'mm', 'A4');
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        // Add pages to PDF
+        while (heightLeft >= 0) {
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            position -= pageHeight;
+            if (heightLeft > 0) {
+                pdf.addPage();
+            }
+        }
+
+        // Create blob URL and open in new tab
+        const blob = pdf.output('blob');
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+
+        console.log('✅ PDF preview opened');
+        return url;
+    } catch (error) {
+        console.error('❌ PDF preview error:', error);
+        throw error;
     }
-
-    // Create blob URL and open in new tab
-    const blob = pdf.output('blob');
-    const url = window.URL.createObjectURL(blob);
-    window.open(url, '_blank');
-
-    console.log('✅ PDF preview opened');
-    return url;
-  } catch (error) {
-    console.error('❌ PDF preview error:', error);
-    throw error;
-  }
 }
 
 /**
  * Convert image URL to base64 data URI
  */
 const urlToBase64 = async (url) => {
-  if (!url) return '';
-  
-  try {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch (error) {
-    console.warn('Failed to convert image to base64:', url, error);
-    return '';
-  }
+    if (!url || typeof url !== 'string') return '';
+
+    url = url.trim();
+    if (!url) return '';
+
+    // If already base64 or data URI, return as-is
+    if (url.startsWith('data:') || url.startsWith('blob:')) {
+        return url;
+    }
+
+    try {
+        // For external domains like Cloudinary, don't use credentials to avoid CORS issues
+        // Only use credentials for same-origin requests
+        const isExternal = !url.includes(window.location.hostname);
+
+        const fetchOptions = {
+            headers: {
+                'Accept': 'image/*'
+            }
+        };
+
+        // Only include credentials for same-origin requests
+        if (!isExternal) {
+            fetchOptions.credentials = 'include';
+        }
+
+        const response = await fetch(url, fetchOptions);
+
+        if (!response.ok) {
+            console.warn('Failed to fetch image:', url, 'Status:', response.status);
+            return '';
+        }
+
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = () => {
+                console.warn('Failed to read image as data URL:', url);
+                reject(new Error('FileReader error'));
+            };
+            reader.readAsDataURL(blob);
+        });
+    } catch (error) {
+        console.warn('Failed to convert image to base64:', url, error?.message);
+        return '';
+    }
 };
 
 /**
  * Convert all image URLs in record to base64
  */
 const convertImagesToBase64 = async (record) => {
-  if (!record) return record;
+    if (!record) return record;
 
-  const recordCopy = { ...record };
+    const recordCopy = { ...record };
 
-  // Convert property images
-  if (Array.isArray(recordCopy.propertyImages)) {
-    recordCopy.propertyImages = await Promise.all(
-      recordCopy.propertyImages.map(async (img) => {
-        if (!img) return img;
-        const url = typeof img === 'string' ? img : img?.url;
-        if (!url) return img;
-        
-        const base64 = await urlToBase64(url);
-        if (typeof img === 'string') {
-          return base64 || img;
-        }
-        return { ...img, url: base64 || url };
-      })
-    );
-  }
+    // Convert property images
+    if (Array.isArray(recordCopy.propertyImages)) {
+        console.log('📸 Processing property images:', recordCopy.propertyImages.length);
+        const converted = await Promise.all(
+            recordCopy.propertyImages.map(async (img, idx) => {
+                try {
+                    // CRITICAL: Reject null/undefined/empty immediately
+                    if (!img) {
+                        console.log(`  Property image ${idx}: null/undefined/empty, skipping`);
+                        return null;
+                    }
 
-  // Convert location images
-  if (Array.isArray(recordCopy.locationImages)) {
-    recordCopy.locationImages = await Promise.all(
-      recordCopy.locationImages.map(async (img) => {
-        if (!img) return img;
-        const url = typeof img === 'string' ? img : img?.url;
-        if (!url) return img;
-        
-        const base64 = await urlToBase64(url);
-        if (typeof img === 'string') {
-          return base64 || img;
-        }
-        return { ...img, url: base64 || url };
-      })
-    );
-  }
+                    // Extract URL from different possible formats
+                    let url = '';
+                    if (typeof img === 'string') {
+                        url = img.trim();
+                    } else if (typeof img === 'object') {
+                        url = (img?.url || img?.preview || img?.data || img?.src || img?.secure_url || '').toString().trim();
+                    }
 
-  return recordCopy;
+                    // CRITICAL: Reject if URL is empty string or only whitespace
+                    if (!url || url.length === 0 || typeof url !== 'string') {
+                        console.log(`  Property image ${idx}: empty/invalid URL extracted "${url}" - FILTERING OUT`);
+                        return null;
+                    }
+
+                    url = extractImageUrl(url);
+                    if (!url) {
+                        console.log(`  Property image ${idx}: no valid URL format - FILTERING OUT`);
+                        return null; // ← CRITICAL: Return null to filter out in next step
+                    }
+
+                    console.log(`  Property image ${idx}: attempting conversion from ${url.substring(0, 60)}`);
+                    const base64 = await urlToBase64(url);
+
+                    if (base64 && base64.trim()) {
+                        if (typeof img === 'string') {
+                            return base64;
+                        }
+                        return { ...img, url: base64 };
+                    } else {
+                        // Conversion failed - return null instead of empty URL
+                        console.log(`  Property image ${idx}: conversion failed - FILTERING OUT`);
+                        return null; // ← CRITICAL: Return null instead of empty URL
+                    }
+                } catch (err) {
+                    console.warn(`Failed to convert property image ${idx}:`, err?.message);
+                    return null; // ← CRITICAL: Return null on error instead of original img
+                }
+            })
+        );
+        // ← CRITICAL: Filter out null entries
+        recordCopy.propertyImages = converted.filter(img => img !== null);
+        console.log(`📸 Property images after filtering: ${recordCopy.propertyImages.length} valid out of ${recordCopy.propertyImages.length + converted.filter(x => x === null).length} total`);
+    }
+
+    // Convert location images
+    if (Array.isArray(recordCopy.locationImages)) {
+        console.log('📸 Processing location images:', recordCopy.locationImages.length);
+        const converted = await Promise.all(
+            recordCopy.locationImages.map(async (img, idx) => {
+                try {
+                    // CRITICAL: Reject null/undefined/empty immediately
+                    if (!img) {
+                        console.log(`  Location image ${idx}: null/undefined/empty, skipping`);
+                        return null;
+                    }
+
+                    // Extract URL from different possible formats
+                    let url = '';
+                    if (typeof img === 'string') {
+                        url = img.trim();
+                    } else if (typeof img === 'object') {
+                        url = (img?.url || img?.preview || img?.data || img?.src || img?.secure_url || '').toString().trim();
+                    }
+
+                    // CRITICAL: Reject if URL is empty string or only whitespace
+                    if (!url || url.length === 0 || typeof url !== 'string') {
+                        console.log(`  Location image ${idx}: empty/invalid URL extracted "${url}" - FILTERING OUT`);
+                        return null;
+                    }
+
+                    url = extractImageUrl(url);
+                    if (!url) {
+                        console.log(`  Location image ${idx}: no valid URL format - FILTERING OUT`);
+                        return null; // ← CRITICAL: Return null to filter out in next step
+                    }
+
+                    console.log(`  Location image ${idx}: attempting conversion from ${url.substring(0, 60)}`);
+                    const base64 = await urlToBase64(url);
+
+                    if (base64 && base64.trim()) {
+                        if (typeof img === 'string') {
+                            return base64;
+                        }
+                        return { ...img, url: base64 };
+                    } else {
+                        // Conversion failed - return null instead of empty URL
+                        console.log(`  Location image ${idx}: conversion failed - FILTERING OUT`);
+                        return null; // ← CRITICAL: Return null instead of empty URL
+                    }
+                } catch (err) {
+                    console.warn(`Failed to convert location image ${idx}:`, err?.message);
+                    return null; // ← CRITICAL: Return null on error instead of original img
+                }
+            })
+        );
+        // ← CRITICAL: Filter out null entries
+        recordCopy.locationImages = converted.filter(img => img !== null);
+        console.log(`📸 Location images after filtering: ${recordCopy.locationImages.length} valid out of ${recordCopy.locationImages.length + converted.filter(x => x === null).length} total`);
+    }
+
+    console.log('✅ Image conversion complete:', {
+        propertyImages: recordCopy.propertyImages?.length || 0,
+        locationImages: recordCopy.locationImages?.length || 0
+    });
+
+    return recordCopy;
 };
 
 /**
- * Client-side PDF generation using jsPDF + html2canvas
- * Works on Vercel without server-side dependencies
+ * Convert HTML string to plain text (removes tags and preserves content)
  */
-export async function generateRecordPDFOffline(record) {
-  try {
-    console.log('📠 Generating PDF (client-side mode)');
-    console.log('📊 Input Record Structure:', {
-      recordKeys: Object.keys(record || {}),
-      rootFields: {
-        uniqueId: record?.uniqueId,
-        bankName: record?.bankName,
-        clientName: record?.clientName,
-        city: record?.city,
-        engineerName: record?.engineerName
-      },
-      pdfDetailsKeys: Object.keys(record?.pdfDetails || {}).slice(0, 20),
-      totalPdfDetailsFields: Object.keys(record?.pdfDetails || {}).length,
-      criticalFields: {
-        postalAddress: record?.pdfDetails?.postalAddress,
-        areaClassification: record?.pdfDetails?.areaClassification,
-        residentialArea: record?.pdfDetails?.residentialArea,
-        commercialArea: record?.pdfDetails?.commercialArea,
-        inspectionDate: record?.pdfDetails?.inspectionDate,
-        agreementForSale: record?.pdfDetails?.agreementForSale
-      },
-      documentsProduced: record?.documentsProduced,
-      agreementForSale_root: record?.agreementForSale,
-      agreementForSale_pdfDetails: record?.pdfDetails?.agreementForSale
-    });
+const htmlToText = (html) => {
+    if (!html) return '';
+    // Remove script and style elements
+    let text = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    text = text.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+    // Remove HTML tags
+    text = text.replace(/<[^>]+>/g, '');
+    // Decode HTML entities
+    text = text.replace(/&nbsp;/g, ' ');
+    text = text.replace(/&lt;/g, '<');
+    text = text.replace(/&gt;/g, '>');
+    text = text.replace(/&amp;/g, '&');
+    text = text.replace(/&quot;/g, '"');
+    text = text.replace(/&#39;/g, "'");
+    // Clean up extra whitespace
+    text = text.replace(/\s+/g, ' ').trim();
+    return text;
+};
 
-    // Convert images to base64 for PDF embedding
-    console.log('🖼️ Converting images to base64...');
-    const recordWithBase64Images = await convertImagesToBase64(record);
-
-    // Dynamically import jsPDF and html2canvas to avoid SSR issues
-    const { jsPDF } = await import('jspdf');
-    const html2canvas = (await import('html2canvas')).default;
-
-    // Generate HTML from the record data with base64 images
-    const htmlContent = generateValuationReportHTML(recordWithBase64Images);
-
-    // Create a temporary container
-    const container = document.createElement('div');
-    container.innerHTML = htmlContent;
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.top = '-9999px';
-    container.style.width = '210mm';
-    container.style.height = 'auto';
-    container.style.backgroundColor = '#ffffff';
-    container.style.fontSize = '9pt';
-    container.style.fontFamily = "'Calibri', 'Arial', sans-serif";
-    document.body.appendChild(container);
-
-    // Convert HTML to canvas
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      backgroundColor: '#ffffff',
-      allowTaint: true,
-      windowHeight: container.scrollHeight,
-      windowWidth: 793
-    });
-
-    // Remove temporary container
-    document.body.removeChild(container);
-
-    // Create PDF from canvas
-    const imgData = canvas.toDataURL('image/png');
-    const imgWidth = 210;
-    const pageHeight = 297;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    const pdf = new jsPDF('p', 'mm', 'A4');
-    let heightLeft = imgHeight;
-    let position = 0;
-
-    // Add pages to PDF
-    while (heightLeft >= 0) {
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-      position -= pageHeight;
-      if (heightLeft > 0) {
-        pdf.addPage();
-      }
+/**
+ * Parse HTML to extract sections for Word document
+ */
+const parseHTMLForDocx = (htmlContent) => {
+    const parser = typeof DOMParser !== 'undefined' 
+        ? new DOMParser() 
+        : null;
+    
+    if (!parser) {
+        // Fallback for Node.js environment (shouldn't happen in browser)
+        return [{
+            type: 'paragraph',
+            text: htmlToText(htmlContent)
+        }];
     }
 
-    // Download PDF
-    const filename = `valuation_${record?.clientName || record?.uniqueId || Date.now()}.pdf`;
-    pdf.save(filename);
+    try {
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        const paragraphs = [];
+        
+        const processElement = (elem) => {
+            if (!elem) return;
+            
+            for (let child of elem.childNodes) {
+                if (child.nodeType === Node.TEXT_NODE) {
+                    const text = child.textContent.trim();
+                    if (text) {
+                        paragraphs.push({
+                            text: text
+                        });
+                    }
+                } else if (child.nodeType === Node.ELEMENT_NODE) {
+                    const tagName = child.tagName.toLowerCase();
+                    const text = htmlToText(child.outerHTML);
+                    
+                    if (text) {
+                        if (['h1', 'h2', 'h3'].includes(tagName)) {
+                            paragraphs.push({
+                                text: text,
+                                heading: tagName === 'h1' ? 'Heading1' : tagName === 'h2' ? 'Heading2' : 'Heading3'
+                            });
+                        } else if (tagName === 'table') {
+                            // For tables, add table rows as separate paragraphs
+                            const rows = child.querySelectorAll('tr');
+                            rows.forEach(row => {
+                                const cells = row.querySelectorAll('td, th');
+                                const rowText = Array.from(cells)
+                                    .map(cell => cell.textContent.trim())
+                                    .join(' | ');
+                                if (rowText) {
+                                    paragraphs.push({
+                                        text: rowText
+                                    });
+                                }
+                            });
+                        } else {
+                            paragraphs.push({
+                                text: text
+                            });
+                        }
+                    }
+                    
+                    // Recursively process nested elements
+                    processElement(child);
+                }
+            }
+        };
+        
+        processElement(doc.body);
+        return paragraphs;
+    } catch (error) {
+        console.error('Error parsing HTML for DOCX:', error);
+        return [{
+            text: htmlToText(htmlContent)
+        }];
+    }
+};
 
-    console.log('✅ PDF generated and downloaded:', filename);
-    return filename;
-  } catch (error) {
-    console.error('❌ Client-side PDF generation error:', error);
-    throw error;
-  }
+/**
+ * Client-side Word document generation using docx library
+ * Generates .docx with identical data as PDF
+ */
+export async function generateRecordDOCX(record) {
+    try {
+        console.log('📝 Generating Word document...');
+        
+        // Use EXACT same data normalization as PDF
+        const normalizedData = normalizeDataForPDF(record);
+        
+        // Use EXACT same HTML generation as PDF
+        const htmlContent = generateValuationReportHTML(normalizedData);
+        
+        // Convert HTML to structured content for Word
+        const paragraphs = parseHTMLForDocx(htmlContent);
+        
+        // Dynamically import docx library
+        const { Document, Packer, Paragraph, TextRun, Table, TableCell, TableRow, BorderStyle, PageBreak, AlignmentType, VerticalAlign, UnderlineType } = await import('docx');
+        
+        // Create document sections
+        const sections = [];
+        let currentPageParagraphs = [];
+        let pageCount = 0;
+        
+        for (const para of paragraphs) {
+            let paragraphElement;
+            
+            // Create paragraph with proper formatting based on heading level
+            if (para.heading === 'Heading1') {
+                paragraphElement = new Paragraph({
+                    text: para.text || '',
+                    bold: true,
+                    size: 28, // 14pt
+                    spacing: { line: 360, lineRule: 'auto', after: 200 },
+                    border: {
+                        bottom: { color: '000000', space: 1, style: BorderStyle.SINGLE, size: 6 }
+                    }
+                });
+            } else if (para.heading === 'Heading2') {
+                paragraphElement = new Paragraph({
+                    text: para.text || '',
+                    bold: true,
+                    size: 24, // 12pt
+                    spacing: { line: 320, lineRule: 'auto', after: 150 }
+                });
+            } else if (para.heading === 'Heading3') {
+                paragraphElement = new Paragraph({
+                    text: para.text || '',
+                    bold: true,
+                    size: 22, // 11pt
+                    spacing: { line: 300, lineRule: 'auto', after: 100 }
+                });
+            } else {
+                // Regular paragraph
+                paragraphElement = new Paragraph({
+                    text: para.text || '',
+                    size: 20, // 10pt
+                    spacing: { line: 240, lineRule: 'auto', after: 80 }
+                });
+            }
+            
+            currentPageParagraphs.push(paragraphElement);
+            
+            // Add page break every ~50 paragraphs (approximate page size)
+            if (currentPageParagraphs.length >= 50) {
+                sections.push(...currentPageParagraphs);
+                sections.push(new PageBreak());
+                currentPageParagraphs = [];
+                pageCount++;
+            }
+        }
+        
+        // Add remaining paragraphs
+        if (currentPageParagraphs.length > 0) {
+            sections.push(...currentPageParagraphs);
+        }
+        
+        console.log(`📄 Word document structure: ${pageCount} full pages + final section with ${currentPageParagraphs.length} paragraphs`);
+        
+        // Create document with identical content structure as PDF
+        const doc = new Document({
+            sections: [{
+                children: sections,
+                properties: {
+                    page: {
+                        margins: {
+                            top: 720,    // 0.5 inch
+                            right: 720,
+                            bottom: 720,
+                            left: 720
+                        }
+                    }
+                }
+            }]
+        });
+        
+        // Generate and save the document
+        console.log('📦 Packing document into .docx format...');
+        const blob = await Packer.toBlob(doc);
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        const filename = `valuation_${record?.clientName || record?.uniqueId || Date.now()}.docx`;
+        
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        
+        console.log(`⬇️ Downloading: ${filename}`);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        console.log('✅ Word document generated and downloaded:', filename);
+        return filename;
+    } catch (error) {
+        console.error('❌ Word document generation error:', error);
+        throw error;
+    }
+}
+
+export async function generateRecordPDFOffline(record) {
+    try {
+        console.log('📠 Generating PDF (client-side mode)');
+        console.log('📊 Input Record Structure:', {
+            recordKeys: Object.keys(record || {}),
+            rootFields: {
+                uniqueId: record?.uniqueId,
+                bankName: record?.bankName,
+                clientName: record?.clientName,
+                city: record?.city,
+                engineerName: record?.engineerName
+            },
+            pdfDetailsKeys: Object.keys(record?.pdfDetails || {}).slice(0, 20),
+            totalPdfDetailsFields: Object.keys(record?.pdfDetails || {}).length,
+            criticalFields: {
+                postalAddress: record?.pdfDetails?.postalAddress,
+                areaClassification: record?.pdfDetails?.areaClassification,
+                residentialArea: record?.pdfDetails?.residentialArea,
+                commercialArea: record?.pdfDetails?.commercialArea,
+                inspectionDate: record?.pdfDetails?.inspectionDate,
+                agreementForSale: record?.pdfDetails?.agreementForSale
+            },
+            documentsProduced: record?.documentsProduced,
+            agreementForSale_root: record?.agreementForSale,
+            agreementForSale_pdfDetails: record?.pdfDetails?.agreementForSale,
+            // CRITICAL: Log images at start
+            propertyImages_count: Array.isArray(record?.propertyImages) ? record.propertyImages.length : 0,
+            locationImages_count: Array.isArray(record?.locationImages) ? record.locationImages.length : 0,
+            propertyImages_sample: record?.propertyImages?.slice(0, 1),
+            locationImages_sample: record?.locationImages?.slice(0, 1)
+        });
+
+        // Convert images to base64 for PDF embedding
+        console.log('🖼️ Converting images to base64...');
+        const recordWithBase64Images = await convertImagesToBase64(record);
+
+        // Dynamically import jsPDF and html2canvas to avoid SSR issues
+        const { jsPDF } = await import('jspdf');
+        const html2canvas = (await import('html2canvas')).default;
+
+        // Generate HTML from the record data with base64 images
+        const htmlContent = generateValuationReportHTML(recordWithBase64Images);
+
+        // Create a temporary container
+        const container = document.createElement('div');
+        container.innerHTML = htmlContent;
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.style.top = '-9999px';
+        container.style.width = '210mm';
+        container.style.height = 'auto';
+        container.style.backgroundColor = '#ffffff';
+        container.style.fontSize = '9pt';
+        container.style.fontFamily = "'Calibri', 'Arial', sans-serif";
+        document.body.appendChild(container);
+
+        // CRITICAL: Wait for images to load, then remove failed ones
+        const allImages = container.querySelectorAll('img.pdf-image');
+        const imagesToRemove = new Set();
+
+        // First pass: check for images with invalid src attribute
+        allImages.forEach(img => {
+            const src = img.src || img.getAttribute('data-src');
+            const alt = img.getAttribute('alt') || 'unknown';
+
+            // If image has no src or invalid src, mark container for removal
+            if (!src || !src.trim() || src === 'undefined' || src === 'null') {
+                console.log(`⏭️ Invalid image src: ${alt}`);
+                let parentContainer = img.closest('.image-container');
+                if (parentContainer) {
+                    imagesToRemove.add(parentContainer);
+                    console.log(`⏭️ Marking for removal (invalid src): ${alt}`);
+                }
+            }
+        });
+
+        // Second pass: add error listeners to detect failed load attempts
+        await Promise.all(Array.from(allImages).map(img => {
+            return new Promise((resolve) => {
+                const alt = img.getAttribute('alt') || 'unknown';
+                const timeoutId = setTimeout(() => {
+                    // If image hasn't loaded after 5 seconds, mark for removal
+                    if (!img.complete || img.naturalHeight === 0) {
+                        console.log(`⏭️ Image timeout/failed to load: ${alt}`);
+                        let parentContainer = img.closest('.image-container');
+                        if (parentContainer) {
+                            imagesToRemove.add(parentContainer);
+                            console.log(`⏭️ Marking for removal (timeout): ${alt}`);
+                        }
+                    }
+                    resolve();
+                }, 5000);
+
+                img.onload = () => {
+                    clearTimeout(timeoutId);
+                    console.log(`✅ Image loaded successfully: ${alt}`);
+                    resolve();
+                };
+
+                img.onerror = () => {
+                    clearTimeout(timeoutId);
+                    console.log(`❌ Image failed to load: ${alt}`);
+                    let parentContainer = img.closest('.image-container');
+                    if (parentContainer) {
+                        imagesToRemove.add(parentContainer);
+                        console.log(`⏭️ Marking for removal (onerror): ${alt}`);
+                    }
+                    resolve();
+                };
+
+                // If already loaded, resolve immediately
+                if (img.complete) {
+                    clearTimeout(timeoutId);
+                    if (img.naturalHeight === 0) {
+                        console.log(`⏭️ Image failed (no height): ${alt}`);
+                        let parentContainer = img.closest('.image-container');
+                        if (parentContainer) {
+                            imagesToRemove.add(parentContainer);
+                            console.log(`⏭️ Marking for removal (no height): ${alt}`);
+                        }
+                    } else {
+                        console.log(`✅ Image already loaded: ${alt}`);
+                    }
+                    resolve();
+                }
+            });
+        }));
+
+        // Remove all marked containers
+        console.log(`🗑️ Removing ${imagesToRemove.size} failed/invalid image containers`);
+        imagesToRemove.forEach(el => {
+            const alt = el.querySelector('img')?.getAttribute('alt') || 'unknown';
+            console.log(`✂️ Removed container: ${alt}`);
+            el.remove();
+        });
+
+        // Extract images and REMOVE ALL image containers from HTML
+        // This prevents empty/blank image containers from appearing in the PDF
+        console.log('⏳ Extracting images and removing containers from HTML...');
+        const images = Array.from(container.querySelectorAll('img.pdf-image'));
+        const imageData = [];
+
+        // Extract valid images and REMOVE ALL their containers
+        for (const img of images) {
+            const src = img.src || img.getAttribute('data-src');
+            const label = img.getAttribute('alt') || 'Image';
+
+            // Only extract images with valid src
+            if (src && (src.startsWith('data:') || src.startsWith('blob:') || src.startsWith('http'))) {
+                imageData.push({
+                    src,
+                    label,
+                    type: label.includes('Location') ? 'location' : 'property'
+                });
+                console.log(`📸 Extracted image: ${label}`);
+            } else {
+                console.log(`⏭️ Invalid image src, will not add to PDF: ${label}`);
+            }
+
+            // CRITICAL FIX: REMOVE the ENTIRE image container from HTML
+            // (not just hiding the image) to prevent empty boxes from rendering in PDF
+            const parentContainer = img.closest('.image-container');
+            if (parentContainer) {
+                console.log(`🗑️ Removing image container from HTML: ${label}`);
+                parentContainer.remove();
+            }
+        }
+
+        console.log('✅ Extracted', imageData.length, 'images; removed', images.length, 'containers from HTML');
+
+        // Convert HTML to canvas
+        const canvas = await html2canvas(container, {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            allowTaint: true,
+            imageTimeout: 10000, // Increased timeout for base64 images
+            windowHeight: container.scrollHeight,
+            windowWidth: 793,
+            onclone: (clonedDocument) => {
+                // Ensure all images have proper attributes for rendering
+                const clonedImages = clonedDocument.querySelectorAll('img');
+                clonedImages.forEach(img => {
+                    img.crossOrigin = 'anonymous';
+                    img.loading = 'eager';
+                    // Ensure img elements are visible
+                    img.style.display = 'block';
+                    img.style.visibility = 'visible';
+                });
+            }
+        });
+
+        // Remove temporary container
+        document.body.removeChild(container);
+
+        console.log('✅ Container removed, creating PDF...');
+
+        // Create PDF from canvas
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210;
+        const pageHeight = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        const pdf = new jsPDF('p', 'mm', 'A4');
+        let heightLeft = imgHeight;
+        let position = 0;
+
+        // Add pages to PDF from canvas
+        while (heightLeft >= 0) {
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            position -= pageHeight;
+            if (heightLeft > 0) {
+                pdf.addPage();
+            }
+        }
+
+        // Add images as separate pages
+        console.log('📸 Adding', imageData.length, 'images to PDF...');
+
+        // Filter out images with invalid src before adding to PDF
+        const validImages = imageData.filter(img => {
+            if (!img.src || typeof img.src !== 'string' || !img.src.trim()) {
+                console.log(`⏭️ Skipping image with invalid src: ${img.label}`);
+                return false;
+            }
+            return true;
+        });
+
+        if (validImages.length > 0) {
+            pdf.addPage(); // Add page for images
+
+            let imageY = 20;
+            let currentPage = pdf.getNumberOfPages();
+
+            for (let i = 0; i < validImages.length; i++) {
+                const img = validImages[i];
+                const isLocationImage = img.type === 'location';
+
+                try {
+                    // Validate src format before attempting to add
+                    if (!img.src.startsWith('data:') && !img.src.startsWith('blob:') && !img.src.startsWith('http://') && !img.src.startsWith('https://')) {
+                        console.log(`⏭️ Skipping image with invalid protocol: ${img.label}`);
+                        continue;
+                    }
+
+                    // Add image title
+                    pdf.setFontSize(11);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text(img.label, 15, imageY);
+                    imageY += 8;
+
+                    // Add image with proper sizing
+                    const imgWidth = 180; // Leave margins
+                    const imgHeight = isLocationImage ? 100 : 80;
+
+                    pdf.addImage(img.src, 'JPEG', 15, imageY, imgWidth, imgHeight);
+                    imageY += imgHeight + 15; // Space after image
+
+                    console.log(`✅ Added image: ${img.label}`);
+
+                    // Check if we need a new page
+                    if (imageY > 270) {
+                        pdf.addPage();
+                        imageY = 20;
+                    }
+                } catch (err) {
+                    console.warn(`Failed to add image ${img.label}:`, err?.message);
+                }
+            }
+        } else {
+            console.log('⏭️ No valid images to add to PDF');
+        }
+
+        // Download PDF
+        const filename = `valuation_${record?.clientName || record?.uniqueId || Date.now()}.pdf`;
+        pdf.save(filename);
+
+        console.log('✅ PDF generated and downloaded:', filename);
+        return filename;
+    } catch (error) {
+        console.error('❌ Client-side PDF generation error:', error);
+        throw error;
+    }
 }
 
 const pdfExportService = {
-  generateValuationReportHTML,
-  generateRecordPDF,
-  previewValuationPDF,
-  generateRecordPDFOffline,
-  normalizeDataForPDF
+    generateValuationReportHTML,
+    generateRecordPDF,
+    previewValuationPDF,
+    generateRecordPDFOffline,
+    generateRecordDOCX,
+    normalizeDataForPDF
 };
 
 export default pdfExportService;

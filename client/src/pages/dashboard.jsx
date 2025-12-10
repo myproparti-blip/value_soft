@@ -288,7 +288,6 @@ const DashboardPage = ({ user, onLogout, onLogin }) => {
             // DEDUPLICATION: Remove duplicates by uniqueId, keeping the NEWEST version
             const uniqueByUniqueIdMap = new Map(); // Map<uniqueId, item>
             const deduplicatedList = [];
-
             filesList.forEach(item => {
                 if (!item.uniqueId) {
                     // No uniqueId, keep it
@@ -431,6 +430,29 @@ const DashboardPage = ({ user, onLogout, onLogin }) => {
         } catch (error) {
             console.error("Download error:", error);
             showError(error.message || "Failed to download PDF");
+            dispatch(hideLoader());
+        }
+    };
+
+    const handleDownloadDOCX = async (record) => {
+        try {
+            dispatch(showLoader("Generating Word document..."));
+            
+            // Determine which DOCX service to use based on form type
+            if (record?.formType === 'bomFlat') {
+                const { generateRecordDOCX } = await import("../services/bomFlatPdf.js");
+                await generateRecordDOCX(record);
+            } else {
+                // Default to UBI Shop for ubiShop, ubiApf, or undefined
+                const { generateRecordDOCX } = await import("../services/ubiShopPdf.js");
+                await generateRecordDOCX(record);
+            }
+            
+            showSuccess("Word document downloaded successfully!");
+            dispatch(hideLoader());
+        } catch (error) {
+            console.error("Download error:", error);
+            showError(error.message || "Failed to download Word document");
             dispatch(hideLoader());
         }
     };
@@ -981,14 +1003,26 @@ const DashboardPage = ({ user, onLogout, onLogin }) => {
                                                                 </Badge>
                                                             )}
                                                             {normalizeStatus(record.status) === "approved" && (
-                                                                <Badge
-                                                                    variant="success"
-                                                                    className="text-xs px-2.5 py-1.5 cursor-pointer hover:shadow-lg hover:scale-110 font-bold transition-all duration-200 flex items-center gap-1.5"
-                                                                    onClick={() => handleDownloadPDF(record)}
-                                                                    title="Download PDF"
-                                                                >
-                                                                    <FaDownload className="h-3 w-3" />
-                                                                </Badge>
+                                                                <>
+                                                                    <Badge
+                                                                        variant="success"
+                                                                        className="text-xs px-2.5 py-1.5 cursor-pointer hover:shadow-lg hover:scale-110 font-bold transition-all duration-200 flex items-center gap-1.5 bg-green-600 hover:bg-green-700 border border-green-700"
+                                                                        onClick={() => handleDownloadPDF(record)}
+                                                                        title="Download PDF - Red Badge"
+                                                                    >
+                                                                        <FaDownload className="h-3 w-3" />
+                                                                        <span className="hidden sm:inline text-xs">PDF</span>
+                                                                    </Badge>
+                                                                    <Badge
+                                                                        variant="outline"
+                                                                        className="text-xs px-2.5 py-1.5 cursor-pointer hover:shadow-lg hover:scale-110 font-bold transition-all duration-200 flex items-center gap-1.5 bg-blue-50 border-2 border-blue-600 text-blue-700 hover:bg-blue-100 hover:border-blue-700"
+                                                                        onClick={() => handleDownloadDOCX(record)}
+                                                                        title="Download Word Document (.docx)"
+                                                                    >
+                                                                        <FaFileAlt className="h-3 w-3" />
+                                                                        <span className="hidden sm:inline text-xs">DOCX</span>
+                                                                    </Badge>
+                                                                </>
                                                             )}
                                                             {(role === "manager" || role === "admin") && (normalizeStatus(record.status) === "pending" || normalizeStatus(record.status) === "on-progress") && (
                                                                 <Badge
